@@ -1,4 +1,4 @@
-// luftqualitaet-card v1.11 (24.11.2026: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.10 (23.11.2026): Schalter 80 %, gleich gross wie die Schalter der Entitaetenkarten; v1.9: Schalter 68 %; v1.8: Schalter als ha-switch im Theme-Stil wie die uebrigen Karten; v1.7: Legende ersetzt durch Inline-Symbol vor dem Max-Wert; v1.6: Max-Werte gecacht gegen Nachrutschen beim Laden; v1.5: kein Springen mehr – DOM wird nur noch gezielt aktualisiert; v1.4: Skalen mit Farbverlauf ueber die Stufen; v1.3: Umbruch ohne Trennstriche, Wert immer auf Hoehe der ersten Namenszeile; v1.2: lange Namen umbrechen; v1.1: Untertext ueber volle Breite, schmale Karte (iPad) mit kleineren Zusatztexten und sauberen Umbruechen; v1.0) – Luftqualitaet Wohnen als Entitaetenliste im Stil der wetterstation-liste-card:
+// luftqualitaet-card v1.12 (24.11.2026: jede Zeile als leicht aufgehelltes Kaestchen im Apple-Grau (118,118,128 / 12 %, Radius 10, 4 px Abstand) wie in der Wetterstation; v1.11: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.10 (23.11.2026): Schalter 80 %, gleich gross wie die Schalter der Entitaetenkarten; v1.9: Schalter 68 %; v1.8: Schalter als ha-switch im Theme-Stil wie die uebrigen Karten; v1.7: Legende ersetzt durch Inline-Symbol vor dem Max-Wert; v1.6: Max-Werte gecacht gegen Nachrutschen beim Laden; v1.5: kein Springen mehr – DOM wird nur noch gezielt aktualisiert; v1.4: Skalen mit Farbverlauf ueber die Stufen; v1.3: Umbruch ohne Trennstriche, Wert immer auf Hoehe der ersten Namenszeile; v1.2: lange Namen umbrechen; v1.1: Untertext ueber volle Breite, schmale Karte (iPad) mit kleineren Zusatztexten und sauberen Umbruechen; v1.0) – Luftqualitaet Wohnen als Entitaetenliste im Stil der wetterstation-liste-card:
 // Schalter fuer Luftbefeuchter/Luftreiniger, Wassertank, Feinstaub und CO2 mit Stufenskala
 // (erreichte Stufen kraeftig, Rest blass, Dreieck = aktuell, gestrichelt = max. heute), Bewertungstext als Untertext.
 (() => {
@@ -19,7 +19,9 @@
     .sx { flex:0 0 calc(100% - 56px); min-width:0; margin:-12px 0 4px 56px; font-size:12px; line-height:1.35; color:var(--secondary-text-color); }
     ha-card { padding:4px 0 8px; overflow:hidden; }
     .hd { font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; padding:12px 16px 4px; color:var(--ha-card-header-color, var(--primary-text-color)); }
-    .body { padding:0 16px; }
+    .body { padding:0 16px 4px; }
+    .body > .r { padding:0 8px; margin:0 -8px 4px; border-radius:10px; background:rgba(118,118,128,.12); }
+    .body > .r:last-child { margin-bottom:4px; }
     .r { display:flex; flex-wrap:wrap; align-items:flex-start; min-height:40px; column-gap:16px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .r > .st { padding-top:10px; }
     .r > .sw { margin-top:5px; }
