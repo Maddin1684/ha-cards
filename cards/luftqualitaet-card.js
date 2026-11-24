@@ -1,4 +1,4 @@
-// luftqualitaet-card v1.10 (23.11.2026: Schalter 80 %, gleich gross wie die Schalter der Entitaetenkarten; v1.9: Schalter 68 %; v1.8: Schalter als ha-switch im Theme-Stil wie die uebrigen Karten; v1.7: Legende ersetzt durch Inline-Symbol vor dem Max-Wert; v1.6: Max-Werte gecacht gegen Nachrutschen beim Laden; v1.5: kein Springen mehr – DOM wird nur noch gezielt aktualisiert; v1.4: Skalen mit Farbverlauf ueber die Stufen; v1.3: Umbruch ohne Trennstriche, Wert immer auf Hoehe der ersten Namenszeile; v1.2: lange Namen umbrechen; v1.1: Untertext ueber volle Breite, schmale Karte (iPad) mit kleineren Zusatztexten und sauberen Umbruechen; v1.0) – Luftqualitaet Wohnen als Entitaetenliste im Stil der wetterstation-liste-card:
+// luftqualitaet-card v1.11 (24.11.2026: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.10 (23.11.2026): Schalter 80 %, gleich gross wie die Schalter der Entitaetenkarten; v1.9: Schalter 68 %; v1.8: Schalter als ha-switch im Theme-Stil wie die uebrigen Karten; v1.7: Legende ersetzt durch Inline-Symbol vor dem Max-Wert; v1.6: Max-Werte gecacht gegen Nachrutschen beim Laden; v1.5: kein Springen mehr – DOM wird nur noch gezielt aktualisiert; v1.4: Skalen mit Farbverlauf ueber die Stufen; v1.3: Umbruch ohne Trennstriche, Wert immer auf Hoehe der ersten Namenszeile; v1.2: lange Namen umbrechen; v1.1: Untertext ueber volle Breite, schmale Karte (iPad) mit kleineren Zusatztexten und sauberen Umbruechen; v1.0) – Luftqualitaet Wohnen als Entitaetenliste im Stil der wetterstation-liste-card:
 // Schalter fuer Luftbefeuchter/Luftreiniger, Wassertank, Feinstaub und CO2 mit Stufenskala
 // (erreichte Stufen kraeftig, Rest blass, Dreieck = aktuell, gestrichelt = max. heute), Bewertungstext als Untertext.
 (() => {
@@ -31,14 +31,14 @@
     .st small { font-size:12px; color:var(--secondary-text-color); margin-left:3px; }
     .bar { flex:0 0 calc(100% - 56px); min-width:0; margin:-4px 0 8px 56px; }
     .r.top > .bar, .sx + .bar { margin-top:4px; }
-    .seg { position:relative; width:100%; height:4px; display:flex; gap:2px; margin-bottom:2px; }
-    .seg > div { height:100%; border-radius:2px; opacity:.25; }
+    .seg { position:relative; width:100%; height:6px; display:flex; gap:3px; margin-bottom:2px; }
+    .seg > div { height:100%; border-radius:3px; opacity:.25; }
     .seg > div.on { opacity:1; }
-    .seg > .tri { position:absolute; top:5px; width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-bottom:6px solid #fff;
-      transform:translateX(-50%); filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000); opacity:1; border-radius:0; }
-    .seg > .mx { position:absolute; top:-5px; height:14px; width:2px; opacity:1; border-radius:0; transform:translateX(-1px);
+    .seg > .tri { position:absolute; top:8px; width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-bottom:6px solid #fff;
+      transform:translateX(-50%); filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45)); opacity:1; border-radius:0; }
+    .seg > .mx { position:absolute; top:-5px; height:16px; width:2px; opacity:1; border-radius:0; transform:translateX(-1px);
       background:repeating-linear-gradient(to bottom,#fff 0 2px,transparent 2px 4px); }
-    .tk { position:relative; width:100%; height:12px; margin-top:10px; font-size:10px; line-height:12px; color:var(--secondary-text-color); }
+    .tk { position:relative; width:100%; height:12px; margin-top:12px; font-size:10px; line-height:12px; color:var(--secondary-text-color); }
     .tk span { position:absolute; top:0; white-space:nowrap; }
     .lgd { display:flex; gap:14px; font-size:10px; color:var(--secondary-text-color); margin-top:6px; align-items:center; }
     .lgd .t { display:inline-block; width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-bottom:6px solid #fff; margin-right:4px; }
@@ -150,7 +150,7 @@
       let p0 = min; const G = 'linear-gradient(90deg,' + zones.map((z) => { const a = (p0 - min) / span * 100, b = (Math.min(z.to, max) - min) / span * 100; p0 = z.to; return `${z.c} ${((a + b) / 2).toFixed(1)}%`; }).join(',') + ')';
       const gs = (s, w) => `background-image:${G};background-size:${(10000 / Math.max(w, 0.1)).toFixed(1)}% 100%;background-position:${w >= 99.9 ? 0 : (s / (100 - w) * 100).toFixed(2)}% 0`;
       const segs = zones.map((z, i) => { const w = (z.to - prev) / span * 100, s0 = (prev - min) / span * 100, on = i === 0 || value > prev; prev = z.to;
-        return `<div class="${on ? 'on' : ''}" style="flex:0 0 calc(${w.toFixed(2)}% - 2px);${gs(s0, w)}"></div>`; }).join('');
+        return `<div class="${on ? 'on' : ''}" style="flex:0 0 calc(${w.toFixed(2)}% - 3px);${gs(s0, w)}"></div>`; }).join('');
       const tk = ticks.map(([v, t]) => { const x = pct(v); return `<span style="${x >= 97 ? 'right:0;text-align:right' : `left:${x}%`}">${t}</span>`; }).join('');
       return `<div class="bar"><div class="seg">${segs}${maxValue != null ? `<div class="mx" style="left:${pct(maxValue)}%"></div>` : ''}<i class="tri" style="left:${Math.max(1, Math.min(99, pct(value)))}%"></i></div><div class="tk">${tk}</div></div>`;
     }
