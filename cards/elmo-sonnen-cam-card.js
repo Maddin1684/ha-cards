@@ -1,4 +1,5 @@
-// ELMO Sonnen-Kamera-Karte v1.44 (24.11.2026) – Kennzeichen Reif (Logbuch rf): eigener Chip statt Schnee, Hof-Bild heisst 'Hof · Schnee/Reif'
+// ELMO Sonnen-Kamera-Karte v1.45 (24.11.2026) – Hof-Bild ohne Wolken/Himmel/Sonne, nur Schnee/Reif
+// v1.44 (24.11.2026) – Kennzeichen Reif (Logbuch rf): eigener Chip statt Schnee, Hof-Bild heisst 'Hof · Schnee/Reif'
 // v1.43 (19.11.2026) – Hoehe halten gegen Springen, grosses Bild mit fester 16:9-Flaeche
 // v1.42 (17.11.2026) – Treffsicherheit: Runden unter der Schattengrenze zaehlen gar nicht mehr (vorher nur Treffer ausgenommen, Widersprueche gezaehlt - drueckte die Quote)
 // v1.41 (16.11.2026) – bei Regen-Nowcast Chip 'Runden pausiert' statt 'naechste in xx Min' (binary_sensor.sonnen_regen_nowcast)
@@ -462,6 +463,15 @@ class ElmoSonnenCamCard extends HTMLElement {
           const si = d && d.sicherheit !== undefined ? Math.round(d.sicherheit) : null;
           const siF = si === null ? '' : (si >= 80 ? '#30d158' : (si >= 70 ? '#ffd60a' : '#ff453a'));
           const sichChip = si === null ? '' : ' <span class="kc" title="' + (si >= 70 ? 'Sicherheit der KI' : 'unter 70 % – Bild zählt nicht') + '" style="background:' + siF + '2e;color:' + siF + '"><ha-icon icon="mdi:check-circle-outline"></ha-icon>' + si + ' % sicher</span>';
+          // Hof-Bild (v1.45): nur Schnee/Reif, keine Wolken, kein Himmel, keine Sonne
+          if (v === 'std' && r.gi) {
+            const hofC = [];
+            if (r.sd && r.sd !== 'keine') hofC.push('<span class="kc" style="background:#81d4fa2e;color:#4fa3e0"><ha-icon icon="mdi:snowflake"></ha-icon>Schnee ' + r.sd + '</span>');
+            if (r.rf === true) hofC.push('<span class="kc" style="background:#bfe3ff2e;color:#9fd0ff"><ha-icon icon="mdi:snowflake-variant"></ha-icon>Reif</span>');
+            const hofT = hofC.length ? hofC.join(' ') : '<span class="kc" style="background:#8e8e932e;color:#aeaeb2"><ha-icon icon="mdi:check"></ha-icon>kein Schnee, kein Reif</span>';
+            info += '<div class="info"><b>' + name + ':</b> ' + (d ? hofT + sichChip + (d.begruendung ? ' · ' + this._esc(d.begruendung) : '') : 'keine Auswertung') + '</div>';
+            continue;
+          }
           info += '<div class="info"><b>' + name + kompass + ':</b> ' + (d ? this._chip(d.himmel_zustand) + ' ' + Math.round(d.bewoelkung_prozent) + ' % Wolken' + tonBild + (d.sonne_direkt ? ' <span class="kc" style="background:#f0a5002e;color:#f0a500"><ha-icon icon="mdi:weather-sunny"></ha-icon>Sonne</span>' : '') + sichChip + ' · ' + this._esc(d.begruendung) : 'keine Auswertung') + '</div>';
         }
         const g = this._gross[r.id];
