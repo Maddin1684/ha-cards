@@ -1,4 +1,5 @@
-// ELMO Kalibrierungs-Karte v2.4 (23.11.2026, Wunsch Martin: Pills Kamera/Station in den Runden auf gleicher Hoehe - Kurzgrund als eigene Rasterzeile darunter)
+// ELMO Kalibrierungs-Karte v2.5 (24.11.2026, Wunsch Martin: Abschnitt Schatten zeigt die letzte Meldung der Schatten-Automatik und offene Kandidaten als Chips - lila Schatten, gelb wieder frei)
+// v2.4 (23.11.2026, Wunsch Martin: Pills Kamera/Station in den Runden auf gleicher Hoehe - Kurzgrund als eigene Rasterzeile darunter)
 // v2.3 (23.11.2026, Wunsch Martin: Trefferquote fuer iPad-Breite - Runden als Raster statt Tabelle, Kurzgrund unter dem Station-Urteil statt eigener Spalte, kompaktere Kacheln; Messpunkte 42 statt 46)
 // v2.2 (23.11.2026, Wunsch Martin: weicht die Station von Kamera/Meldung ab, steht im Kasten 'So entscheidet die Station' der Grund - z. B. heller Dunst/Nebelreste bei Feuchte ab 95 %, kein Messpunkt; in der Trefferquote-Tabelle Kurzgrund bei falschen Runden)
 // v2.1 (23.11.2026, Wunsch Martin: Einstufung als dezenter Chip statt grosser gelber Schrift; Schwellen-Kasten in Klartext - was die Zahl bedeutet, Rangliste der Nachbarwerte, was sie verschieben wuerde (echte Simulation mit der Regel von sensor.sonnen_stufengrenzen), welche Punkte nicht passen, letzter Lern-Grund)
@@ -30,7 +31,8 @@ class ElmoKalibrierungCard extends HTMLElement {
     if (!this.shadowRoot) { this.attachShadow({ mode: 'open' }); }
     const keys = ['sensor.sonnenklassifikation_heute', 'sensor.sonnen_stufengrenzen', 'sensor.sonnen_entscheidung', 'sensor.sonnen_spitzenindex_20min', 'sensor.sonnen_index_10min',
       'input_text.sonnenmoment_proben_a', 'input_text.sonnenmoment_proben_b', 'input_text.sonnen_letzte_lernaenderung', 'input_text.sonnen_schwellen_grund', 'input_text.sonnen_cam_letzte_runde',
-      'input_text.sonnen_schattenkarte_morgen', 'input_text.sonnen_schattenkarte_abend', 'input_text.sonnen_schatten_kandidaten', 'sensor.sonnen_schattengrenze', 'input_text.sonnen_bestaetigt'];
+      'input_text.sonnen_schattenkarte_morgen', 'input_text.sonnen_schattenkarte_abend', 'input_text.sonnen_schatten_kandidaten', 'sensor.sonnen_schattengrenze', 'input_text.sonnen_bestaetigt',
+      'input_text.sonnen_frei_kandidaten', 'input_text.sonnen_schatten_letzte_erkennung'];
     const sig = keys.map((k) => (h.states[k] ? h.states[k].state : '')).join('§') + '§' + Math.floor(Date.now() / 60000) + '§' + (this._offen ? 1 : 0);
     if (sig === this._sig) return;
     this._sig = sig;
@@ -402,10 +404,25 @@ class ElmoKalibrierungCard extends HTMLElement {
     // 4) Schatten
     const iv = this._schattenHeute();
     const ivTxt = iv.length ? iv.map((x) => (x.abSA ? 'bis ' + x.bis + ' Uhr' : (x.bisSU ? 'ab ' + x.von + ' Uhr' : x.von + '–' + x.bis + ' Uhr'))).join(' und ') : 'Heute keine Schattenzeiten';
-    const kand = this._s('input_text.sonnen_schatten_kandidaten').split(',').filter((k) => /^[ma]\d+:[\d.]+:\d{8}$/.test(k)).map((k) => {
+    /* v2.5 (24.11.2026): Kandidaten als Chips - lila = moeglicher Schatten, gelb = Stelle wird evtl. wieder frei (script.sonnen_schatten_freigeben) */
+    const tagesteil = (ph, az) => (az >= 160 && az <= 200 ? 'mittags' : (ph === 'm' ? 'morgens' : 'nachmittags'));
+    const kandL = (id) => this._s(id).split(',').filter((k) => /^[ma]\d+:[\d.]+:\d{8}$/.test(k)).map((k) => {
       const p = k.slice(1).split(':');
-      return (k[0] === 'm' ? 'morgens' : 'nachmittags') + ' bei ' + p[0] + '° / ' + Math.round(parseFloat(p[1])) + '° (seit ' + p[2].slice(6, 8) + '.' + p[2].slice(4, 6) + '.)';
+      return { teil: tagesteil(k[0], parseFloat(p[0])), az: p[0], el: Math.round(parseFloat(p[1])), seit: p[2].slice(6, 8) + '.' + p[2].slice(4, 6) + '.' };
     });
+    const kand = kandL('input_text.sonnen_schatten_kandidaten');
+    const frei = kandL('input_text.sonnen_frei_kandidaten');
+    const icSch = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M6 20l4-9 3 5 2-3 3 7"/></svg>';
+    const icSon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+    const chips = kand.map((k) => '<span class="skc sks">' + icSch + 'Schatten · ' + k.teil + ' ' + k.az + '° bis ' + k.el + '° <small>seit ' + k.seit + '</small></span>').join('')
+      + frei.map((k) => '<span class="skc skf">' + icSon + 'wieder frei · ' + k.teil + ' ' + k.az + '° bei ' + k.el + '° <small>seit ' + k.seit + '</small></span>').join('');
+    const meldRaw = this._s('input_text.sonnen_schatten_letzte_erkennung');
+    const meldM = /^(\d{2})\.(\d{2})\. (\d{2}:\d{2}) (?:Morgen|Abend): (.*)$/.exec(meldRaw || '');
+    const heuteDM = String(new Date().getDate()).padStart(2, '0') + '.' + String(new Date().getMonth() + 1).padStart(2, '0');
+    const meld = meldM ? '<div class="skm">' + icSch.replace('width="14" height="14"', 'width="18" height="18"').replace('currentColor', '#9fe1ff') + '<div><div class="skt">Letzte Meldung · ' + (meldM[1] + '.' + meldM[2] === heuteDM ? 'heute ' : meldM[1] + '.' + meldM[2] + '. ') + meldM[3] + '</div><div class="skx">' + this._esc(meldM[4]) + '</div></div></div>'
+      : (meldRaw && !['unknown', 'unavailable', ''].includes(meldRaw) ? '<div class="skm"><div class="skx">' + this._esc(meldRaw) + '</div></div>' : '');
+    const kandBlock = meld + '<div class="skg"><span class="lab">Wartet auf einen zweiten Tag</span>'
+      + (chips ? '<div class="skcs">' + chips + '</div><span class="sek">Lila = neu gesehener Schatten, gelb = Stelle, an der die Station im Schattenfenster volles Licht gemessen hat. Bestätigt ein zweiter Tag, ändert sich die Schattenkarte; nach 30 Tagen ohne Bestätigung verfällt ein Kandidat.</span>' : '<span class="leer">Nichts offen.</span>') + '</div>';
 
     const warum = '<details class="warum"' + (this._offen ? ' open' : '') + '><summary>Warum Modell 3.0?</summary>'
       + '<p>Die Station misst nur Helligkeit. Heller Hochnebel und Sonne zwischen Wolken liefern dieselbe Helligkeit (Index 0,5–0,7) – die bis 22.11. gelernten Grenzen Bewölkt|Teilweise und Teilweise|Sonnig je Sonnenhöhe überlappten deshalb, egal wie lange gelernt wurde (18.–23.11.: Station allein 23 von 40 Kamera-Runden richtig).</p>'
@@ -428,6 +445,8 @@ class ElmoKalibrierungCard extends HTMLElement {
       + '.regel.an{background:rgba(100,210,255,.12);outline:1.5px solid rgba(100,210,255,.55)}'
       + '.pill{display:inline-block;font-weight:600;font-size:12px;padding:3px 8px;border-radius:7px;text-align:center}.bew{color:#c4c4ca;background:rgba(127,127,135,.22)}.teil{color:#ffd60a;background:rgba(255,214,10,.14)}.son{color:#ff9f0a;background:rgba(255,159,10,.18)}'
       + 'svg text{font-family:inherit}'
+      + '.skm{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);margin-top:8px}.skm svg{flex:none;margin-top:1px}.skt{font-size:12px;color:var(--secondary-text-color)}.skx{font-size:13px;line-height:1.4}'
+      + '.skg{margin-top:10px;display:flex;flex-direction:column;gap:6px}.skcs{display:flex;flex-wrap:wrap;gap:6px}.skc{display:inline-flex;align-items:center;gap:6px;padding:5px 11px 5px 8px;border-radius:999px;font-size:12.5px;font-weight:600}.skc small{font-weight:400;opacity:.75}.sks{background:rgba(111,90,138,.35);color:#d6c4f0}.skf{background:rgba(255,214,10,.14);color:#ffd60a}'
       + '.quote{display:flex;gap:10px}.q{flex:1;min-width:0;padding:8px 6px;border-radius:12px;background:rgba(255,255,255,.04);text-align:center}.q b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.q small{display:block;font-size:11px;line-height:1.35;color:var(--secondary-text-color)}.rl{display:flex;flex-direction:column}.rd{display:grid;grid-template-columns:minmax(40px,auto) 1fr 1fr 34px 16px;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12.5px;font-variant-numeric:tabular-nums}.rd>span{min-width:0}.rd .pill{font-size:11.5px;padding:2px 7px}.rd em{grid-column:3 / span 3;display:block;font-style:normal;font-size:11px;color:#98989f;margin-top:-4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rd em.du{color:#cfc3ea}.rd .sp{text-align:right}.rd .ok,.rd .nok{text-align:center}.rh{font-size:11.5px;color:var(--secondary-text-color);padding-top:2px}.z{white-space:nowrap}'
       + 'table{width:100%;border-collapse:collapse;font-size:12.5px}td,th{padding:5px 4px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}th{color:var(--secondary-text-color);font-weight:500}.ok{color:#30d158;font-weight:600}.nok{color:#ff453a;font-weight:600}'
       + '.block{display:flex;flex-direction:column;gap:4px}.lab{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--secondary-text-color)}'
@@ -443,7 +462,7 @@ class ElmoKalibrierungCard extends HTMLElement {
       + schwelleBox + quoteBox
       + '<div class="block"><h3>Was die KI zuletzt gelernt hat</h3>' + log + '</div>'
       + '<div class="block"><h3>Station im Schatten – heute</h3>' + (() => { const sun = (this._hass.states['sun.sun'] || { attributes: {} }).attributes; let sa = Date.parse(sun.next_rising), su = Date.parse(sun.next_setting); if (isNaN(sa) || isNaN(su)) return ''; if (sa > su) sa -= 86400000; if (su - sa > 86400000) su -= 86400000; const T = su - sa, m = (h) => { const d = new Date(sa); const p = h.split(':'); d.setHours(+p[0], +p[1], 0, 0); return d.getTime(); }; const pos = (t) => Math.max(0, Math.min(100, (t - sa) / T * 100)); const jetzt = Date.now(); return '<div style="position:relative;height:18px;border-radius:5px;overflow:hidden;background:rgba(255,214,10,.55);margin:4px 0 2px">' + iv.map((x) => { const a = x.abSA ? sa : m(x.von), b = x.bisSU ? su : m(x.bis); return '<span style="position:absolute;top:0;bottom:0;left:' + pos(a).toFixed(1) + '%;width:' + Math.max(0.8, pos(b) - pos(a)).toFixed(1) + '%;background:#6f5a8a"></span>'; }).join('') + (jetzt > sa && jetzt < su ? '<span style="position:absolute;top:0;bottom:0;width:3px;left:calc(' + pos(jetzt).toFixed(1) + '% - 1px);background:#64d2ff"></span>' : '') + '</div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--secondary-text-color)"><span>' + new Date(sa).toTimeString().slice(0, 5) + '</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#6f5a8a"></i> Schatten – Kamera entscheidet · <i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(255,214,10,.55)"></i> Station misst</span><span>' + new Date(su).toTimeString().slice(0, 5) + '</span></div>'; })() + '<span class="sek">' + ivTxt + '</span>'
-      + (kand.length ? '<span class="sek">Noch nicht bestätigt: möglicher Schatten ' + kand.join(', ') + ' – wartet auf einen zweiten Tag.</span>' : '') + '</div>'
+      + kandBlock + '</div>'
       + warum
       + '</ha-card>';
     const det = this.shadowRoot.querySelector('details.warum');
