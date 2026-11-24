@@ -1,4 +1,4 @@
-// ELMO Frost-Effekte v3 (24.11.2026; v2: sonniges Frostbild, Lichtschein nur auf dem Pflaster; v3: alles kraeftiger - Lichtschein der Fenster ca. doppelt so hell, Reifpunkte groesser und laenger sichtbar, Eisblumen und Dachlicht staerker): <elmo-frost-fx data-key="day|sun|night" data-stage="1|2" data-dev="desktop|ipad">
+// ELMO Frost-Effekte v4 (24.11.2026; v4: Fensterschein auf dem Hof deutlich sichtbar - zusaetzliche weiche Grundschicht ohne Rauschmaske, additives Mischen; v2: sonniges Frostbild, Lichtschein nur auf dem Pflaster; v3: alles kraeftiger - Lichtschein der Fenster ca. doppelt so hell, Reifpunkte groesser und laenger sichtbar, Eisblumen und Dachlicht staerker): <elmo-frost-fx data-key="day|sun|night" data-stage="1|2" data-dev="desktop|ipad">
 // Liegt in der ELMO-Karte (Desktop + iPad) exakt ueber dem Frost-Hausbild.
 // day = haus-bewoelkt-frost-tag.png (640x617), sun = haus-sonnig-frost-tag.png (640x619),
 // night = haus-frost-nacht.png (640x598).
@@ -142,11 +142,12 @@
     return `<svg class="pool" viewBox="0 0 640 598" preserveAspectRatio="none" aria-hidden="true"><defs>${g}`
       + `<clipPath id="slab" clipPathUnits="userSpaceOnUse"><polygon points="${SLAB.map((p) => p.join(',')).join(' ')}"/></clipPath>`
       + `<filter id="pb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>`
+      + `<filter id="pb2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>`
       + `<pattern id="nA" patternUnits="userSpaceOnUse" width="34" height="34"><image href="${nA}" width="34" height="34" preserveAspectRatio="none"/></pattern>`
       + `<pattern id="nB" patternUnits="userSpaceOnUse" width="150" height="150"><image href="${nB}" width="150" height="150" preserveAspectRatio="none"/></pattern>`
       + `<mask id="mA" color-interpolation="sRGB" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="598"><rect x="-200" y="-200" width="1040" height="1000" fill="url(#nA)"><animateTransform attributeName="transform" type="translate" from="0 0" to="34 34" dur="15s" begin="${neg(15)}" repeatCount="indefinite"/></rect></mask>`
       + `<mask id="mB" color-interpolation="sRGB" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="598"><rect x="-200" y="-200" width="1040" height="1000" fill="url(#nB)"><animateTransform attributeName="transform" type="translate" from="0 0" to="-150 150" dur="40s" begin="${neg(40)}" repeatCount="indefinite"/></rect></mask>`
-      + `</defs><g clip-path="url(#slab)"><g class="flick"><g mask="url(#mB)"><g mask="url(#mA)"><g><animate attributeName="opacity" values="0.8;1;0.8" dur="11.4s" begin="${neg(11.4)}" repeatCount="indefinite" ${spl}/>`
+      + `</defs><g clip-path="url(#slab)"><g class="flick"><g filter="url(#pb2)" opacity=".7">${polys}</g></g><g class="flick"><g mask="url(#mB)"><g mask="url(#mA)"><g><animate attributeName="opacity" values="0.8;1;0.8" dur="11.4s" begin="${neg(11.4)}" repeatCount="indefinite" ${spl}/>`
       + `<g transform="translate(360 508)"><g><animateTransform attributeName="transform" type="scale" values="0.9;1.17;0.9" dur="11.4s" begin="${neg(11.4)}" repeatCount="indefinite" ${spl}/>`
       + `<g transform="translate(-360 -508)"><g filter="url(#pb)">${polys}</g></g></g></g></g></g></g></g></g></svg>`;
   };
@@ -184,7 +185,7 @@
 .fb img{position:absolute;inset:0;width:100%;height:100%;display:block;${night ? 'mix-blend-mode:screen;' : ''}}
 .fb .band{width:45%;background:linear-gradient(90deg,rgba(${fc},0),rgba(${fc},${fa}),rgba(${fc},0));animation:elfGlim ${fper}s linear ${neg(fper, 3)} infinite}
 @keyframes elfGlim{0%{transform:translateX(-130%) skewX(20deg)}24%,100%{transform:translateX(260%) skewX(20deg)}}
-.pool{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen}
+.pool{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;mix-blend-mode:plus-lighter}
 .flick{animation:elfFlick 4.7s ease-in-out ${neg(4.7)} infinite}
 @keyframes elfFlick{0%,100%{opacity:.94}17%{opacity:1}33%{opacity:.9}52%{opacity:1}70%{opacity:.92}86%{opacity:.98}}
 i{position:absolute;width:1.8px;height:1.8px;margin:-.9px 0 0 -.9px;border-radius:50%;opacity:0;background:${night ? '#f2f6ff' : '#fff'};box-shadow:${night ? '0 0 3px .9px rgba(160,200,255,.95)' : '0 0 2.6px .8px rgba(185,218,255,1)'}}
