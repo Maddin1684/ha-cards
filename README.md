@@ -24,3 +24,10 @@ Enthält nur Karten-Code und Entitätsnamen, keine Zugangsdaten.
 | kamera-live-card.js | /local/cards/kamera-live-card.js |
 | kamera-ki-training-card.js | /local/cards/kamera-ki-training-card.js |
 | arbeitsweg-route-card.js | /local/cards/arbeitsweg-route-card.js (TomTom-Schlüssel steht in der Karten-Konfiguration, nicht hier) |
+
+## Weitere Dateien
+
+| Ordner | Inhalt | Ziel in HA |
+|---|---|---|
+| `leaflet/` | `elmo-radar-card.js` (eigene Karte) sowie Leaflet 1.9.4 (`leaflet-src.esm.js`, `leaflet.css`, unverändert) | `/config/www/leaflet/` – Downloader-Unterordner `leaflet` |
+| `python_scripts/` | `set_state.py` | `/config/python_scripts/` – **nicht** über den Downloader (der schreibt nur nach `www`, und `www` ist ohne Login abrufbar); von Hand kopieren, danach `python_script.reload` |
