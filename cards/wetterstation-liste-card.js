@@ -1,4 +1,4 @@
-// wetterstation-liste-card v1.44 (24.11.2026: ISS 'jetzt sichtbar' nur noch nach dem Ueberflug-Sensor (auch waehrend die Integration den Start weiterschiebt), sonst 'zu tief am Horizont'; v1.43: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.42: Tendenz-Bilder (Temperatur, Luftdruck) 3 px tiefer, auf Hoehe der uebrigen Icons; v1.41: Puls-Animation am Elm-Punkt laeuft nur bei aufgeklappter ISS-Karte (zugeklappt kein Dauer-Neuzeichnen mehr); v1.40: animierte Tendenz-Bilder (Pfeile) als eigene Grafikebene gegen Ruckeln auf dem iPad, ISS-Takt aendert nur noch bei offener Karte bzw. echter Aenderung; v1.39: ISS-Untertext direkt unter dem Namen wie bei Sonne/Taupunkt, Pfeil rechts unter dem Zeitpunkt, 'bei dir zu hell' heisst 'im Tageslicht'; v1.38: zusammengefuehrt mit der Parallel-Version: ISS-Bodenspur ein voller Umlauf ohne Luecken am Kartenrand; v1.37: schmale Karte (iPad): ISS-Zeitpunkt zweizeilig rechtsbuendig ('Heute' / 'um 16:11'), Grund in eigener Zeile; v1.36: ISS-Zeitpunkt rechtsbuendig ohne Umbruch, Aufklapp-Pfeil rechts unter dem Zeitpunkt, 'gerade ueber … · Grund' mit Trennpunkt; v1.35: Grund (Erdschatten usw.) in eigener Zeile unter 'gerade ueber'; v1.34: ISS-Karte mit Nachtseite, Untertext nennt den Grund (Erdschatten / bei dir zu hell / zu weit weg / jetzt sichtbar mit Blickrichtung); v1.33: Elm-Punkt wieder gruen, Beschriftung weiss; v1.32: v1.31: ISS laeuft live weiter (Bahnmodell, alle 2 s), 'gerade ueber' immer sichtbar, Beschriftung Elm; v1.30: ISS-Zeile aufklappbar mit Weltkarte – ISS-Position als Raumstation-Symbol mit Bodenspur +-45 min, Elm gruen pulsierend, 'gerade ueber ...'; klappt 30 min vor bis Ende eines sichtbaren Ueberflugs selbst auf; v1.29: Wind und Boeen ohne Nachkommastellen, aktuelle Windgeschwindigkeit farbig; v1.28: UV-Index mit Tagesmaximum (gestrichelt), nur Stufen, die mind. 5 min gehalten wurden; v1.27: Legenden ersetzt durch Inline-Symbol vor dem gestrichelt markierten Wert; v1.26: Legenden rechtsbuendig; v1.25: Legenden klein und dezent direkt unter der Skala (Luftdruck, Wind); v1.24: Tendenz-Aenderung farbig nach Vorzeichen, Luftdruck-Legende unter dem Hinweis; v1.23: 12-h-Wert farbig, Legende jetzt/vor 3 h, History-Werte gecacht gegen Nachrutschen; v1.22: Luftdruck mit 12-h-Aenderung, Marke Stand vor 3 h, Hinweis Wetterumschwung/Sturmgefahr/Hoch; v1.21: Pollen-Stufenstriche mit Abstand zum Icon; v1.20: UV-Beschriftung linksbuendig am Stufenbeginn; v1.19: Positions-Skalen (Luftdruck, Luftfeuchte, Blitz-Entfernung) nur aktiver Bereich hell, Rest 35 % statt 25 %; v1.18: kein Springen mehr – DOM wird nur noch gezielt aktualisiert, Pollen-Icons mit fester Hoehe; v1.17: Skalen mit Farbverlauf ueber die Stufen (ausser Polarlicht); v1.16: Umbruch nur an Wortgrenzen ohne Trennstriche, Wert/Status immer auf Hoehe der ersten Namenszeile; v1.15: lange Namen umbrechen; v1.14: Luftfeuchte-Icon immer weiss; v1.13: Untertext bei einzeiligem Wert ueber volle Breite, Warnmarken-Text weg, Kp schmal nebeneinander mit Kurzlabels, Sonne schmal zweizeilig; v1.12: schmale Karte (iPad): kleinere Zusatztexte, Umbruch nur zwischen Textbloecken, Kp-Werte 2x2, Skalen ohne doppelte Einheiten; v1.11: Mond-Icon optisch zentriert; v1.10: Ovation -> Sichtbarkeit Elm; v1.9: Glaette wieder entfernt (DWD-Warnung vorhanden); v1.8: Icons bei mehrzeiligen Zeilen neben dem Namen; v1.7: Pegel cm/h + Tagesmax (gestrichelt), Luftdruck-Skala Tief/normal/Hoch; v1.6: Skalen hoeher, Wert/Zeit bei mehrzeiligen Zeilen oben buendig, Kp-Werte als Spalten in Farbe + Schwellen; v1.5: Windstaerke-Max mit Umbruch, Pollen kompakt, Sonne mit Tageslaengen-Aenderung, Polarlicht Kp-Werte, Pegel-Pfeil animiert; v1.4: Boee + max. Boee zusammengefasst mit Legende, Max-Werte mit Uhrzeit, Pegel als Saeule, Pollen als senkrechte Pillen; v1.3: Grenzwerte linksbuendig, Tendenz-Aenderung unter dem Namen (Temp 1 h, Druck 3 h), Luftfeuchte-Skala Nebel/feucht/trocken, Pegel mit Tendenz, Pollen als fuellende Pillen, Haus in Blitz-Skala) – Wetterstation als Entitaetenliste wie die Ursprungskarte (Himmel/Klima/Niederschlag/Blitze/Wind aufklappbar),
+// wetterstation-liste-card v1.45 (24.11.2026: Polarlicht-Zeile aufklappbar mit kleiner Deutschlandkarte – Helligkeitsklassen aus Theusners Karte (camera.aurora_mtwetter_de) pixelgenau ausgelesen, in Martins Farben (fotografisch gelb, schwach gruen, deutlich lila halb, hell lila), dezent; 'Bei dir' am Elm-Punkt; klappt bei Polarlicht in Deutschland selbst auf; Tipp auf die Karte oeffnet das Originalbild; v1.44: ISS 'jetzt sichtbar' nur noch nach dem Ueberflug-Sensor (auch waehrend die Integration den Start weiterschiebt), sonst 'zu tief am Horizont'; v1.43: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.42: Tendenz-Bilder (Temperatur, Luftdruck) 3 px tiefer, auf Hoehe der uebrigen Icons; v1.41: Puls-Animation am Elm-Punkt laeuft nur bei aufgeklappter ISS-Karte (zugeklappt kein Dauer-Neuzeichnen mehr); v1.40: animierte Tendenz-Bilder (Pfeile) als eigene Grafikebene gegen Ruckeln auf dem iPad, ISS-Takt aendert nur noch bei offener Karte bzw. echter Aenderung; v1.39: ISS-Untertext direkt unter dem Namen wie bei Sonne/Taupunkt, Pfeil rechts unter dem Zeitpunkt, 'bei dir zu hell' heisst 'im Tageslicht'; v1.38: zusammengefuehrt mit der Parallel-Version: ISS-Bodenspur ein voller Umlauf ohne Luecken am Kartenrand; v1.37: schmale Karte (iPad): ISS-Zeitpunkt zweizeilig rechtsbuendig ('Heute' / 'um 16:11'), Grund in eigener Zeile; v1.36: ISS-Zeitpunkt rechtsbuendig ohne Umbruch, Aufklapp-Pfeil rechts unter dem Zeitpunkt, 'gerade ueber … · Grund' mit Trennpunkt; v1.35: Grund (Erdschatten usw.) in eigener Zeile unter 'gerade ueber'; v1.34: ISS-Karte mit Nachtseite, Untertext nennt den Grund (Erdschatten / bei dir zu hell / zu weit weg / jetzt sichtbar mit Blickrichtung); v1.33: Elm-Punkt wieder gruen, Beschriftung weiss; v1.32: v1.31: ISS laeuft live weiter (Bahnmodell, alle 2 s), 'gerade ueber' immer sichtbar, Beschriftung Elm; v1.30: ISS-Zeile aufklappbar mit Weltkarte – ISS-Position als Raumstation-Symbol mit Bodenspur +-45 min, Elm gruen pulsierend, 'gerade ueber ...'; klappt 30 min vor bis Ende eines sichtbaren Ueberflugs selbst auf; v1.29: Wind und Boeen ohne Nachkommastellen, aktuelle Windgeschwindigkeit farbig; v1.28: UV-Index mit Tagesmaximum (gestrichelt), nur Stufen, die mind. 5 min gehalten wurden; v1.27: Legenden ersetzt durch Inline-Symbol vor dem gestrichelt markierten Wert; v1.26: Legenden rechtsbuendig; v1.25: Legenden klein und dezent direkt unter der Skala (Luftdruck, Wind); v1.24: Tendenz-Aenderung farbig nach Vorzeichen, Luftdruck-Legende unter dem Hinweis; v1.23: 12-h-Wert farbig, Legende jetzt/vor 3 h, History-Werte gecacht gegen Nachrutschen; v1.22: Luftdruck mit 12-h-Aenderung, Marke Stand vor 3 h, Hinweis Wetterumschwung/Sturmgefahr/Hoch; v1.21: Pollen-Stufenstriche mit Abstand zum Icon; v1.20: UV-Beschriftung linksbuendig am Stufenbeginn; v1.19: Positions-Skalen (Luftdruck, Luftfeuchte, Blitz-Entfernung) nur aktiver Bereich hell, Rest 35 % statt 25 %; v1.18: kein Springen mehr – DOM wird nur noch gezielt aktualisiert, Pollen-Icons mit fester Hoehe; v1.17: Skalen mit Farbverlauf ueber die Stufen (ausser Polarlicht); v1.16: Umbruch nur an Wortgrenzen ohne Trennstriche, Wert/Status immer auf Hoehe der ersten Namenszeile; v1.15: lange Namen umbrechen; v1.14: Luftfeuchte-Icon immer weiss; v1.13: Untertext bei einzeiligem Wert ueber volle Breite, Warnmarken-Text weg, Kp schmal nebeneinander mit Kurzlabels, Sonne schmal zweizeilig; v1.12: schmale Karte (iPad): kleinere Zusatztexte, Umbruch nur zwischen Textbloecken, Kp-Werte 2x2, Skalen ohne doppelte Einheiten; v1.11: Mond-Icon optisch zentriert; v1.10: Ovation -> Sichtbarkeit Elm; v1.9: Glaette wieder entfernt (DWD-Warnung vorhanden); v1.8: Icons bei mehrzeiligen Zeilen neben dem Namen; v1.7: Pegel cm/h + Tagesmax (gestrichelt), Luftdruck-Skala Tief/normal/Hoch; v1.6: Skalen hoeher, Wert/Zeit bei mehrzeiligen Zeilen oben buendig, Kp-Werte als Spalten in Farbe + Schwellen; v1.5: Windstaerke-Max mit Umbruch, Pollen kompakt, Sonne mit Tageslaengen-Aenderung, Polarlicht Kp-Werte, Pegel-Pfeil animiert; v1.4: Boee + max. Boee zusammengefasst mit Legende, Max-Werte mit Uhrzeit, Pegel als Saeule, Pollen als senkrechte Pillen; v1.3: Grenzwerte linksbuendig, Tendenz-Aenderung unter dem Namen (Temp 1 h, Druck 3 h), Luftfeuchte-Skala Nebel/feucht/trocken, Pegel mit Tendenz, Pollen als fuellende Pillen, Haus in Blitz-Skala) – Wetterstation als Entitaetenliste wie die Ursprungskarte (Himmel/Klima/Niederschlag/Blitze/Wind aufklappbar),
 // Farben und Animationen der bisherigen uix-Styles; bei UV, Polarlicht, Temperatur am Windmesser, Taupunkt, Wind und Blitz-Entfernung rechts eine Stufenskala
 // (erreichte Stufen kraeftig, Rest blass, Dreieck = aktuell, gestrichelt = max. heute).
 (() => {
@@ -108,7 +108,22 @@
     .chips div span { font-weight:400; }
     .chips ha-icon { --mdc-icon-size:16px; }
     .ich { display:block; width:18px; --mdc-icon-size:18px; color:var(--secondary-text-color); margin:2px -3px 0 auto; transition:transform .25s; }
-    .r.iopen .ich { transform:rotate(180deg); }
+    .r.iopen .ich, .r.aopen .ich { transform:rotate(180deg); }
+    .am { flex:0 0 calc(100% - 56px); margin:0 0 0 56px; display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
+    .r.aopen .am { grid-template-rows:1fr; }
+    .am > div { overflow:hidden; min-height:0; display:flex; gap:14px; align-items:flex-start; }
+    .amap { position:relative; flex:0 0 150px; width:150px; aspect-ratio:611/790; margin:4px 0 10px; border-radius:8px; background:rgba(255,255,255,.06); overflow:hidden; }
+    .amap svg { position:absolute; inset:0; width:100%; height:100%; }
+    .amap .ie { position:absolute; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:${C.green}; }
+    .amap .ie::after { content:''; position:absolute; inset:-3px; border-radius:50%; border:1.5px solid ${C.green}; animation:ipulse 2s ease-out infinite; }
+    .r:not(.aopen) .amap .ie::after { animation:none; }
+    .amap .il { position:absolute; transform:translate(7px,-50%); font-size:10px; line-height:12px; color:#fff; text-shadow:0 0 2px #000; font-style:normal; }
+    .alg { display:flex; flex-direction:column; gap:4px; padding-top:6px; font-size:11px; line-height:1.3; color:var(--secondary-text-color); min-width:0; }
+    .alg b { font-weight:500; }
+    .alg > span:first-child { font-size:12px; margin-bottom:4px; }
+    .alg .nw { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .alg i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:0; }
+    .alg .ast { font-size:10px; opacity:.7; margin-top:4px; }
     .im { flex:0 0 calc(100% - 56px); margin:0 0 0 56px; display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
     .r.iopen .im { grid-template-rows:1fr; }
     .im > div { overflow:hidden; min-height:0; }
@@ -132,6 +147,7 @@
       .kg .l { display:none; } .kg .s { display:inline; }
       .dot, .lg { display:none; } .dl2 { display:block; }
       .kh { font-size:9px; }
+      .amap { flex-basis:128px; width:128px; } .am > div { gap:10px; } .alg { font-size:10px; } .alg > span:first-child { font-size:11px; }
       .iu, .iq { display:block; } .isep { display:none; }
     }
     @keyframes sunny { 70% { transform:rotate(360deg) scale(1); } 80% { transform:scale(1); } 90% { transform:scale(1.15); } 100% { transform:scale(1); } }
@@ -188,9 +204,9 @@
     }
     getCardSize() { return 14; }
     getGridOptions() { return { columns: 12, rows: 'auto' }; }
-    connectedCallback() { this._iv = setInterval(() => { this._sig = ''; this._render(); }, 60000); this._iv2 = setInterval(() => this._issTick(), 2000); this._loadLand(); }
+    connectedCallback() { this._iv = setInterval(() => { this._sig = ''; this._render(); }, 60000); this._iv2 = setInterval(() => this._issTick(), 2000); this._loadLand(); this._loadDE(); }
     disconnectedCallback() { clearInterval(this._iv); clearInterval(this._iv2); }
-    set hass(h) { this._hass = h; this._hist(); this._render(); }
+    set hass(h) { this._hass = h; this._hist(); this._loadAur(); this._render(); }
 
     _s(k) { const id = this._e[k]; return id ? this._hass.states[id] : undefined; }
     _v(k) { const s = this._s(k); return s ? s.state : ''; }
@@ -228,6 +244,10 @@
       const it = ev.target.closest('[data-iss]');
       if (it) { const o = it.classList.contains('iopen'); it.classList.toggle('iopen', !o); this._issMan = { open: !o, key: this._issKey(), soon: !!this._issSoon };
         try { localStorage.setItem('wslc-iss', JSON.stringify(this._issMan)); } catch (e) {} this._sig = ''; this._render(); return; }
+      if (ev.target.closest('[data-aurcam]')) { const cam = this._e.aurora_camera; if (cam && this._hass.services.browser_mod) this._hass.callService('browser_mod', 'more_info', { entity: cam, large: false, ignore_popup_card: false }); else this._more(cam); return; }
+      const ar = ev.target.closest('[data-aurora]');
+      if (ar && this._de) { const o = ar.classList.contains('aopen'); ar.classList.toggle('aopen', !o); this._aurMan = { open: !o, auto: !!this._aurAuto };
+        try { localStorage.setItem('wslc-aur', JSON.stringify(this._aurMan)); } catch (e) {} this._sig = ''; this._render(); return; }
       const t = ev.target.closest('[data-more],[data-aurora]'); if (!t) return;
       if (t.dataset.aurora) {
         const cam = this._e.aurora_camera;
@@ -355,6 +375,103 @@
       if (atl) return 'dem Atlantik';
       if (lon > 20 && lon <= 120 && lat < 30) return 'dem Indischen Ozean';
       return 'dem Pazifik';
+    }
+    /* ---------- Polarlicht-Deutschlandkarte (Daten: Theusner-Bild ueber camera.aurora_mtwetter_de) ---------- */
+    // Kartenausschnitt (Grad) und Umrechnung in SVG-Koordinaten (laengentreu skaliert mit cos 51 Grad)
+    static get AB() { return { lo0: 5.6, lo1: 15.3, la0: 47.2, la1: 55.1, k: 63 }; }
+    async _loadDE() {
+      if (this._de || this._deBusy) return;
+      try { const c = localStorage.getItem('wslc-de1'); if (c) { this._de = JSON.parse(c); this._sig = ''; this._render(); return; } } catch (e) {}
+      this._deBusy = true;
+      try {
+        const topo = await (await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')).json();
+        const { scale: k, translate: tr } = topo.transform, B = WetterstationListeCard.AB;
+        const arcs = topo.arcs.map((a) => { let x = 0, y = 0; return a.map(([dx, dy]) => { x += dx; y += dy; return [+(x * k[0] + tr[0]).toFixed(3), +(y * k[1] + tr[1]).toFixed(3)]; }); });
+        const arc = (i) => (i >= 0 ? arcs[i] : arcs[~i].slice().reverse());
+        const ring = (r) => r.reduce((pts, i, n) => pts.concat(n ? arc(i).slice(1) : arc(i)), []);
+        const near = (r) => r.some(([x, y]) => x > B.lo0 - 3 && x < B.lo1 + 3 && y > B.la0 - 3 && y < B.la1 + 3);
+        const de = [], nb = [];
+        topo.objects.countries.geometries.forEach((g) => {
+          const polys = g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : [];
+          polys.forEach((pp) => { const r = ring(pp[0]); if (!near(r)) return; (String(g.id) === '276' ? de : nb).push(r); });
+        });
+        this._de = { de, nb };
+        try { localStorage.setItem('wslc-de1', JSON.stringify(this._de)); } catch (e) {}
+        this._sig = ''; this._render();
+      } catch (e) { /* keine Umrisse verfuegbar */ }
+      this._deBusy = false;
+    }
+    // Theusner-Bild laden und je Kartenzelle die Helligkeitsklasse auslesen (0 keine, 1 fotografisch, 2 schwach, 3 deutlich, 4 hell)
+    async _loadAur() {
+      const s = this._s('aurora_camera'), url = s && s.attributes.entity_picture;
+      if (!url || this._aurBusy || (this._aurUrl === url && Date.now() - (this._aurAt || 0) < 600000)) return;
+      if (Date.now() - (this._aurAt || 0) < 240000 && this._aurGrid) return;
+      this._aurBusy = true; this._aurUrl = url;
+      try {
+        const bmp = await createImageBitmap(await (await fetch(url)).blob());
+        const cv = document.createElement('canvas'); cv.width = bmp.width; cv.height = bmp.height;
+        const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0);
+        const W = bmp.width, H = bmp.height, px = cx.getImageData(0, 0, W, H).data, f = W / 768;
+        const REF = [[248, 181, 0, 1], [120, 193, 33, 1], [255, 70, 0, 3], [132, 0, 71, 4], [248, 181, 0, 2]];
+        // Theusner-Farben: gruen = fotografisch, gelb = schwach, orange = deutlich, weinrot = hell
+        const CLS = [[120, 193, 33, 1], [248, 181, 0, 2], [255, 70, 0, 3], [132, 0, 71, 4]];
+        const at = (x, y) => { x = Math.round(x * f); y = Math.round(y * f); if (x < 0 || y < 0 || x >= W || y >= H) return 0;
+          if ((x < 152 * f && y < 342 * f) || y < 58 * f || y > 1012 * f) return 0;
+          const i = (y * W + x) * 4, r = px[i], g = px[i + 1], b = px[i + 2]; if (Math.abs(r - g) < 14 && Math.abs(g - b) < 14) return 0;
+          let best = 0, bd = 4000; CLS.forEach(([R, G, B2, c]) => { const d = (r - R) ** 2 + (g - G) ** 2 + (b - B2) ** 2; if (d < bd) { bd = d; best = c; } }); return best; };
+        // Bild-Projektion (aus Grenzlinien eingemessen): x = 205 + (lon - 7,6) * 59,1 ; y = 443 + (52,5 - lat) * 98,4
+        const ix = (lo) => 205 + (lo - 7.6) * 59.1, iy = (la) => 443 + (52.5 - la) * 98.4;
+        const B = WetterstationListeCard.AB, GW = 97, GH = 132, grid = new Uint8Array(GW * GH);
+        for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+          const lo = B.lo0 + (i + 0.5) / GW * (B.lo1 - B.lo0), la = B.la1 - (j + 0.5) / GH * (B.la1 - B.la0);
+          const x = ix(lo), y = iy(la); let m = 0;
+          for (let dy = -2; dy <= 2; dy += 2) for (let dx = -2; dx <= 2; dx += 2) { const c = at(x + dx, y + dy); if (c > m) m = c; }
+          grid[j * GW + i] = m;
+        }
+        this._aurGrid = { grid, GW, GH }; this._aurAt = Date.now();
+        const H2 = this._hass, el = H2.config && H2.config.latitude != null ? H2.config.latitude : 50.3, eo = H2.config && H2.config.longitude != null ? H2.config.longitude : 9.45;
+        let me = 0; for (let dy = -3; dy <= 3; dy += 3) for (let dx = -3; dx <= 3; dx += 3) me = Math.max(me, at(ix(eo) + dx, iy(el) + dy));
+        let top = 0; grid.forEach((c, n) => { if (c > top) { const i = n % GW, j = (n - i) / GW; if (this._inDE(B.lo0 + (i + 0.5) / GW * (B.lo1 - B.lo0), B.la1 - (j + 0.5) / GH * (B.la1 - B.la0))) top = c; } });
+        this._aurElm = me; this._aurTop = top;
+        // Farbflaeche als kleines Bild (wird in der Karte weich hochskaliert)
+        const oc = document.createElement('canvas'); oc.width = GW; oc.height = GH; const o = oc.getContext('2d'), od = o.createImageData(GW, GH);
+        const COL = [null, [255, 214, 10, 255], [48, 209, 88, 255], [191, 90, 242, 150], [191, 90, 242, 255]];
+        grid.forEach((c, n) => { if (!c) return; const q = COL[c]; od.data.set(q, n * 4); });
+        o.putImageData(od, 0, 0); this._aurImg = oc.toDataURL();
+        this._sig = ''; this._render();
+      } catch (e) { /* Bild nicht lesbar */ }
+      this._aurBusy = false;
+    }
+    _inDE(lo, la) {
+      return ((this._de && this._de.de) || []).some((r) => { let c = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [xi, yi] = r[i], [xj, yj] = r[j]; if ((yi > la) !== (yj > la) && lo < (xj - xi) * (la - yi) / (yj - yi) + xi) c = !c; } return c; });
+    }
+    _aurOpen() {
+      const auto = (this._aurTop || 0) > 0;
+      if (this._aurMan === undefined) { try { this._aurMan = JSON.parse(localStorage.getItem('wslc-aur') || 'null'); } catch (e) { this._aurMan = null; } }
+      const m = this._aurMan; this._aurAuto = auto;
+      // bei Polarlicht in Deutschland automatisch offen, ausser du hast es in dieser Lage selbst zugeklappt
+      if (auto) return m && m.auto ? m.open : true;
+      return !!(m && !m.auto && m.open);
+    }
+    _aurMap() {
+      if (!this._de) return '';
+      const B = WetterstationListeCard.AB, X = (lo) => ((lo - B.lo0) * B.k).toFixed(1), Y = (la) => ((B.la1 - la) * 100).toFixed(1);
+      const VW = Math.round((B.lo1 - B.lo0) * B.k), VH = Math.round((B.la1 - B.la0) * 100);
+      const P = (r) => 'M' + r.map(([x, y]) => `${X(x)},${Y(y)}`).join('L') + 'Z';
+      const de = this._de.de.map(P).join(''), nb = this._de.nb.map(P).join('');
+      const H = this._hass, el = H.config && H.config.latitude != null ? H.config.latitude : 50.3, eo = H.config && H.config.longitude != null ? H.config.longitude : 9.45;
+      const img = this._aurImg ? `<image href="${this._aurImg}" x="0" y="0" width="${VW}" height="${VH}" preserveAspectRatio="none"/>` : '';
+      const NM = ['nicht sichtbar', 'fotografisch', 'schwach sichtbar', 'deutlich sichtbar', 'hell'], NC = ['', C.yellow, C.green, C.purple, C.purple];
+      const me = this._aurElm || 0, t = this._aurAt ? hhmm(new Date(this._aurAt)) : '';
+      return `<div class="am"><div><div class="amap" data-aurcam="1"><svg viewBox="0 0 ${VW} ${VH}">
+        <defs><clipPath id="wdeclip"><path d="${de}"/></clipPath></defs>
+        <path d="${nb}" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.18)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        <g opacity=".1">${img}</g><g clip-path="url(#wdeclip)" opacity=".32">${img}</g>
+        <path d="${de}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+        <i class="ie" style="left:${(X(eo) / VW * 100).toFixed(2)}%;top:${(Y(el) / VH * 100).toFixed(2)}%"></i><i class="il" style="left:${(X(eo) / VW * 100).toFixed(2)}%;top:${(Y(el) / VH * 100).toFixed(2)}%">Elm</i></div>
+        <div class="alg"><span>Bei dir: <b style="color:${NC[me] || 'var(--primary-text-color)'}">${NM[me]}</b></span>
+        <span class="nw"><i style="background:${C.yellow}"></i>fotografisch</span><span class="nw"><i style="background:${C.green}"></i>schwach</span><span class="nw"><i style="background:${C.purple};opacity:.6"></i>deutlich</span><span class="nw"><i style="background:${C.purple}"></i>hell</span>
+        <span class="ast">Theusner${t ? ' · ' + t : ''}</span></div></div></div>`;
     }
     _issKey() { return String(this._a('iss_pass', 'pass_start_unix') || ''); }
     _issOpen() {
@@ -489,7 +606,8 @@
       const aAnim = aS === 'Vorwarnung' ? 'a-f3' : aI >= 4 ? 'a-f2' : '';
       const mPic = this._a('moon_phase_text', 'entity_picture');
       const full = this._v('moon_phase') === 'full_moon';
-      const auroraMini = `<div class="st" style="color:${aCol || 'var(--primary-text-color)'}">${esc(aS)}</div>` + this._bar(
+      const aOpen = this._aurOpen(), aMap = this._aurMap();
+      const auroraMini = `<div class="st" style="color:${aCol || 'var(--primary-text-color)'}">${esc(aS)}${aMap ? '<ha-icon class="ich" icon="mdi:chevron-down"></ha-icon>' : ''}</div>` + this._bar(
         STUFEN.map((x, i) => `<div class="${i <= aI ? 'on' : ''}" style="flex:1;background:${STUFEN_C[i]}"></div>`).join('') + `<i class="tri" style="left:${(aI + 0.5) / 7 * 100}%"></i>`,
         [[0, 'sehr<br>gering'], [3 / 7 * 100, 'Vorwarnung', C.yellow], [5 / 7 * 100, 'sehr<br>hoch', C.purple], [100, 'extrem', C.purple]])
         .replace(/<\/div>$/, () => {
@@ -511,7 +629,7 @@
           `<div class="st" style="color:${full ? C.yellow : 'var(--primary-text-color)'}">${esc(this._v('moon_phase_text'))}</div>`) +
         this._row('iss', ico('mdi:space-station', this._v('iss_warning') === 'on' ? 'a-f4' : ''), `ISS Überflug${im.where ? `<span class="sec"><span class="iw">gerade über ${esc(im.where)}</span><span class="isep"> · </span><span class="iq nw"${iq.c ? ` style="color:${iq.c}"` : ''}>${iq.t}</span></span>` : ''}`,
           `<div class="st" style="color:${issSoon ? C.yellow : 'var(--primary-text-color)'}">${(() => { const k = iss.indexOf(' um '); return k > 0 ? `${esc(iss.slice(0, k))} <span class="iu">${esc(iss.slice(k + 1))}</span>` : esc(iss); })()}${im.html ? '<ha-icon class="ich" icon="mdi:chevron-down"></ha-icon>' : ''}</div>${im.html}`).replace('class="r', iOpen && im.html ? 'class="r iopen' : 'class="r') +
-        this._row('aurora', ico('mdi:creation', aAnim, aCol), 'Chance Polarlichter', auroraMini)));
+        this._row('aurora', ico('mdi:creation', aAnim, aCol), 'Chance Polarlichter', auroraMini + aMap).replace('class="r', aOpen && aMap ? 'class="r aopen' : 'class="r')));
 
       /* ---------- Klima ---------- */
       const tT = this._v('temp_trend'), pT = this._v('pressure_trend');
