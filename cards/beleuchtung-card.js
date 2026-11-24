@@ -1,4 +1,4 @@
-// beleuchtung-card v1.0 (25.11.2026: Beleuchtung als Liste im Stil der wetterstation-liste-card – jeder Raum ein Kaestchen im Apple-Grau,
+// beleuchtung-card v1.1 (25.11.2026: Raum-Icons immer weiss, Status bricht um statt den Raumnamen zu kuerzen, Lampen-Karten ohne eigenen Rahmen/Hintergrund; v1.0: Beleuchtung als Liste im Stil der wetterstation-liste-card – jeder Raum ein Kaestchen im Apple-Grau,
 // Status rechts ('alle ausgeschaltet' / 'x Lichter an' gelb), dezentes Plus/Minus im Kreis zum Aufklappen, aufgeklappt die bisherigen
 // Lampen-Karten (mushroom-light-card) des Raums; ersetzt die Entitaetenkarte mit fold-entity-row).
 // Konfiguration: title, rooms: [{ name, icon, cards: [Karten-Konfigurationen] }] – die Lampen werden aus cards[].entity gelesen.
@@ -16,9 +16,9 @@
     .room:last-child { margin-bottom:4px; }
     .r { display:flex; align-items:flex-start; min-height:40px; column-gap:16px; cursor:pointer; -webkit-tap-highlight-color:transparent; user-select:none; }
     .bd { flex:0 0 40px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; }
-    .bd ha-icon { --mdc-icon-size:24px; color:var(--state-icon-color, var(--paper-item-icon-color, #44739e)); display:inline-flex; transition:color .2s; }
-    .nm { flex:1; min-width:0; font-size:14px; line-height:1.3; padding:10px 0 4px; color:var(--primary-text-color); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .st { padding-top:10px; font-size:14px; line-height:1.3; text-align:right; white-space:nowrap; color:var(--primary-text-color); }
+    .bd ha-icon { --mdc-icon-size:24px; color:#fff; display:inline-flex; }
+    .nm { flex:0 0 auto; max-width:60%; font-size:14px; line-height:1.3; padding:10px 0 4px; color:var(--primary-text-color); }
+    .st { flex:1 1 auto; min-width:0; padding:10px 0 4px; font-size:14px; line-height:1.3; text-align:right; color:var(--primary-text-color); }
     .pc { flex:0 0 14px; padding-top:13px; color:var(--secondary-text-color); opacity:.7; display:flex; justify-content:flex-end; }
     .pc ha-icon { --mdc-icon-size:13px; display:flex; }
     .pc .m, .room.open .pc .p { display:none !important; }
@@ -26,7 +26,7 @@
     .fb { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
     .room.open .fb { grid-template-rows:1fr; }
     .fi { overflow:hidden; min-height:0; }
-    .fi > * { display:block; margin:0 0 4px; }
+    .fi > * { display:block; margin:0 0 4px; --ha-card-background:transparent; --card-background-color:transparent; --ha-card-box-shadow:none; --ha-card-border-width:0; --ha-card-border-color:transparent; --ha-card-backdrop-filter:none; }
   `;
 
   const morph = (a, b) => {
@@ -94,7 +94,7 @@
       const rows = this._c.rooms.map((r, i) => {
         const on = this._lights(r).filter((id) => H.states[id] && H.states[id].state === 'on').length;
         const txt = on === 0 ? 'alle ausgeschaltet' : on === 1 ? '1 Licht an' : `${on} Lichter an`;
-        return `<div class="room${this._open[i] ? ' open' : ''}"><div class="r" data-i="${i}"><div class="bd"><ha-icon icon="${esc(r.icon || 'mdi:lightbulb-group')}"${on ? ` style="color:${C.yellow}"` : ''}></ha-icon></div>
+        return `<div class="room${this._open[i] ? ' open' : ''}"><div class="r" data-i="${i}"><div class="bd"><ha-icon icon="${esc(r.icon || 'mdi:lightbulb-group')}"></ha-icon></div>
           <div class="nm">${esc(r.name)}</div><div class="st"${on ? ` style="color:${C.yellow}"` : ''}>${txt}</div>
           <div class="pc"><ha-icon class="p" icon="mdi:plus-circle-outline"></ha-icon><ha-icon class="m" icon="mdi:minus-circle-outline"></ha-icon></div></div>
           <div class="fb"><div class="fi" data-slot="${i}" data-keep></div></div></div>`;
