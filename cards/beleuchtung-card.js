@@ -1,4 +1,4 @@
-// beleuchtung-card v1.1 (25.11.2026: Raum-Icons immer weiss, Status bricht um statt den Raumnamen zu kuerzen, Lampen-Karten ohne eigenen Rahmen/Hintergrund; v1.0: Beleuchtung als Liste im Stil der wetterstation-liste-card – jeder Raum ein Kaestchen im Apple-Grau,
+// beleuchtung-card v1.2 (25.11.2026: Knopf 'Alle aus' neben dem Titel – schaltet alle eingeschalteten Lampen der Karte aus, blass wenn keine an ist; v1.1: Raum-Icons immer weiss, Status bricht um statt den Raumnamen zu kuerzen, Lampen-Karten ohne eigenen Rahmen/Hintergrund; v1.0: Beleuchtung als Liste im Stil der wetterstation-liste-card – jeder Raum ein Kaestchen im Apple-Grau,
 // Status rechts ('alle ausgeschaltet' / 'x Lichter an' gelb), dezentes Plus/Minus im Kreis zum Aufklappen, aufgeklappt die bisherigen
 // Lampen-Karten (mushroom-light-card) des Raums; ersetzt die Entitaetenkarte mit fold-entity-row).
 // Konfiguration: title, rooms: [{ name, icon, cards: [Karten-Konfigurationen] }] – die Lampen werden aus cards[].entity gelesen.
@@ -11,6 +11,11 @@
     :host { display:block; container-type:inline-size; }
     ha-card { padding:4px 0 8px; overflow:hidden; }
     .hd { font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; padding:12px 16px 4px; color:var(--ha-card-header-color, var(--primary-text-color)); }
+    .hd { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .off { flex:0 0 auto; display:flex; align-items:center; gap:6px; height:30px; padding:0 12px 0 10px; border:0; border-radius:15px; background:rgba(118,118,128,.24); color:var(--primary-text-color); font:inherit; font-size:13px; line-height:1; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity .2s; }
+    .off ha-icon { --mdc-icon-size:16px; display:flex; color:${C.yellow}; }
+    .off.none { opacity:.4; cursor:default; }
+    .off.none ha-icon { color:var(--secondary-text-color); }
     .body { padding:0 16px 4px; }
     .room { padding:0 8px 2px; margin:0 -8px 4px; border-radius:10px; background:rgba(118,118,128,.12); }
     .room:last-child { margin-bottom:4px; }
@@ -81,6 +86,9 @@
       });
     }
     _click(ev) {
+      const off = ev.target.closest('[data-alloff]');
+      if (off) { const ids = this._c.rooms.flatMap((r) => this._lights(r)).filter((id) => this._hass.states[id] && this._hass.states[id].state === 'on');
+        if (ids.length) this._hass.callService('light', 'turn_off', { entity_id: ids }); return; }
       const row = ev.target.closest('.r'); if (!row) return;
       const i = +row.dataset.i;
       this._open[i] = !this._open[i];
@@ -90,7 +98,8 @@
     }
     _html() {
       const H = this._hass, out = [];
-      if (this._c.title !== false) out.push(`<div class="hd">${esc(this._c.title || 'Beleuchtung')}</div>`);
+      const anyOn = this._c.rooms.some((r) => this._lights(r).some((id) => H.states[id] && H.states[id].state === 'on'));
+      if (this._c.title !== false) out.push(`<div class="hd"><span>${esc(this._c.title || 'Beleuchtung')}</span><button class="off${anyOn ? '' : ' none'}" data-alloff="1" aria-label="Alle Lichter aus"><ha-icon icon="mdi:lightbulb-group-off-outline"></ha-icon>Alle aus</button></div>`);
       const rows = this._c.rooms.map((r, i) => {
         const on = this._lights(r).filter((id) => H.states[id] && H.states[id].state === 'on').length;
         const txt = on === 0 ? 'alle ausgeschaltet' : on === 1 ? '1 Licht an' : `${on} Lichter an`;
