@@ -1,4 +1,4 @@
-// wetterstation-liste-card v1.62 (24.11.2026: ISS-Kaestchen unten 3 px mehr Luft fuers Plus; v1.61: Zeilen-Kaestchen im Apple-Grau (118,118,128 / 12 %) passend zu den Ueberschrift-Kacheln; v1.60: Zeilen-Kaestchen 5 % Weiss; v1.59: jede Zeile als eigenes, ganz leicht aufgehelltes Kaestchen (3 % Weiss, Radius 10, 4 px Abstand); v1.58: neue Option 'kaesten: true' – jede Kategorie als eigene Karte ohne grossen Rahmen drumherum (zum Vergleich); v1.57: zurueck auf Stand v1.54 – keine Kategorie-Kaesten, Ueberschriften wieder mit Linie darunter; v1.56/v1.55 Kaesten verworfen; v1.54: Plus/Minus 13 px, etwas tiefer; v1.53: Plus/Minus ohne zusaetzlichen Abstand (naeher am Wert, beim Polarlicht in der Hinweiszeile statt eigener Zeile); v1.52: Ueberschrift-Kachel 28 px mit 20-px-Icon, Zeilen-Icons mittig darunter, Plus/Minus 15 px; v1.51: Zeilen-Icons buendig unter dem Ueberschrift-Icon, Namen buendig unter dem Ueberschrift-Text; dezentes Plus/Minus im Kreis statt 'Karte'/'Verlauf'; v1.50: Ueberschriften 14 px in Grossbuchstaben, rechts 'Einklappen' / 'Anzeigen' statt Pfeil; v1.49: Ueberschriften mit grauer Icon-Kachel, 15 px, Trennlinie darunter; aufklappbare Zeilen mit Kapsel 'Karte' / 'Verlauf' statt Pfeil; v1.48: Sonne aufklappbar mit Tagesbogen als duenne Verlaufslinie (Nacht grau, Blaue Stunde blau, Goldene Stunde orange, Tag gelb), Sonnenpunkt, Hoechststand, 'noch … hell' und Zeiten der Goldenen/Blauen Stunde; v1.47: Polarlicht-Karte klappt nur noch selbst auf, wenn bei dir (Elm) etwas sichtbar ist; v1.46: Polarlicht-Karte klappt ueber 'Karte' am Ende der Hinweiszeile auf (Pfeil nicht mehr an der Skala), Elm-Puls kleiner; v1.45: Polarlicht-Zeile aufklappbar mit kleiner Deutschlandkarte – Helligkeitsklassen aus Theusners Karte (camera.aurora_mtwetter_de) pixelgenau ausgelesen, in Martins Farben (fotografisch gelb, schwach gruen, deutlich lila halb, hell lila), dezent; 'Bei dir' am Elm-Punkt; klappt bei Polarlicht in Deutschland selbst auf; Tipp auf die Karte oeffnet das Originalbild; v1.44: ISS 'jetzt sichtbar' nur noch nach dem Ueberflug-Sensor (auch waehrend die Integration den Start weiterschiebt), sonst 'zu tief am Horizont'; v1.43: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.42: Tendenz-Bilder (Temperatur, Luftdruck) 3 px tiefer, auf Hoehe der uebrigen Icons; v1.41: Puls-Animation am Elm-Punkt laeuft nur bei aufgeklappter ISS-Karte (zugeklappt kein Dauer-Neuzeichnen mehr); v1.40: animierte Tendenz-Bilder (Pfeile) als eigene Grafikebene gegen Ruckeln auf dem iPad, ISS-Takt aendert nur noch bei offener Karte bzw. echter Aenderung; v1.39: ISS-Untertext direkt unter dem Namen wie bei Sonne/Taupunkt, Pfeil rechts unter dem Zeitpunkt, 'bei dir zu hell' heisst 'im Tageslicht'; v1.38: zusammengefuehrt mit der Parallel-Version: ISS-Bodenspur ein voller Umlauf ohne Luecken am Kartenrand; v1.37: schmale Karte (iPad): ISS-Zeitpunkt zweizeilig rechtsbuendig ('Heute' / 'um 16:11'), Grund in eigener Zeile; v1.36: ISS-Zeitpunkt rechtsbuendig ohne Umbruch, Aufklapp-Pfeil rechts unter dem Zeitpunkt, 'gerade ueber … · Grund' mit Trennpunkt; v1.35: Grund (Erdschatten usw.) in eigener Zeile unter 'gerade ueber'; v1.34: ISS-Karte mit Nachtseite, Untertext nennt den Grund (Erdschatten / bei dir zu hell / zu weit weg / jetzt sichtbar mit Blickrichtung); v1.33: Elm-Punkt wieder gruen, Beschriftung weiss; v1.32: v1.31: ISS laeuft live weiter (Bahnmodell, alle 2 s), 'gerade ueber' immer sichtbar, Beschriftung Elm; v1.30: ISS-Zeile aufklappbar mit Weltkarte – ISS-Position als Raumstation-Symbol mit Bodenspur +-45 min, Elm gruen pulsierend, 'gerade ueber ...'; klappt 30 min vor bis Ende eines sichtbaren Ueberflugs selbst auf; v1.29: Wind und Boeen ohne Nachkommastellen, aktuelle Windgeschwindigkeit farbig; v1.28: UV-Index mit Tagesmaximum (gestrichelt), nur Stufen, die mind. 5 min gehalten wurden; v1.27: Legenden ersetzt durch Inline-Symbol vor dem gestrichelt markierten Wert; v1.26: Legenden rechtsbuendig; v1.25: Legenden klein und dezent direkt unter der Skala (Luftdruck, Wind); v1.24: Tendenz-Aenderung farbig nach Vorzeichen, Luftdruck-Legende unter dem Hinweis; v1.23: 12-h-Wert farbig, Legende jetzt/vor 3 h, History-Werte gecacht gegen Nachrutschen; v1.22: Luftdruck mit 12-h-Aenderung, Marke Stand vor 3 h, Hinweis Wetterumschwung/Sturmgefahr/Hoch; v1.21: Pollen-Stufenstriche mit Abstand zum Icon; v1.20: UV-Beschriftung linksbuendig am Stufenbeginn; v1.19: Positions-Skalen (Luftdruck, Luftfeuchte, Blitz-Entfernung) nur aktiver Bereich hell, Rest 35 % statt 25 %; v1.18: kein Springen mehr – DOM wird nur noch gezielt aktualisiert, Pollen-Icons mit fester Hoehe; v1.17: Skalen mit Farbverlauf ueber die Stufen (ausser Polarlicht); v1.16: Umbruch nur an Wortgrenzen ohne Trennstriche, Wert/Status immer auf Hoehe der ersten Namenszeile; v1.15: lange Namen umbrechen; v1.14: Luftfeuchte-Icon immer weiss; v1.13: Untertext bei einzeiligem Wert ueber volle Breite, Warnmarken-Text weg, Kp schmal nebeneinander mit Kurzlabels, Sonne schmal zweizeilig; v1.12: schmale Karte (iPad): kleinere Zusatztexte, Umbruch nur zwischen Textbloecken, Kp-Werte 2x2, Skalen ohne doppelte Einheiten; v1.11: Mond-Icon optisch zentriert; v1.10: Ovation -> Sichtbarkeit Elm; v1.9: Glaette wieder entfernt (DWD-Warnung vorhanden); v1.8: Icons bei mehrzeiligen Zeilen neben dem Namen; v1.7: Pegel cm/h + Tagesmax (gestrichelt), Luftdruck-Skala Tief/normal/Hoch; v1.6: Skalen hoeher, Wert/Zeit bei mehrzeiligen Zeilen oben buendig, Kp-Werte als Spalten in Farbe + Schwellen; v1.5: Windstaerke-Max mit Umbruch, Pollen kompakt, Sonne mit Tageslaengen-Aenderung, Polarlicht Kp-Werte, Pegel-Pfeil animiert; v1.4: Boee + max. Boee zusammengefasst mit Legende, Max-Werte mit Uhrzeit, Pegel als Saeule, Pollen als senkrechte Pillen; v1.3: Grenzwerte linksbuendig, Tendenz-Aenderung unter dem Namen (Temp 1 h, Druck 3 h), Luftfeuchte-Skala Nebel/feucht/trocken, Pegel mit Tendenz, Pollen als fuellende Pillen, Haus in Blitz-Skala) – Wetterstation als Entitaetenliste wie die Ursprungskarte (Himmel/Klima/Niederschlag/Blitze/Wind aufklappbar),
+// wetterstation-liste-card v1.63 (25.11.2026: 'Mond' aufklappbar mit Himmel ueber Elm – Rundumblick vom Balkon (Mitte ONO), Horizont aus Copernicus-Hoehendaten (Open-Meteo, einmalig gespeichert), Berge/Orte beschriftet, zwei Windraeder (drehen nach Wind, nachts dunkel mit rotem Blinklicht), Planeten und Mond (Mondphasen-Bild) live berechnet (astronomy-engine), Grosser Wagen mit echten Sternpositionen, Textzeile mit Richtung/Hoehe und 'ueber dem …'; v1.62: ISS-Kaestchen unten 3 px mehr Luft fuers Plus; v1.61: Zeilen-Kaestchen im Apple-Grau (118,118,128 / 12 %) passend zu den Ueberschrift-Kacheln; v1.60: Zeilen-Kaestchen 5 % Weiss; v1.59: jede Zeile als eigenes, ganz leicht aufgehelltes Kaestchen (3 % Weiss, Radius 10, 4 px Abstand); v1.58: neue Option 'kaesten: true' – jede Kategorie als eigene Karte ohne grossen Rahmen drumherum (zum Vergleich); v1.57: zurueck auf Stand v1.54 – keine Kategorie-Kaesten, Ueberschriften wieder mit Linie darunter; v1.56/v1.55 Kaesten verworfen; v1.54: Plus/Minus 13 px, etwas tiefer; v1.53: Plus/Minus ohne zusaetzlichen Abstand (naeher am Wert, beim Polarlicht in der Hinweiszeile statt eigener Zeile); v1.52: Ueberschrift-Kachel 28 px mit 20-px-Icon, Zeilen-Icons mittig darunter, Plus/Minus 15 px; v1.51: Zeilen-Icons buendig unter dem Ueberschrift-Icon, Namen buendig unter dem Ueberschrift-Text; dezentes Plus/Minus im Kreis statt 'Karte'/'Verlauf'; v1.50: Ueberschriften 14 px in Grossbuchstaben, rechts 'Einklappen' / 'Anzeigen' statt Pfeil; v1.49: Ueberschriften mit grauer Icon-Kachel, 15 px, Trennlinie darunter; aufklappbare Zeilen mit Kapsel 'Karte' / 'Verlauf' statt Pfeil; v1.48: Sonne aufklappbar mit Tagesbogen als duenne Verlaufslinie (Nacht grau, Blaue Stunde blau, Goldene Stunde orange, Tag gelb), Sonnenpunkt, Hoechststand, 'noch … hell' und Zeiten der Goldenen/Blauen Stunde; v1.47: Polarlicht-Karte klappt nur noch selbst auf, wenn bei dir (Elm) etwas sichtbar ist; v1.46: Polarlicht-Karte klappt ueber 'Karte' am Ende der Hinweiszeile auf (Pfeil nicht mehr an der Skala), Elm-Puls kleiner; v1.45: Polarlicht-Zeile aufklappbar mit kleiner Deutschlandkarte – Helligkeitsklassen aus Theusners Karte (camera.aurora_mtwetter_de) pixelgenau ausgelesen, in Martins Farben (fotografisch gelb, schwach gruen, deutlich lila halb, hell lila), dezent; 'Bei dir' am Elm-Punkt; klappt bei Polarlicht in Deutschland selbst auf; Tipp auf die Karte oeffnet das Originalbild; v1.44: ISS 'jetzt sichtbar' nur noch nach dem Ueberflug-Sensor (auch waehrend die Integration den Start weiterschiebt), sonst 'zu tief am Horizont'; v1.43: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.42: Tendenz-Bilder (Temperatur, Luftdruck) 3 px tiefer, auf Hoehe der uebrigen Icons; v1.41: Puls-Animation am Elm-Punkt laeuft nur bei aufgeklappter ISS-Karte (zugeklappt kein Dauer-Neuzeichnen mehr); v1.40: animierte Tendenz-Bilder (Pfeile) als eigene Grafikebene gegen Ruckeln auf dem iPad, ISS-Takt aendert nur noch bei offener Karte bzw. echter Aenderung; v1.39: ISS-Untertext direkt unter dem Namen wie bei Sonne/Taupunkt, Pfeil rechts unter dem Zeitpunkt, 'bei dir zu hell' heisst 'im Tageslicht'; v1.38: zusammengefuehrt mit der Parallel-Version: ISS-Bodenspur ein voller Umlauf ohne Luecken am Kartenrand; v1.37: schmale Karte (iPad): ISS-Zeitpunkt zweizeilig rechtsbuendig ('Heute' / 'um 16:11'), Grund in eigener Zeile; v1.36: ISS-Zeitpunkt rechtsbuendig ohne Umbruch, Aufklapp-Pfeil rechts unter dem Zeitpunkt, 'gerade ueber … · Grund' mit Trennpunkt; v1.35: Grund (Erdschatten usw.) in eigener Zeile unter 'gerade ueber'; v1.34: ISS-Karte mit Nachtseite, Untertext nennt den Grund (Erdschatten / bei dir zu hell / zu weit weg / jetzt sichtbar mit Blickrichtung); v1.33: Elm-Punkt wieder gruen, Beschriftung weiss; v1.32: v1.31: ISS laeuft live weiter (Bahnmodell, alle 2 s), 'gerade ueber' immer sichtbar, Beschriftung Elm; v1.30: ISS-Zeile aufklappbar mit Weltkarte – ISS-Position als Raumstation-Symbol mit Bodenspur +-45 min, Elm gruen pulsierend, 'gerade ueber ...'; klappt 30 min vor bis Ende eines sichtbaren Ueberflugs selbst auf; v1.29: Wind und Boeen ohne Nachkommastellen, aktuelle Windgeschwindigkeit farbig; v1.28: UV-Index mit Tagesmaximum (gestrichelt), nur Stufen, die mind. 5 min gehalten wurden; v1.27: Legenden ersetzt durch Inline-Symbol vor dem gestrichelt markierten Wert; v1.26: Legenden rechtsbuendig; v1.25: Legenden klein und dezent direkt unter der Skala (Luftdruck, Wind); v1.24: Tendenz-Aenderung farbig nach Vorzeichen, Luftdruck-Legende unter dem Hinweis; v1.23: 12-h-Wert farbig, Legende jetzt/vor 3 h, History-Werte gecacht gegen Nachrutschen; v1.22: Luftdruck mit 12-h-Aenderung, Marke Stand vor 3 h, Hinweis Wetterumschwung/Sturmgefahr/Hoch; v1.21: Pollen-Stufenstriche mit Abstand zum Icon; v1.20: UV-Beschriftung linksbuendig am Stufenbeginn; v1.19: Positions-Skalen (Luftdruck, Luftfeuchte, Blitz-Entfernung) nur aktiver Bereich hell, Rest 35 % statt 25 %; v1.18: kein Springen mehr – DOM wird nur noch gezielt aktualisiert, Pollen-Icons mit fester Hoehe; v1.17: Skalen mit Farbverlauf ueber die Stufen (ausser Polarlicht); v1.16: Umbruch nur an Wortgrenzen ohne Trennstriche, Wert/Status immer auf Hoehe der ersten Namenszeile; v1.15: lange Namen umbrechen; v1.14: Luftfeuchte-Icon immer weiss; v1.13: Untertext bei einzeiligem Wert ueber volle Breite, Warnmarken-Text weg, Kp schmal nebeneinander mit Kurzlabels, Sonne schmal zweizeilig; v1.12: schmale Karte (iPad): kleinere Zusatztexte, Umbruch nur zwischen Textbloecken, Kp-Werte 2x2, Skalen ohne doppelte Einheiten; v1.11: Mond-Icon optisch zentriert; v1.10: Ovation -> Sichtbarkeit Elm; v1.9: Glaette wieder entfernt (DWD-Warnung vorhanden); v1.8: Icons bei mehrzeiligen Zeilen neben dem Namen; v1.7: Pegel cm/h + Tagesmax (gestrichelt), Luftdruck-Skala Tief/normal/Hoch; v1.6: Skalen hoeher, Wert/Zeit bei mehrzeiligen Zeilen oben buendig, Kp-Werte als Spalten in Farbe + Schwellen; v1.5: Windstaerke-Max mit Umbruch, Pollen kompakt, Sonne mit Tageslaengen-Aenderung, Polarlicht Kp-Werte, Pegel-Pfeil animiert; v1.4: Boee + max. Boee zusammengefasst mit Legende, Max-Werte mit Uhrzeit, Pegel als Saeule, Pollen als senkrechte Pillen; v1.3: Grenzwerte linksbuendig, Tendenz-Aenderung unter dem Namen (Temp 1 h, Druck 3 h), Luftfeuchte-Skala Nebel/feucht/trocken, Pegel mit Tendenz, Pollen als fuellende Pillen, Haus in Blitz-Skala) – Wetterstation als Entitaetenliste wie die Ursprungskarte (Himmel/Klima/Niederschlag/Blitze/Wind aufklappbar),
 // Farben und Animationen der bisherigen uix-Styles; bei UV, Polarlicht, Temperatur am Windmesser, Taupunkt, Wind und Blitz-Entfernung rechts eine Stufenskala
 // (erreichte Stufen kraeftig, Rest blass, Dreieck = aktuell, gestrichelt = max. heute).
 (() => {
@@ -129,8 +129,20 @@
     .pw { display:block; text-align:right; margin:3px -1px -2px 0; line-height:0; }
     .pc { display:inline-flex; color:var(--secondary-text-color); opacity:.7; }
     .pc ha-icon { --mdc-icon-size:13px; display:flex; }
-    .pc .m, .r.iopen .pc .p, .r.aopen .pc .p, .r.sopen .pc .p { display:none !important; }
-    .r.iopen .pc .m, .r.aopen .pc .m, .r.sopen .pc .m { display:flex !important; }
+    .pc .m, .r.iopen .pc .p, .r.aopen .pc .p, .r.sopen .pc .p, .r.kopen .pc .p { display:none !important; }
+    .r.iopen .pc .m, .r.aopen .pc .m, .r.sopen .pc .m, .r.kopen .pc .m { display:flex !important; }
+    .pm { flex:0 0 calc(100% - 44px); margin:0 0 0 44px; display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
+    .r.kopen .pm { grid-template-rows:1fr; }
+    .pm > div { overflow:hidden; min-height:0; }
+    .skysvg { display:block; width:100%; height:auto; margin-top:2px; border-radius:8px; }
+    .skt { font-size:7.5px; }
+    .skl { font-size:12px; color:var(--secondary-text-color); padding:6px 0 10px; }
+    .sdot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:4px; }
+    @keyframes wspin { to { transform:rotate(360deg); } }
+    @keyframes wblink { 0%, 45% { opacity:1; } 50%, 100% { opacity:.08; } }
+    .wtr { animation:wspin 4s linear infinite; transform-box:fill-box; transform-origin:center; }
+    .wbl { animation:wblink 1.5s steps(1) infinite; }
+    .r:not(.kopen) .wtr, .r:not(.kopen) .wbl { animation:none; }
     .r > .sst { padding-top:10px; }
     .sm { flex:0 0 calc(100% - 44px); margin:0 0 0 44px; display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
     .r.sopen .sm { grid-template-rows:1fr; }
@@ -272,6 +284,9 @@
         try { localStorage.setItem('wslc-open', JSON.stringify(this._open)); } catch (e) {}
         return;
       }
+      const ky = ev.target.closest('[data-sky]');
+      if (ky) { const o = ky.classList.contains('kopen'); ky.classList.toggle('kopen', !o); this._skyMan = !o;
+        try { localStorage.setItem('wslc-sky', !o ? '1' : '0'); } catch (e) {} this._sig = ''; this._render(); return; }
       const su = ev.target.closest('[data-sun]');
       if (su) { const o = su.classList.contains('sopen'); su.classList.toggle('sopen', !o); this._sunMan = !o;
         try { localStorage.setItem('wslc-sun', !o ? '1' : '0'); } catch (e) {} this._sig = ''; this._render(); return; }
@@ -540,6 +555,136 @@
         <circle cx="${f(X(now))}" cy="${f(Y(en))}" r="4" fill="${en > 0 ? C.yellow : C.gray}" stroke="var(--ha-card-background, var(--card-background-color, #1c1c1e))" stroke-width="1.5"/></svg>
         <div class="sin"><span>${rest}</span><span class="nw" style="color:${C.orange}">Goldene Stunde ${T(b1)}–${T(g1)} · ${T(g2)}–${T(b2)}</span><span class="nw" style="color:#64a8ff">Blaue Stunde ${T(b0)}–${T(b1)} · ${T(b2)}–${T(b3)}</span></div></div></div>`;
     }
+    /* ---------- Himmel ueber Elm (aufklappbar unter 'Mond'): Horizont aus Hoehendaten, Planeten, Mond, Grosser Wagen ---------- */
+    static get SKY_MARKS() { return [
+      { n: 'Ebertsberg', t: 'peak', lat: 50.36189, lon: 9.5689637 }, { n: 'Kohlewald', t: 'peak', lat: 50.3572083, lon: 9.5842084 },
+      { n: 'Neuberg', t: 'peak', lat: 50.3506035, lon: 9.5889334 }, { n: 'Giebel', t: 'peak', lat: 50.3510537, lon: 9.5479394 },
+      { n: 'Weinberg', t: 'peak', lat: 50.3537279, lon: 9.5448751 }, { n: 'Berghof', t: 'pin', lat: 50.3729703, lon: 9.5615709 },
+      { n: 'Breites Feld', t: 'pin', lat: 50.3785, lon: 9.5620728 }, { n: 'Schlüchtern', t: 'pin', lat: 50.3480278, lon: 9.5250073 },
+      { t: 'wind', lat: 50.3612398, lon: 9.5853037 }, { t: 'wind', lat: 50.3641666, lon: 9.5819463 }]; }
+    _skyOpen() {
+      if (this._skyMan === undefined) { try { this._skyMan = localStorage.getItem('wslc-sky') === '1'; } catch (e) { this._skyMan = false; } }
+      return this._skyMan;
+    }
+    _loadAstro() {
+      if (window.Astronomy || this._astroBusy) return;
+      this._astroBusy = true;
+      const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/astronomy-engine@2/astronomy.browser.min.js';
+      sc.onload = () => { this._sig = ''; this._render(); }; sc.onerror = () => { this._astroBusy = false; this._astroErr = true; this._sig = ''; this._render(); };
+      document.head.appendChild(sc);
+    }
+    _dest(la, lo, az, d) {
+      const r = Math.PI / 180, R = 6371000, p1 = la * r, dd = d / R;
+      const p2 = Math.asin(Math.sin(p1) * Math.cos(dd) + Math.cos(p1) * Math.sin(dd) * Math.cos(az));
+      return [p2 / r, lo + Math.atan2(Math.sin(az) * Math.sin(dd) * Math.cos(p1), Math.cos(dd) - Math.sin(p1) * Math.sin(p2)) / r];
+    }
+    _azDist(la, lo, la2, lo2) {
+      const r = Math.PI / 180, dl = (lo2 - lo) * r, y = Math.sin(dl) * Math.cos(la2 * r), x = Math.cos(la * r) * Math.sin(la2 * r) - Math.sin(la * r) * Math.cos(la2 * r) * Math.cos(dl);
+      const a = Math.sin((la2 - la) * r / 2) ** 2 + Math.cos(la * r) * Math.cos(la2 * r) * Math.sin(dl / 2) ** 2;
+      return [((Math.atan2(y, x) / r) + 360) % 360, 12742000 * Math.asin(Math.sqrt(a))];
+    }
+    // Horizontlinie einmalig aus dem Copernicus-Hoehenmodell (Open-Meteo) berechnen und dauerhaft speichern
+    async _loadHorizon() {
+      if (this._hor || this._horBusy) return;
+      const H = this._hass, la = H.config.latitude, lo = H.config.longitude, M = this._c.sky_marks || WetterstationListeCard.SKY_MARKS;
+      const key = 'wslc-hor2:' + la.toFixed(4) + ',' + lo.toFixed(4) + ':' + M.length + ':' + M.reduce((t, m) => t + m.lat + m.lon, 0).toFixed(4);
+      try { const c = localStorage.getItem(key); if (c) { this._hor = JSON.parse(c); this._sig = ''; this._render(); return; } } catch (e) {}
+      this._horBusy = true;
+      try {
+        const D = [150, 300, 450, 600, 800, 1000, 1200, 1450, 1700, 2000, 2400, 2800, 3300, 4000, 5000, 6500, 8000, 10000, 13000], N = 180;
+        const pts = [[la, lo]];
+        for (let i = 0; i < N; i++) D.forEach((d) => pts.push(this._dest(la, lo, i * 2 * Math.PI / 180, d)));
+        M.forEach((m) => pts.push([m.lat, m.lon]));
+        const el = [];
+        for (let k = 0; k < pts.length; k += 100) {
+          const ch = pts.slice(k, k + 100);
+          const r = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${ch.map((q) => q[0].toFixed(5)).join(',')}&longitude=${ch.map((q) => q[1].toFixed(5)).join(',')}`);
+          const j = await r.json(); if (!j.elevation) throw new Error('Hoehendaten'); el.push(...j.elevation);
+        }
+        const h0 = el[0] + (this._c.sky_eye_height != null ? this._c.sky_eye_height : 6), ang = (h, d) => Math.atan((h - h0 - d * d / 14700000) / d) * 180 / Math.PI;
+        const near = [], far = []; let n = 1;
+        for (let i = 0; i < N; i++) { let a1 = -3, a2 = -3; D.forEach((d) => { const a = ang(el[n++], d); if (d < 3000) a1 = Math.max(a1, a); else a2 = Math.max(a2, a); }); near.push(+a1.toFixed(2)); far.push(+a2.toFixed(2)); }
+        const marks = M.map((m, i) => { const [az, d] = this._azDist(la, lo, m.lat, m.lon); return Object.assign({}, m, { az: +az.toFixed(1), d: Math.round(d), el: el[n + i] }); });
+        this._hor = { h0, near, far, marks };
+        try { localStorage.setItem(key, JSON.stringify(this._hor)); } catch (e) {}
+        this._sig = ''; this._render();
+      } catch (e) { this._horErr = true; this._sig = ''; this._render(); }
+      this._horBusy = false;
+    }
+    _horAt(az, arr) {
+      const a = arr || this._hor.near, f = (((az % 360) + 360) % 360) / 2, i = Math.floor(f) % a.length, j = (i + 1) % a.length;
+      return a[i] + (a[j] - a[i]) * (f - Math.floor(f));
+    }
+    _skyHtml() {
+      const H = this._hass, A = window.Astronomy;
+      if (!this._skyOpen() && !this._skyHad) return '<div class="pm"><div></div></div>';
+      this._skyHad = true; this._loadAstro(); this._loadHorizon();
+      if (!A || !this._hor) return `<div class="pm"><div><div class="skl">${this._astroErr || this._horErr ? 'Himmelsdaten nicht erreichbar' : 'Himmel wird berechnet …'}</div></div></div>`;
+      const W = 320, HH = 140, hz = 100, C = this._c.sky_center != null ? this._c.sky_center : 62;
+      const X = (az) => ((az - C + 540) % 360) / 360 * W;
+      const Y = (al) => (al <= 10 ? hz - al * 4 : hz - 40 - (Math.min(al, 85) - 10) * 0.76);
+      const f1 = (v) => v.toFixed(1), now = new Date(), obs = new A.Observer(H.config.latitude, H.config.longitude, this._hor.h0);
+      const hor = (body) => { const e = A.Equator(body, now, obs, true, true); return A.Horizon(now, obs, e.ra, e.dec, 'normal'); };
+      const sun = hor('Sun').altitude, night = sun < -6, dark = sun < -3;
+      const DIR = ['N', 'NNO', 'NO', 'ONO', 'O', 'OSO', 'SO', 'SSO', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'], dir = (az) => DIR[Math.round(az / 22.5) % 16];
+      const sky = sun > 0 ? ['#2c5b9a', '#8fb3d9'] : sun > -6 ? ['#141d40', '#5b5f8a'] : ['#070914', '#2a3560'];
+      const ridge = sun > 0 ? ['#4a6a52', '#22331e', 'rgba(255,255,255,.35)'] : ['#1a2140', '#05070e', 'rgba(150,170,220,.55)'];
+      let s = `<svg class="skysvg" viewBox="0 0 ${W} ${HH}"><defs><linearGradient id="wskyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset=".7" stop-color="${sky[1]}"/></linearGradient></defs><rect width="${W}" height="${HH}" fill="url(#wskyg)"/>`;
+      if (night) for (let i = 0; i < 55; i++) s += `<circle cx="${f1((i * 73.3) % W)}" cy="${f1(4 + (i * 37.1) % (hz - 30))}" r="${i % 7 ? 0.4 : 0.65}" fill="#fff" opacity="${i % 3 ? 0.25 : 0.5}"/>`;
+      // Grosser Wagen (echte Sternpositionen)
+      let uma = null;
+      if (night) {
+        const S = [[11.0621, 61.751, 1.8], [11.0307, 56.382, 2.4], [11.8972, 53.695, 2.4], [12.2571, 57.033, 3.3], [12.9005, 55.960, 1.8], [13.3988, 54.925, 2.2], [13.7923, 49.313, 1.9], [13.4204, 54.988, 4.0]]
+          .map(([ra, de, m]) => { const h = A.Horizon(now, obs, ra, de, 'normal'); return { x: X(h.azimuth), y: Y(h.altitude), al: h.altitude, az: h.azimuth, r: Math.max(0.45, 1.9 - 0.38 * m) }; });
+        if (S.some((q) => q.al > 0)) {
+          [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [4, 5], [5, 6]].forEach(([a, b]) => { if (Math.abs(S[a].x - S[b].x) < W / 2) s += `<line x1="${f1(S[a].x)}" y1="${f1(S[a].y)}" x2="${f1(S[b].x)}" y2="${f1(S[b].y)}" stroke="rgba(170,200,255,.35)" stroke-width=".6"/>`; });
+          S.forEach((q) => { s += `<circle cx="${f1(q.x)}" cy="${f1(q.y)}" r="${q.r.toFixed(2)}" fill="#fff"/>`; });
+          s += `<text x="${f1(S[3].x)}" y="${f1(Math.min(...S.map((q) => q.y)) - 6)}" class="skt" fill="rgba(170,200,255,.8)" text-anchor="middle">Großer Wagen</text>`;
+          const al = S.slice(0, 7).map((q) => q.al); uma = { az: S[3].az, lo: Math.round(Math.min(...al)), hi: Math.round(Math.max(...al)) };
+        }
+      }
+      // Planeten und Mond
+      const BOD = [['Moon', 'Mond', '#d9d4c7', 0], ['Venus', 'Venus', '#fffbe6', 2.1], ['Jupiter', 'Jupiter', '#f5deb3', 2], ['Mars', 'Mars', '#ff6b4a', 1.5], ['Saturn', 'Saturn', '#e6c27a', 1.6], ['Mercury', 'Merkur', '#c7c7cc', 1.3]];
+      const bodies = BOD.map(([b, n, c, r]) => { const h = hor(b); const top = h.altitude > this._horAt(h.azimuth) + 0.3;
+        return { b, n, c, r, az: h.azimuth, al: h.altitude, vis: top && (b === 'Moon' || night || (b === 'Venus' && sun < -2)) }; });
+      const mPic = this._a('moon_phase_text', 'entity_picture');
+      bodies.forEach((q) => {
+        if (q.al < -1) return; const x = X(q.az), y = Y(q.al);
+        if (q.b === 'Moon') { s += mPic ? `<image href="${esc(mPic)}" x="${f1(x - 5)}" y="${f1(y - 5)}" width="10" height="10"/>` : `<circle cx="${f1(x)}" cy="${f1(y)}" r="4.5" fill="${q.c}"/>`; s += `<text x="${f1(x)}" y="${f1(y - 8)}" class="skt" fill="rgba(235,235,245,.75)" text-anchor="middle">Mond</text>`; return; }
+        s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${q.r}" fill="${q.c}" opacity="${q.vis ? 1 : 0.35}"/>` + (q.vis ? `<circle cx="${f1(x)}" cy="${f1(y)}" r="${q.r + 2.2}" fill="none" stroke="${q.c}" stroke-opacity=".3" stroke-width=".7"/>` : '') +
+          `<text x="${f1(x)}" y="${f1(y - q.r - 4)}" class="skt" fill="${q.vis ? '#fff' : 'rgba(235,235,245,.45)'}" text-anchor="middle">${q.n}</text>`;
+      });
+      // Windraeder (hinter der vorderen Bergkante), Drehzahl nach Wind
+      const ws = num(this._v('wind')), spin = ws >= 3 ? `animation-duration:${Math.max(1.6, 9 - ws / 4).toFixed(1)}s` : 'animation:none';
+      const path = (arr) => { let d = ''; for (let i = 0; i <= W; i += 2) { const az = C - 180 + i / W * 360; d += (d ? 'L' : 'M') + i + ',' + f1(Y(this._horAt(az, arr))); } return d; };
+      const far = path(this._hor.far), near = path(this._hor.near), tcol = sun > 0 ? '#f2f2f7' : '#3a3a3c';
+      s += `<path d="${far}L${W},${HH}L0,${HH}Z" fill="${ridge[0]}"/><path d="${far}" fill="none" stroke="${ridge[2]}" stroke-opacity=".6" stroke-width=".6"/>`;
+      this._hor.marks.filter((m) => m.t === 'wind').forEach((m, k) => {
+        const hub = Math.atan((m.el + (this._c.sky_hub || 140) - this._hor.h0) / m.d) * 180 / Math.PI, base = Math.atan((m.el - this._hor.h0) / m.d) * 180 / Math.PI;
+        const rot = Math.max(3, Math.atan((this._c.sky_rotor || 65) / m.d) * 180 / Math.PI * 4), x = X(m.az), yh = Y(hub);
+        s += `<line x1="${f1(x)}" x2="${f1(x)}" y1="${f1(Y(base))}" y2="${f1(yh)}" stroke="${tcol}" stroke-width="1"/><g class="wtr" style="${spin};animation-delay:-${k * 0.7}s"><g transform="translate(${f1(x)},${f1(yh)})">${[0, 120, 240].map((d) => `<line x1="0" y1="0" x2="0" y2="-${rot.toFixed(1)}" stroke="${tcol}" stroke-width="1.1" stroke-linecap="round" transform="rotate(${d})"/>`).join('')}</g></g><circle cx="${f1(x)}" cy="${f1(yh)}" r="1" fill="${tcol}"/>` +
+          (dark ? `<circle cx="${f1(x)}" cy="${f1(yh - 1.5)}" r="1.3" fill="#ff453a" class="wbl" style="animation-delay:${k * 0.2}s"/>` : '');
+      });
+      s += `<path d="${near}L${W},${HH}L0,${HH}Z" fill="${ridge[1]}"/><path d="${near}" fill="none" stroke="${ridge[2]}" stroke-width=".8"/>`;
+      // Beschriftungen: Berge unter der Kante, Orte als Nadel (nahe Orte zusammengefasst)
+      const lab = []; const peaks = this._hor.marks.filter((m) => m.t === 'peak').map((m) => ({ x: X(m.az), y: Y(this._horAt(m.az)) + 10, n: m.n })).sort((a, b) => a.x - b.x);
+      peaks.forEach((q) => { const prev = lab.filter((l) => Math.abs(l.x - q.x) < 34).length; lab.push(q); s += `<text x="${f1(q.x)}" y="${f1(q.y + prev * 9)}" class="skt" fill="rgba(200,210,235,.75)" text-anchor="${q.x < 24 ? 'start' : q.x > W - 24 ? 'end' : 'middle'}">${esc(q.n)}</text>`; });
+      const pins = []; this._hor.marks.filter((m) => m.t === 'pin').sort((a, b) => a.az - b.az).forEach((m) => { const p = pins.find((q) => Math.abs(q.az - m.az) < 4); if (p) p.n += ' · ' + m.n; else pins.push({ az: m.az, n: m.n }); });
+      pins.forEach((q) => { const x = X(q.az), y = Y(this._horAt(q.az)); s += `<line x1="${f1(x)}" x2="${f1(x)}" y1="${f1(y)}" y2="${f1(Y(-5.5))}" stroke="rgba(255,214,10,.6)" stroke-width=".7"/><circle cx="${f1(x)}" cy="${f1(y)}" r="1.5" fill="#ffd60a"/><text x="${f1(x)}" y="${f1(Y(-5.5) + 8)}" class="skt" fill="rgba(255,214,10,.85)" text-anchor="${x < 40 ? 'start' : x > W - 40 ? 'end' : 'middle'}">${esc(q.n)}</text>`; });
+      s += `<line x1="${W / 2}" x2="${W / 2}" y1="${HH - 13}" y2="${HH - 9}" stroke="${C.green}" stroke-width="1.2"/>`;
+      [['N', 0], ['NO', 45], ['O', 90], ['SO', 135], ['S', 180], ['SW', 225], ['W', 270], ['NW', 315]].forEach(([d, a]) => { const x = X(a); if (x > 4 && x < W - 4) s += `<text x="${f1(x)}" y="${HH - 2}" class="skt" fill="rgba(235,235,245,.5)" text-anchor="middle">${d}</text>`; });
+      s += '</svg>';
+      // Textzeile: was gerade zu sehen ist
+      const over = (q) => { if (q.al > 25) return ''; let best = null; this._hor.marks.forEach((m) => { const da = Math.abs(((m.az - q.az + 540) % 360) - 180); if (da < 9 && (!best || da < best.da)) best = { da, m }; });
+        if (!best) return ''; const m = best.m; return ' · über ' + (m.t === 'wind' ? 'den Windrädern' : m.n === 'Schlüchtern' ? 'Schlüchtern' : m.n === 'Breites Feld' ? 'dem Breiten Feld' : 'dem ' + m.n); };
+      const items = bodies.filter((q) => q.vis).sort((a, b) => b.al - a.al).slice(0, 4).map((q) => `<span><i class="sdot" style="background:${q.c}"></i><b>${q.n}</b> ${dir(q.az)} · ${Math.round(q.al)}°${over(q)}</span>`);
+      if (uma) items.push(`<span><i class="sdot" style="background:#aac8ff"></i><b>Großer Wagen</b> ${dir(uma.az)} · ${uma.lo}–${uma.hi}°</span>`);
+      if (!bodies.some((q) => q.vis && q.b !== 'Moon')) {
+        let nx = null; bodies.filter((q) => q.b !== 'Moon' && q.b !== 'Mercury' && !q.vis).forEach((q) => { try { const t = A.SearchRiseSet(q.b, obs, +1, now, 0.6); if (t && (!nx || t.date < nx.t)) nx = { t: t.date, n: q.n }; } catch (e) {} });
+        items.push(`<span>${night ? 'gerade keine Planeten sichtbar' : 'Planeten erst bei Dunkelheit'}${nx ? ` · ${nx.n} geht um ${hhmm(nx.t)} auf` : ''}</span>`);
+      }
+      return `<div class="pm"><div>${s}<div class="sin">${items.join('')}</div></div></div>`;
+    }
     _issKey() { return String(this._a('iss_pass', 'pass_start_unix') || ''); }
     _issOpen() {
       const s0 = +this._a('iss_pass', 'pass_start_unix') || 0, s1 = +this._a('iss_pass', 'pass_end_unix') || 0, now = Date.now() / 1000;
@@ -691,7 +836,7 @@
           this._mini(`<span style="color:${uvC}">${uv} ${esc(uvTxt)}</span>`, { min: 0, max: 12, value: uv + 0.5, maxValue: um && um.v > 0 ? um.v + 0.5 : null,
             zones: Array.from({ length: 12 }, (_, i) => ({ to: i + 1, c: i <= 2 ? C.green : i <= 5 ? C.yellow : i <= 7 ? C.orange : i <= 10 ? C.red : C.purple })),
             ticks: [[0, 'UV 0'], [3, '3'], [6, '6'], [8, '8'], [11, '11+']] })) +
-        this._row(E.moon, '<ha-icon icon="mdi:moon-waning-crescent" style="transform:translateX(4px)"></ha-icon>', 'Mond', `<div class="cols"><div>${esc(this._a('moon', 'moonset') || '–')}<span>Untergang</span></div><div>${esc(this._a('moon', 'moonrise') || '–')}<span>Aufgang</span></div></div>`) +
+        this._row(E.moon, '<ha-icon icon="mdi:moon-waning-crescent" style="transform:translateX(4px)"></ha-icon>', 'Mond', `<div class="sst"><div class="cols"><div>${esc(this._a('moon', 'moonset') || '–')}<span>Untergang</span></div><div>${esc(this._a('moon', 'moonrise') || '–')}<span>Aufgang</span></div></div><span class="pw"><span class="pc"><ha-icon class="p" icon="mdi:plus-circle-outline"></ha-icon><ha-icon class="m" icon="mdi:minus-circle-outline"></ha-icon></span></span></div>${this._skyHtml()}`, ' data-sky="1"').replace('class="r', this._skyOpen() ? 'class="r kopen' : 'class="r') +
         this._row(E.moon_phase_text, mPic ? `<img src="${esc(mPic)}" alt="" style="transform:scale(.6)">` : ico('mdi:moon-waning-crescent'), 'Mondphase',
           `<div class="st" style="color:${full ? C.yellow : 'var(--primary-text-color)'}">${esc(this._v('moon_phase_text'))}</div>`) +
         this._row('iss', ico('mdi:space-station', this._v('iss_warning') === 'on' ? 'a-f4' : ''), `ISS Überflug${im.where ? `<span class="sec"><span class="iw">gerade über ${esc(im.where)}</span><span class="isep"> · </span><span class="iq nw"${iq.c ? ` style="color:${iq.c}"` : ''}>${iq.t}</span></span>` : ''}`,
