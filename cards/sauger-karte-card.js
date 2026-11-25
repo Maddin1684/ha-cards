@@ -1,4 +1,5 @@
-// sauger-karte-card v1.1 (25.11.2026): alles auf einen Blick statt 3 Tabs – Status-Kacheln (Zustand, letzte Reinigung, Fortschritt/Trocknung als Balken, Wassertank/Fehler nur bei Bedarf), Etagenwahl (input_select.karte) als Segmentschalter; Teppiche und 'Ignorieren' entfernt.
+// sauger-karte-card v1.2 (25.11.2026): Raeume einfarbig dezent (ausgewaehlt blau, aktueller Raum pulsiert), Reinigungsspur aus dem Kartenbild (gesaugt feine weisse Linie, gewischt zartblaues Band), Hindernisse in Apple-Rot, Fortschritt als Farbverlauf-Balken, Modus-Kapsel antippen = Modus waehlen (nur einstellen, startet nicht).
+// v1.1 (25.11.2026): alles auf einen Blick statt 3 Tabs – Status-Kacheln (Zustand, letzte Reinigung, Fortschritt/Trocknung als Balken, Wassertank/Fehler nur bei Bedarf), Etagenwahl (input_select.karte) als Segmentschalter; Teppiche und 'Ignorieren' entfernt.
 // v1.0 (25.11.2026): Saugroboter-Karte im Apple-Stil – Raumformen aus der Dreame-Karte (camera.*_map)
 // neu gezeichnet (runde Ecken, Apple-Farben halbtransparent, feiner weisser Rand), Teppiche gepunktet, Basis und Roboter,
 // Hindernisse als orange Symbole: Antippen oeffnet direkt das Foto des Saugers (Art, Trefferquote, Raum) mit 'Ignorieren';
@@ -42,17 +43,26 @@
     .tile.al b, .tile.al small { color:${C.red}; }
     .tile.al ha-icon { animation:skbl 1s steps(1) infinite; }
     @keyframes skbl { 50% { opacity:0; } }
+    .mm { position:relative; display:inline-flex; }
+    .menu { position:absolute; top:calc(100% + 6px); left:0; z-index:6; min-width:210px; background:#2c2c2e; border-radius:12px; padding:4px; box-shadow:0 8px 24px rgba(0,0,0,.45); display:none; }
+    .menu.on { display:block; }
+    .menu button { display:flex; align-items:center; gap:8px; width:100%; border:0; background:none; color:#f2f2f7; font:inherit; font-size:13px; padding:8px 10px; border-radius:8px; cursor:pointer; text-align:left; }
+    .menu button:hover { background:rgba(118,118,128,.24); }
+    .menu button ha-icon { --mdc-icon-size:16px; display:flex; }
+    .menu button .ck { margin-left:auto; color:${C.blue}; }
+    .menu small { display:block; font-size:11px; color:#8e8e93; padding:6px 10px 4px; }
     .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .chip.btnc { border:0; font:inherit; font-size:12px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:rgba(118,118,128,.24); font-size:12px; color:var(--primary-text-color); white-space:nowrap; }
     .chip ha-icon { --mdc-icon-size:14px; display:flex; }
     .mw { position:relative; width:100%; }
     .mw svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
     .mw path.rm { cursor:pointer; transition:fill-opacity .25s, stroke-width .25s; -webkit-tap-highlight-color:transparent; }
     .mw path.cur { animation:skrm 2.4s ease-in-out infinite; }
-    @keyframes skrm { 0%,100% { fill-opacity:.3; } 50% { fill-opacity:.5; } }
+    @keyframes skrm { 0%,100% { fill-opacity:.07; } 50% { fill-opacity:.2; } }
     .lbl { position:absolute; transform:translate(-50%,-50%); padding:2px 8px; border-radius:999px; background:rgba(28,28,30,.72); font-size:11px; line-height:15px; color:#f2f2f7; white-space:nowrap; pointer-events:none; display:flex; align-items:center; gap:4px; }
     .lbl i { width:6px; height:6px; border-radius:50%; }
-    .pin { position:absolute; transform:translate(-50%,-50%); width:22px; height:22px; border-radius:50%; background:${C.orange}; color:#1c1c1e; border:2px solid #1c1c1e; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; -webkit-tap-highlight-color:transparent; }
+    .pin { position:absolute; transform:translate(-50%,-50%); width:22px; height:22px; border-radius:50%; background:${C.red}; color:#fff; border:2px solid #1c1c1e; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; -webkit-tap-highlight-color:transparent; }
     .pin ha-icon { --mdc-icon-size:13px; display:flex; }
     .msg { font-size:12px; color:var(--secondary-text-color); padding:24px 0; text-align:center; }
     .lb { position:absolute; inset:0; background:rgba(0,0,0,.62); border-radius:12px; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; z-index:5; }
@@ -90,10 +100,10 @@
       }
       if (!v || !m) { this.shadowRoot.querySelector('.mw').innerHTML = '<div class="msg">Sauger oder Karte nicht gefunden</div>'; return; }
       const A = m.attributes || {}, V = v.attributes || {};
-      const mapKey = m.state + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : '');
+      const mapKey = (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : '');
       if (mapKey !== this._mapKey && !this._busy) this._loadMap(A, mapKey);
       this._head(v, V, A);
-      if (this._geo) this._overlay(v, V, A);
+      if (this._geo) { this._overlay(v, V, A); if (m.state + A.entity_picture !== this._trKey && !this._trBusy && !this._busy) this._loadTrail(A, m.state + A.entity_picture); }
     }
 
     _head(v, V, A) {
@@ -108,8 +118,8 @@
       set('.bat', b != null ? `<ha-icon icon="${V.charging ? 'mdi:battery-charging' : 'mdi:battery'}" style="color:${bc}"></ha-icon>${b} %` : '');
       this._tiles(v, V);
       const obs = this._obstacles(A).length;
-      set('.chips', (obs ? `<span class="chip"><ha-icon icon="mdi:alert-outline" style="color:${C.orange}"></ha-icon>${obs} Hindernis${obs === 1 ? '' : 'se'}</span>` : '') +
-        (V.cleaning_mode ? `<span class="chip"><ha-icon icon="mdi:water-outline" style="color:${C.blue}"></ha-icon>${esc(MODE[V.cleaning_mode] || V.cleaning_mode)}</span>` : ''));
+      set('.chips', (obs ? `<span class="chip"><ha-icon icon="mdi:alert-outline" style="color:${C.red}"></ha-icon>${obs} Hindernis${obs === 1 ? '' : 'se'}</span>` : '') +
+        this._modeChip(V));
       const n = this._sel.size;
       set('.sel', n ? esc([...this._sel].map((id) => this._roomName(id, A)).join(', ')) : (run ? '' : 'Räume antippen zum Auswählen'));
       let acts;
@@ -124,14 +134,14 @@
     _tiles(v, V) {
       const H = this._hass, r = this.shadowRoot, ok = (o) => o && !['unavailable', 'unknown', ''].includes(o.state), fmt = (o) => (H.formatEntityState ? H.formatEntityState(o) : o.state);
       const tile = (ic, lbl, val, x = '', cls = '') => `<div class="tile ${cls}"><small><ha-icon icon="${ic}"></ha-icon>${esc(lbl)}</small><b>${esc(val)}</b>${x}</div>`;
-      const bar = (p, c) => `<div class="bar"><i style="width:${Math.max(0, Math.min(100, p))}%;background:${c}"></i></div>`;
+      const bar = (p, c) => { const w = Math.max(0.5, Math.min(100, p)); return `<div class="bar"><i style="width:${w}%;background:${c === 'grad' ? `linear-gradient(90deg,${C.red} 0%,${C.yellow} 50%,${C.green} 80%);background-size:${(10000 / w).toFixed(1)}% 100%` : c}"></i></div>`; };
       const zs = this._st('state'), hi = this._st('cleaning_history'), ar = this._st('cleaned_area'), ct = this._st('cleaning_time');
       const pr = this._st('cleaning_progress'), dp = this._st('drying_progress'), dl = this._st('drying_left'), lw = this._st('low_water_warning'), er = this._st('error');
       let h = tile('mdi:information-outline', 'Zustand', ok(zs) ? fmt(zs) : (STATE[v.state] || v.state));
       let last = '–'; if (ok(hi)) { const d = new Date(hi.state); if (!isNaN(d)) { const t = new Date(); last = (d.toDateString() === t.toDateString() ? 'heute' : d.toDateString() === new Date(t - 864e5).toDateString() ? 'gestern' : `${d.getDate()}.${d.getMonth() + 1}.`) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); } }
       const extra = [ok(ar) ? ar.state + ' m²' : '', ok(ct) ? ct.state + ' min' : ''].filter(Boolean).join(' · ');
       h += tile('mdi:history', 'Letzte Reinigung', last, extra ? `<span class="sx">${esc(extra)}</span>` : '');
-      if (ok(pr) && (v.state === 'cleaning' || v.state === 'paused' || v.state === 'returning')) { const p = +pr.state; h += tile('mdi:timelapse', 'Reinigungsfortschritt', p + ' %' + (extra ? ' · ' + extra : ''), bar(p, p >= 76 ? C.green : p >= 31 ? C.yellow : C.red), 'w'); }
+      if (ok(pr) && (v.state === 'cleaning' || v.state === 'paused' || v.state === 'returning')) { const p = +pr.state; h += tile('mdi:timelapse', 'Reinigungsfortschritt', p + ' %' + (extra ? ' · ' + extra : ''), bar(p, 'grad'), 'w'); }
       if (ok(dp) && +dp.state < 100) { const p = +dp.state; h += tile('mdi:hair-dryer', 'Trocknung', (ok(dl) ? 'noch ' + dl.state + ' min' : p + ' %'), bar(p, C.blue), 'w'); }
       if (ok(lw) && lw.state !== 'no_warning') h += tile('mdi:water-alert', 'Wassertank', fmt(lw), '', 'al w');
       if (ok(er) && er.state !== 'no_error') h += tile('mdi:alert-circle-outline', 'Fehler', fmt(er), '', 'al w');
@@ -139,6 +149,26 @@
       const ks = H.states[this._c.floor || 'input_select.karte'];
       const fl = ks && (ks.attributes.options || []).length > 1 ? ks.attributes.options.map((o) => `<button class="${o === ks.state ? 'on' : ''}" data-floor="${esc(o)}">${esc(o)}</button>`).join('') : '';
       if (r.querySelector('.fl').innerHTML !== fl) r.querySelector('.fl').innerHTML = fl;
+    }
+    // Reinigungsmodus: mit CleanGenius ueber dessen Modus, sonst ueber select.*_cleaning_mode; 'Saugen'/'Wischen' schalten CleanGenius aus
+    _sel2(k) { return this._hass.states[this._c.entity.replace('vacuum.', 'select.') + '_' + k]; }
+    _modeNow(V) { const cg = this._sel2('cleangenius'), on = cg && cg.state !== 'off' && cg.state !== 'unavailable', cm = this._sel2('cleangenius_mode');
+      if (on && cm) return cm.state === 'mop_after_vacuum' ? 'after' : 'both';
+      return { 'Sweeping': 'vac', 'Mopping': 'mop', 'Sweeping and mopping': 'both', 'Mopping after sweeping': 'after' }[V.cleaning_mode] || 'both'; }
+    _modeChip(V) {
+      const M = [['vac', 'Saugen', 'mdi:broom'], ['mop', 'Wischen', 'mdi:water-outline'], ['both', 'Saugen + Wischen', 'mdi:water-plus-outline'], ['after', 'Erst saugen, dann wischen', 'mdi:debug-step-over']];
+      const now = this._modeNow(V), cur = M.find((m) => m[0] === now), cg = this._sel2('cleangenius'), gen = cg && cg.state !== 'off' && cg.state !== 'unavailable';
+      return `<span class="mm"><button class="chip btnc" data-menu="1"><ha-icon icon="${cur[2]}" style="color:${C.blue}"></ha-icon>${esc(cur[1])}<ha-icon icon="mdi:chevron-down" style="--mdc-icon-size:14px;opacity:.6"></ha-icon></button>
+        <span class="menu${this._menu ? ' on' : ''}"><small>Modus für die nächste Reinigung${gen ? ' · CleanGenius an' : ''}</small>${M.map((m) => `<button data-mode="${m[0]}"><ha-icon icon="${m[2]}"></ha-icon>${m[1]}${m[0] === now ? '<ha-icon class="ck" icon="mdi:check"></ha-icon>' : ''}</button>`).join('')}</span></span>`;
+    }
+    _setMode(m) {
+      const H = this._hass, base = this._c.entity.replace('vacuum.', 'select.') + '_', cg = this._sel2('cleangenius'), gen = cg && cg.state !== 'off' && cg.state !== 'unavailable';
+      const sel = (k, o) => H.callService('select', 'select_option', { entity_id: base + k, option: o });
+      const plain = () => { const opts = ((this._sel2('cleaning_mode') || {}).attributes || {}).options || [], want = { vac: 'sweeping', mop: 'mopping', both: 'sweeping_and_mopping', after: 'mopping_after_sweeping' }[m];
+        sel('cleaning_mode', opts.find((o) => o.toLowerCase().replace(/ /g, '_') === want) || want); };
+      if ((m === 'both' || m === 'after') && gen) sel('cleangenius_mode', m === 'both' ? 'vacuum_and_mop' : 'mop_after_vacuum');
+      else if (gen) { sel('cleangenius', 'off'); setTimeout(plain, 2500); }
+      else plain();
     }
     _roomName(id, A) { const r = (A.rooms || {})[id]; return r ? (r.custom_name || r.name) : ''; }
     _obstacles(A) {
@@ -214,13 +244,41 @@
       this._busy = false; this._render();
     }
 
+    // Reinigungsspur aus dem Kartenbild: weisse Linie = gesaugt, aufgehellter Saum = gewischt (Beschriftungen/Symbole der Vorlage ausgespart)
+    async _loadTrail(A, key) {
+      const tf = this._tf(A), G = this._geo; if (!tf || !A.entity_picture) return;
+      this._trBusy = true;
+      try {
+        const bmp = await createImageBitmap(await (await fetch(A.entity_picture)).blob());
+        const W = bmp.width, Hh = bmp.height, cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
+        const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0); const id = cx.getImageData(0, 0, W, Hh), d = id.data;
+        const skip = new Uint8Array(W * Hh), box = (x0, y0, x1, y1) => { for (let y = Math.max(0, y0 | 0); y < Math.min(Hh, y1); y++) for (let x = Math.max(0, x0 | 0); x < Math.min(W, x1); x++) skip[y * W + x] = 1; };
+        Object.values(A.rooms || {}).forEach((r) => { if (r.x == null) return; const [x, y] = tf(r.x, r.y); box(x - 80, y - 80, x + 80, y + 28); });
+        Object.values(A.obstacles || {}).forEach((o) => { const [x, y] = tf(o.x, o.y); box(x - 26, y - 52, x + 26, y + 8); });
+        [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 22, y - 22, x + 22, y + 22); } });
+        const pth = cx.createImageData(W, Hh), mop = cx.createImageData(W, Hh), o = pth.data, mo = mop.data; let n = 0;
+        for (let q = 0; q < W * Hh; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b), mx = Math.max(r, g, b);
+          if (mn >= 246) { o[i] = 255; o[i + 1] = 255; o[i + 2] = 255; o[i + 3] = 215; n++; }
+          if (mn >= 180 && mn / mx >= 0.79) { mo[i] = 100; mo[i + 1] = 210; mo[i + 2] = 255; mo[i + 3] = 255; n++; } }
+        // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
+        const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
+        const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
+        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.32; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
+        this._trail = n > 50 ? cv.toDataURL() : ''; this._trKey = key;
+        const g = this.shadowRoot.querySelector('.tr');
+        if (g) g.innerHTML = this._trail ? `<image href="${this._trail}" x="0" y="0" width="${W / G.S}" height="${Hh / G.S}" preserveAspectRatio="none"/>` : '';
+      } catch (e) { this._trKey = key; }
+      this._trBusy = false;
+    }
+
     // feste Ebene: Raeume (nur bei neuer Karte), Rest in _overlay
     _build() {
+      this._trKey = '';
       const G = this._geo, mw = this.shadowRoot.querySelector('.mw');
       mw.style.aspectRatio = `${G.vb[2]} / ${G.vb[3]}`;
       mw.innerHTML = `<svg viewBox="${G.vb.join(' ')}"><defs><pattern id="skp" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r=".8" fill="#fff" fill-opacity=".28"/></pattern></defs>` +
-        G.rooms.map((r) => `<path class="rm" data-room="${r.id}" d="${r.d}" fill="${r.c}" fill-opacity=".26" stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-linejoin="round"/>`).join('') +
-        `<g class="ov" style="pointer-events:none"></g></svg><div class="hl"></div><div class="lb"></div>`;
+        G.rooms.map((r) => `<path class="rm" data-room="${r.id}" d="${r.d}" fill="#ffffff" fill-opacity=".07" stroke="rgba(235,235,245,.35)" stroke-width="1" stroke-linejoin="round"/>`).join('') +
+        `<g class="tr" style="pointer-events:none"></g><g class="ov" style="pointer-events:none"></g></svg><div class="hl"></div><div class="lb"></div>`;
     }
 
     _overlay(v, V, A) {
@@ -232,14 +290,14 @@
       if (sig === this._sig) return; this._sig = sig;
       const r = this.shadowRoot;
       r.querySelectorAll('path.rm').forEach((p) => { const id = p.dataset.room, s = this._sel.has(id), cur = run && String(V.current_segment) === id;
-        p.setAttribute('fill-opacity', s ? '.55' : '.26'); p.setAttribute('stroke-width', s ? '2' : '1'); p.classList.toggle('cur', cur && !s); });
+        p.setAttribute('fill', s ? C.blue : '#ffffff'); p.setAttribute('fill-opacity', s ? '.32' : '.07'); p.setAttribute('stroke', s ? C.blue : 'rgba(235,235,245,.35)'); p.classList.toggle('cur', cur && !s); });
       let s = '';
       if (cpos && !(vp && Math.hypot(vp.x - cpos.x, vp.y - cpos.y) < 150)) { const [x, y] = P(cpos.x, cpos.y); s += `<rect x="${f1(x - 4)}" y="${f1(y - 4)}" width="8" height="8" rx="2.5" fill="#f2f2f7" stroke="#1c1c1e" stroke-width="1.2"/><path d="M${f1(x - 2)},${f1(y + .6)}L${f1(x)},${f1(y - 1.6)}L${f1(x + 2)},${f1(y + .6)}" fill="none" stroke="#1c1c1e" stroke-width=".9"/>`; }
       if (vp) { const [x, y] = P(vp.x, vp.y), pa = P(vp.x + 300 * Math.cos(((vp.a || 0)) * Math.PI / 180), vp.y + 300 * Math.sin(((vp.a || 0)) * Math.PI / 180)), dx = pa[0] - x, dy = pa[1] - y, dl = Math.hypot(dx, dy) || 1;
         s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="9" fill="${C.green}" fill-opacity=".25"/><circle cx="${f1(x)}" cy="${f1(y)}" r="5.5" fill="#f2f2f7" stroke="#1c1c1e" stroke-width="1.5"/><circle cx="${f1(x + dx / dl * 3)}" cy="${f1(y + dy / dl * 3)}" r="1.4" fill="${C.green}"/>`; }
       r.querySelector('.ov').innerHTML = s;
       const rooms = A.rooms || {}, col = {}; G.rooms.forEach((q) => { col[q.id] = q.c; });
-      r.querySelector('.hl').innerHTML = Object.keys(rooms).filter((k) => col[k] && rooms[k].x != null).map((k) => `<span class="lbl" style="${pct(P(rooms[k].x, rooms[k].y))}"><i style="background:${col[k]}"></i>${esc(rooms[k].custom_name || rooms[k].name)}</span>`).join('') +
+      r.querySelector('.hl').innerHTML = Object.keys(rooms).filter((k) => col[k] && rooms[k].x != null).map((k) => `<span class="lbl" style="${pct(P(rooms[k].x, rooms[k].y))}">${esc(rooms[k].custom_name || rooms[k].name)}</span>`).join('') +
         obs.map((o) => `<button class="pin" data-obs="${o.id}" style="${pct(P(o.x, o.y))}" aria-label="${esc(o.type)}"><ha-icon icon="${o.icon}"></ha-icon></button>`).join('');
     }
 
@@ -252,6 +310,10 @@
           <div class="lbi"><div><b>${esc(o.type)}</b><span>${esc([o.room, o.p != null ? o.p + ' %' : ''].filter(Boolean).join(' · '))}</span></div></div></div>`;
         lb.classList.add('on'); return; }
       if (e.target.closest('[data-close]') || e.target === lb) { lb.classList.remove('on'); return; }
+      const mb = e.target.closest('[data-mode]');
+      if (mb) { this._menu = false; this._setMode(mb.dataset.mode); this._render(); return; }
+      if (e.target.closest('[data-menu]')) { this._menu = !this._menu; r.querySelector('.menu').classList.toggle('on', this._menu); return; }
+      if (this._menu) { this._menu = false; const mn = r.querySelector('.menu'); if (mn) mn.classList.remove('on'); }
       const fb = e.target.closest('[data-floor]');
       if (fb) { this._hass.callService('input_select', 'select_option', { entity_id: this._c.floor || 'input_select.karte', option: fb.dataset.floor }); this._sel.clear(); return; }
       const rm = e.target.closest('path.rm');
