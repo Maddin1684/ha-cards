@@ -1,4 +1,5 @@
-// sauger-karte-card v2.0 (25.11.2026): Hindernisse als dezente rot getoente Mini-Kapsel mit kleinem Symbol (groessere unsichtbare Tippflaeche).
+// sauger-karte-card v2.1 (25.11.2026): Wischband nur noch ein Hauch Blau; Etagenschalter dezent (zarte Spur, ausgewaehlte Etage leicht grau, andere in Sekundaerfarbe).
+// v2.0 (25.11.2026): Hindernisse als dezente rot getoente Mini-Kapsel mit kleinem Symbol (groessere unsichtbare Tippflaeche).
 // v1.9 (25.11.2026): Reinigungsspur dezenter (Saugspur zartgrau, Wischband nur ein Hauch blau).
 // v1.8 (25.11.2026): Raumnamen ohne Schatten, in leicht transparenter grauer Kapsel.
 // v1.7 (25.11.2026): Raumnamen kleiner und dezent (ohne Kapsel, gedaempftes Grau).
@@ -35,10 +36,11 @@
     .nm { flex:1; min-width:0; }
     .nm b { display:block; font-size:15px; font-weight:500; color:var(--primary-text-color); }
     .nm span { display:block; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .fl { display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.24); margin-bottom:8px; }
+    .fl { display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.12); margin-bottom:8px; }
     .fl:empty { display:none; }
     .fl button { flex:1; border:0; background:none; color:var(--primary-text-color); font:inherit; font-size:13px; padding:4px 8px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .fl button.on { background:#636366; font-weight:500; }
+    .fl button { color:var(--secondary-text-color); }
+    .fl button.on { background:rgba(118,118,128,.26); color:var(--primary-text-color); font-weight:500; }
     .tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:8px; }
     .tile { background:rgba(118,118,128,.12); border-radius:10px; padding:6px 9px; min-width:0; }
     .tile.w { grid-column:1 / -1; }
@@ -288,7 +290,7 @@
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
-        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.16; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
+        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.07; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
         const tk = 'skc-tr-' + (A.map_id || ''), v = this._hass.states[this._c.entity], running = v && ['cleaning', 'paused', 'returning'].includes(v.state);
         if (n > 50) { this._trail = cv.toDataURL(); try { const h = document.createElement('canvas'); h.width = W / 2; h.height = Hh / 2; h.getContext('2d').drawImage(cv, 0, 0, W / 2, Hh / 2); localStorage.setItem(tk, h.toDataURL()); } catch (e) {} }
         else if (!running) { try { this._trail = localStorage.getItem(tk) || ''; } catch (e) { this._trail = ''; } } // Spur der letzten Reinigung
