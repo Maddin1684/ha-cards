@@ -1,4 +1,5 @@
-// sauger-karte-card v1.3 (25.11.2026): letzte Hindernisse (mit Fotos) und letzte Reinigungsspur werden je Etage gemerkt und weiter gezeigt, wenn die Integration die Karte neu laedt und sie dabei verwirft.
+// sauger-karte-card v1.4 (25.11.2026): Kopf wie die anderen Karten (z. B. Luftqualitaet): Titel 'Saugroboter' 24 px ohne Symbol, Akku rechts; Untertitel entfaellt (Zustand steht in den Kacheln).
+// v1.3 (25.11.2026): letzte Hindernisse (mit Fotos) und letzte Reinigungsspur werden je Etage gemerkt und weiter gezeigt, wenn die Integration die Karte neu laedt und sie dabei verwirft.
 // v1.2 (25.11.2026): Raeume einfarbig dezent (ausgewaehlt blau, aktueller Raum pulsiert), Reinigungsspur aus dem Kartenbild (gesaugt feine weisse Linie, gewischt zartblaues Band), Hindernisse in Apple-Rot, Fortschritt als Farbverlauf-Balken, Modus-Kapsel antippen = Modus waehlen (nur einstellen, startet nicht).
 // v1.1 (25.11.2026): alles auf einen Blick statt 3 Tabs – Status-Kacheln (Zustand, letzte Reinigung, Fortschritt/Trocknung als Balken, Wassertank/Fehler nur bei Bedarf), Etagenwahl (input_select.karte) als Segmentschalter; Teppiche und 'Ignorieren' entfernt.
 // v1.0 (25.11.2026): Saugroboter-Karte im Apple-Stil – Raumformen aus der Dreame-Karte (camera.*_map)
@@ -20,8 +21,9 @@
 
   const CSS = `
     :host { display:block; }
-    ha-card { padding:12px 14px 14px; overflow:hidden; }
-    .hd { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+    ha-card { padding:4px 16px 14px; overflow:hidden; }
+    .hd { display:flex; align-items:center; gap:12px; padding:12px 0 4px; margin-bottom:6px; }
+    .ttl { flex:1; min-width:0; font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; color:var(--ha-card-header-color, var(--primary-text-color)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .tl { flex:0 0 34px; height:34px; border-radius:9px; background:rgba(118,118,128,.28); display:flex; align-items:center; justify-content:center; }
     .tl ha-icon { --mdc-icon-size:22px; color:#fff; display:flex; }
     .nm { flex:1; min-width:0; }
@@ -95,7 +97,7 @@
       const v = H.states[this._c.entity], m = H.states[this._c.map];
       if (!this.shadowRoot) {
         const r = this.attachShadow({ mode: 'open' });
-        r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="tl"><ha-icon icon="mdi:robot-vacuum"></ha-icon></div><div class="nm"><b></b><span></span></div><span class="chip bat"></span></div>
+        r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="ttl"></div><span class="chip bat"></span></div>
           <div class="fl"></div><div class="tiles"></div><div class="chips"></div><div class="mw"><div class="msg">Karte wird geladen …</div></div><div class="ft"><span class="sel"></span><span class="acts"></span></div></ha-card>`;
         r.querySelector('ha-card').addEventListener('click', (e) => this._click(e));
       }
@@ -113,8 +115,7 @@
       const hm = /^\d+:\s*(\d+)\/(\d+)\s+(\d+:\d+)/.exec(hist), last = hm ? `zuletzt ${+hm[2]}.${+hm[1]}. ${hm[3]}` : '';
       const sub = run || v.state === 'paused' ? [V.cleaning_progress != null ? V.cleaning_progress + ' %' : '', V.cleaned_area != null ? V.cleaned_area + ' m²' : '', this._roomName(V.current_segment, A)].filter(Boolean).join(' · ') : '';
       const set = (sel, html) => { const e = r.querySelector(sel); if (e.innerHTML !== html) e.innerHTML = html; };
-      set('.nm b', esc(this._c.title || (V.friendly_name || 'Saugroboter').split(/\s{2,}/)[0]));
-      set('.nm span', esc([STATE[st] || st, sub].filter(Boolean).join(' · ')));
+      set('.ttl', esc(this._c.title || 'Saugroboter')); void sub;
       const b = V.battery_level != null ? V.battery_level : V.battery, bc = b > 50 ? C.green : b > 20 ? C.yellow : C.red;
       set('.bat', b != null ? `<ha-icon icon="${V.charging ? 'mdi:battery-charging' : 'mdi:battery'}" style="color:${bc}"></ha-icon>${b} %` : '');
       this._tiles(v, V);
