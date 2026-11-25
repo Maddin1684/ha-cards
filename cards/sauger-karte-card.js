@@ -1,4 +1,5 @@
-// sauger-karte-card v1.9 (25.11.2026): Reinigungsspur dezenter (Saugspur zartgrau, Wischband nur ein Hauch blau).
+// sauger-karte-card v2.0 (25.11.2026): Hindernisse als dezente rot getoente Mini-Kapsel mit kleinem Symbol (groessere unsichtbare Tippflaeche).
+// v1.9 (25.11.2026): Reinigungsspur dezenter (Saugspur zartgrau, Wischband nur ein Hauch blau).
 // v1.8 (25.11.2026): Raumnamen ohne Schatten, in leicht transparenter grauer Kapsel.
 // v1.7 (25.11.2026): Raumnamen kleiner und dezent (ohne Kapsel, gedaempftes Grau).
 // v1.6 (25.11.2026): kompakter – Karte hoechstens 280 px hoch (mittig), engere Abstaende, flachere Kacheln/Knoepfe.
@@ -70,8 +71,9 @@
     @keyframes skrm { 0%,100% { fill-opacity:.07; } 50% { fill-opacity:.2; } }
     .lbl { position:absolute; transform:translate(-50%,-50%); font-size:9.5px; font-weight:500; line-height:12px; letter-spacing:.02em; color:rgba(235,235,245,.7); padding:1px 6px; border-radius:999px; background:rgba(118,118,128,.28); white-space:nowrap; pointer-events:none; }
     .lbl i { width:6px; height:6px; border-radius:50%; }
-    .pin { position:absolute; transform:translate(-50%,-50%); width:22px; height:22px; border-radius:50%; background:${C.red}; color:#fff; border:2px solid #1c1c1e; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; -webkit-tap-highlight-color:transparent; }
-    .pin ha-icon { --mdc-icon-size:13px; display:flex; }
+    .pin { position:absolute; transform:translate(-50%,-50%); height:16px; padding:0 5px; border-radius:999px; background:rgba(255,69,58,.2); color:${C.red}; border:0; display:flex; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .pin::before { content:''; position:absolute; inset:-8px -6px; }
+    .pin ha-icon { --mdc-icon-size:11px; display:flex; }
     .msg { font-size:12px; color:var(--secondary-text-color); padding:24px 0; text-align:center; }
     .lb { position:absolute; inset:0; background:rgba(0,0,0,.62); border-radius:12px; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; z-index:5; }
     .lb.on { opacity:1; pointer-events:auto; }
