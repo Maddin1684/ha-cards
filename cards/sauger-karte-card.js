@@ -1,4 +1,5 @@
-// sauger-karte-card v1.6 (25.11.2026): kompakter – Karte hoechstens 280 px hoch (mittig), engere Abstaende, flachere Kacheln/Knoepfe.
+// sauger-karte-card v1.7 (25.11.2026): Raumnamen kleiner und dezent (ohne Kapsel, gedaempftes Grau).
+// v1.6 (25.11.2026): kompakter – Karte hoechstens 280 px hoch (mittig), engere Abstaende, flachere Kacheln/Knoepfe.
 // v1.5 (25.11.2026): Kachelwerte (z. B. Zustand) brechen um statt abgeschnitten zu werden.
 // v1.4 (25.11.2026): Kopf wie die anderen Karten (z. B. Luftqualitaet): Titel 'Saugroboter' 24 px ohne Symbol, Akku rechts; Untertitel entfaellt (Zustand steht in den Kacheln).
 // v1.3 (25.11.2026): letzte Hindernisse (mit Fotos) und letzte Reinigungsspur werden je Etage gemerkt und weiter gezeigt, wenn die Integration die Karte neu laedt und sie dabei verwirft.
@@ -65,7 +66,7 @@
     .mw path.rm { cursor:pointer; transition:fill-opacity .25s, stroke-width .25s; -webkit-tap-highlight-color:transparent; }
     .mw path.cur { animation:skrm 2.4s ease-in-out infinite; }
     @keyframes skrm { 0%,100% { fill-opacity:.07; } 50% { fill-opacity:.2; } }
-    .lbl { position:absolute; transform:translate(-50%,-50%); padding:2px 8px; border-radius:999px; background:rgba(28,28,30,.72); font-size:11px; line-height:15px; color:#f2f2f7; white-space:nowrap; pointer-events:none; display:flex; align-items:center; gap:4px; }
+    .lbl { position:absolute; transform:translate(-50%,-50%); font-size:9.5px; font-weight:500; line-height:12px; letter-spacing:.02em; color:rgba(235,235,245,.6); text-shadow:0 0 3px rgba(0,0,0,.85); white-space:nowrap; pointer-events:none; }
     .lbl i { width:6px; height:6px; border-radius:50%; }
     .pin { position:absolute; transform:translate(-50%,-50%); width:22px; height:22px; border-radius:50%; background:${C.red}; color:#fff; border:2px solid #1c1c1e; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; -webkit-tap-highlight-color:transparent; }
     .pin ha-icon { --mdc-icon-size:13px; display:flex; }
