@@ -1,4 +1,5 @@
-// sauger-karte-card v1.8 (25.11.2026): Raumnamen ohne Schatten, in leicht transparenter grauer Kapsel.
+// sauger-karte-card v1.9 (25.11.2026): Reinigungsspur dezenter (Saugspur zartgrau, Wischband nur ein Hauch blau).
+// v1.8 (25.11.2026): Raumnamen ohne Schatten, in leicht transparenter grauer Kapsel.
 // v1.7 (25.11.2026): Raumnamen kleiner und dezent (ohne Kapsel, gedaempftes Grau).
 // v1.6 (25.11.2026): kompakter – Karte hoechstens 280 px hoch (mittig), engere Abstaende, flachere Kacheln/Knoepfe.
 // v1.5 (25.11.2026): Kachelwerte (z. B. Zustand) brechen um statt abgeschnitten zu werden.
@@ -280,12 +281,12 @@
         [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 22, y - 22, x + 22, y + 22); } });
         const pth = cx.createImageData(W, Hh), mop = cx.createImageData(W, Hh), o = pth.data, mo = mop.data; let n = 0;
         for (let q = 0; q < W * Hh; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b), mx = Math.max(r, g, b);
-          if (mn >= 246) { o[i] = 255; o[i + 1] = 255; o[i + 2] = 255; o[i + 3] = 215; n++; }
+          if (mn >= 246) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; n++; }
           if (mn >= 180 && mn / mx >= 0.79) { mo[i] = 100; mo[i + 1] = 210; mo[i + 2] = 255; mo[i + 3] = 255; n++; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
-        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.32; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
+        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.16; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
         const tk = 'skc-tr-' + (A.map_id || ''), v = this._hass.states[this._c.entity], running = v && ['cleaning', 'paused', 'returning'].includes(v.state);
         if (n > 50) { this._trail = cv.toDataURL(); try { const h = document.createElement('canvas'); h.width = W / 2; h.height = Hh / 2; h.getContext('2d').drawImage(cv, 0, 0, W / 2, Hh / 2); localStorage.setItem(tk, h.toDataURL()); } catch (e) {} }
         else if (!running) { try { this._trail = localStorage.getItem(tk) || ''; } catch (e) { this._trail = ''; } } // Spur der letzten Reinigung
