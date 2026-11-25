@@ -1,4 +1,5 @@
-// sauger-karte-card v2.4 (25.11.2026): Wischflaeche in tieferem Blau (#0058e6, dunkler als Apple-Blau) statt Hellblau.
+// sauger-karte-card v2.5 (25.11.2026): Kachelwerte in normaler Schrift statt fett (passend zu den anderen Karten).
+// v2.4 (25.11.2026): Wischflaeche in tieferem Blau (#0058e6, dunkler als Apple-Blau) statt Hellblau.
 // v2.3 (25.11.2026): Wischflaeche etwas kraeftiger in hellem Apple-Wasserblau (#64d2ff).
 // v2.2 (25.11.2026): ausgewaehlte Raeume dezent in Orange #f56300 statt Blau.
 // v2.1 (25.11.2026): Wischband nur noch ein Hauch Blau; Etagenschalter dezent (zarte Spur, ausgewaehlte Etage leicht grau, andere in Sekundaerfarbe).
@@ -50,7 +51,7 @@
     .tile.w { grid-column:1 / -1; }
     .tile small { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--secondary-text-color); }
     .tile small ha-icon { --mdc-icon-size:14px; display:flex; }
-    .tile b { display:block; font-size:14px; font-weight:500; line-height:1.3; color:var(--primary-text-color); margin-top:2px; overflow-wrap:anywhere; }
+    .tile b { display:block; font-size:14px; font-weight:400; line-height:1.3; color:var(--primary-text-color); margin-top:2px; overflow-wrap:anywhere; }
     .tile .sx { display:block; font-size:11px; color:var(--secondary-text-color); margin-top:1px; }
     .tile .bar { height:6px; border-radius:3px; background:rgba(118,118,128,.3); margin-top:6px; overflow:hidden; }
     .tile .bar i { display:block; height:100%; border-radius:3px; transition:width .6s; }
