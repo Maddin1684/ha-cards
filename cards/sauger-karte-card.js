@@ -1,4 +1,5 @@
-// sauger-karte-card v1.0 (25.11.2026): Saugroboter-Karte im Apple-Stil – Raumformen aus der Dreame-Karte (camera.*_map)
+// sauger-karte-card v1.1 (25.11.2026): alles auf einen Blick statt 3 Tabs – Status-Kacheln (Zustand, letzte Reinigung, Fortschritt/Trocknung als Balken, Wassertank/Fehler nur bei Bedarf), Etagenwahl (input_select.karte) als Segmentschalter; Teppiche und 'Ignorieren' entfernt.
+// v1.0 (25.11.2026): Saugroboter-Karte im Apple-Stil – Raumformen aus der Dreame-Karte (camera.*_map)
 // neu gezeichnet (runde Ecken, Apple-Farben halbtransparent, feiner weisser Rand), Teppiche gepunktet, Basis und Roboter,
 // Hindernisse als orange Symbole: Antippen oeffnet direkt das Foto des Saugers (Art, Trefferquote, Raum) mit 'Ignorieren';
 // Raeume antippen = auswaehlen, Knopf startet nur diese Raeume (dreame_vacuum.vacuum_clean_segment), sonst 'Alle reinigen'.
@@ -24,6 +25,23 @@
     .nm { flex:1; min-width:0; }
     .nm b { display:block; font-size:15px; font-weight:500; color:var(--primary-text-color); }
     .nm span { display:block; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fl { display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.24); margin-bottom:10px; }
+    .fl:empty { display:none; }
+    .fl button { flex:1; border:0; background:none; color:var(--primary-text-color); font:inherit; font-size:13px; padding:6px 8px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .fl button.on { background:#636366; font-weight:500; }
+    .tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:10px; }
+    .tile { background:rgba(118,118,128,.12); border-radius:12px; padding:8px 10px; min-width:0; }
+    .tile.w { grid-column:1 / -1; }
+    .tile small { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--secondary-text-color); }
+    .tile small ha-icon { --mdc-icon-size:14px; display:flex; }
+    .tile b { display:block; font-size:14px; font-weight:500; color:var(--primary-text-color); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tile .sx { display:block; font-size:11px; color:var(--secondary-text-color); margin-top:1px; }
+    .tile .bar { height:6px; border-radius:3px; background:rgba(118,118,128,.3); margin-top:6px; overflow:hidden; }
+    .tile .bar i { display:block; height:100%; border-radius:3px; transition:width .6s; }
+    .tile.al { background:rgba(255,69,58,.16); }
+    .tile.al b, .tile.al small { color:${C.red}; }
+    .tile.al ha-icon { animation:skbl 1s steps(1) infinite; }
+    @keyframes skbl { 50% { opacity:0; } }
     .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
     .chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:rgba(118,118,128,.24); font-size:12px; color:var(--primary-text-color); white-space:nowrap; }
     .chip ha-icon { --mdc-icon-size:14px; display:flex; }
@@ -67,7 +85,7 @@
       if (!this.shadowRoot) {
         const r = this.attachShadow({ mode: 'open' });
         r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="tl"><ha-icon icon="mdi:robot-vacuum"></ha-icon></div><div class="nm"><b></b><span></span></div><span class="chip bat"></span></div>
-          <div class="chips"></div><div class="mw"><div class="msg">Karte wird geladen …</div></div><div class="ft"><span class="sel"></span><span class="acts"></span></div></ha-card>`;
+          <div class="fl"></div><div class="tiles"></div><div class="chips"></div><div class="mw"><div class="msg">Karte wird geladen …</div></div><div class="ft"><span class="sel"></span><span class="acts"></span></div></ha-card>`;
         r.querySelector('ha-card').addEventListener('click', (e) => this._click(e));
       }
       if (!v || !m) { this.shadowRoot.querySelector('.mw').innerHTML = '<div class="msg">Sauger oder Karte nicht gefunden</div>'; return; }
@@ -82,15 +100,15 @@
       const r = this.shadowRoot, st = v.state, run = st === 'cleaning' || st === 'returning';
       const hist = Object.keys(A.cleaning_history_picture || {})[0] || '';
       const hm = /^\d+:\s*(\d+)\/(\d+)\s+(\d+:\d+)/.exec(hist), last = hm ? `zuletzt ${+hm[2]}.${+hm[1]}. ${hm[3]}` : '';
-      const sub = run ? [V.cleaning_progress != null ? V.cleaning_progress + ' %' : '', V.cleaned_area != null ? V.cleaned_area + ' m²' : '', this._roomName(V.current_segment, A)].filter(Boolean).join(' · ') : last;
+      const sub = run || v.state === 'paused' ? [V.cleaning_progress != null ? V.cleaning_progress + ' %' : '', V.cleaned_area != null ? V.cleaned_area + ' m²' : '', this._roomName(V.current_segment, A)].filter(Boolean).join(' · ') : '';
       const set = (sel, html) => { const e = r.querySelector(sel); if (e.innerHTML !== html) e.innerHTML = html; };
       set('.nm b', esc(this._c.title || (V.friendly_name || 'Saugroboter').split(/\s{2,}/)[0]));
       set('.nm span', esc([STATE[st] || st, sub].filter(Boolean).join(' · ')));
       const b = V.battery_level != null ? V.battery_level : V.battery, bc = b > 50 ? C.green : b > 20 ? C.yellow : C.red;
       set('.bat', b != null ? `<ha-icon icon="${V.charging ? 'mdi:battery-charging' : 'mdi:battery'}" style="color:${bc}"></ha-icon>${b} %` : '');
-      const obs = this._obstacles(A).length, carp = (A.detected_carpets || []).length + (A.carpets || []).length;
+      this._tiles(v, V);
+      const obs = this._obstacles(A).length;
       set('.chips', (obs ? `<span class="chip"><ha-icon icon="mdi:alert-outline" style="color:${C.orange}"></ha-icon>${obs} Hindernis${obs === 1 ? '' : 'se'}</span>` : '') +
-        (carp ? `<span class="chip"><ha-icon icon="mdi:dots-grid"></ha-icon>${carp} Teppich${carp === 1 ? '' : 'e'}</span>` : '') +
         (V.cleaning_mode ? `<span class="chip"><ha-icon icon="mdi:water-outline" style="color:${C.blue}"></ha-icon>${esc(MODE[V.cleaning_mode] || V.cleaning_mode)}</span>` : ''));
       const n = this._sel.size;
       set('.sel', n ? esc([...this._sel].map((id) => this._roomName(id, A)).join(', ')) : (run ? '' : 'Räume antippen zum Auswählen'));
@@ -102,6 +120,26 @@
       set('.acts', acts);
     }
 
+    _st(k) { return this._hass.states[this._c.entity.replace('vacuum.', 'sensor.') + '_' + k]; }
+    _tiles(v, V) {
+      const H = this._hass, r = this.shadowRoot, ok = (o) => o && !['unavailable', 'unknown', ''].includes(o.state), fmt = (o) => (H.formatEntityState ? H.formatEntityState(o) : o.state);
+      const tile = (ic, lbl, val, x = '', cls = '') => `<div class="tile ${cls}"><small><ha-icon icon="${ic}"></ha-icon>${esc(lbl)}</small><b>${esc(val)}</b>${x}</div>`;
+      const bar = (p, c) => `<div class="bar"><i style="width:${Math.max(0, Math.min(100, p))}%;background:${c}"></i></div>`;
+      const zs = this._st('state'), hi = this._st('cleaning_history'), ar = this._st('cleaned_area'), ct = this._st('cleaning_time');
+      const pr = this._st('cleaning_progress'), dp = this._st('drying_progress'), dl = this._st('drying_left'), lw = this._st('low_water_warning'), er = this._st('error');
+      let h = tile('mdi:information-outline', 'Zustand', ok(zs) ? fmt(zs) : (STATE[v.state] || v.state));
+      let last = '–'; if (ok(hi)) { const d = new Date(hi.state); if (!isNaN(d)) { const t = new Date(); last = (d.toDateString() === t.toDateString() ? 'heute' : d.toDateString() === new Date(t - 864e5).toDateString() ? 'gestern' : `${d.getDate()}.${d.getMonth() + 1}.`) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); } }
+      const extra = [ok(ar) ? ar.state + ' m²' : '', ok(ct) ? ct.state + ' min' : ''].filter(Boolean).join(' · ');
+      h += tile('mdi:history', 'Letzte Reinigung', last, extra ? `<span class="sx">${esc(extra)}</span>` : '');
+      if (ok(pr) && (v.state === 'cleaning' || v.state === 'paused' || v.state === 'returning')) { const p = +pr.state; h += tile('mdi:timelapse', 'Reinigungsfortschritt', p + ' %' + (extra ? ' · ' + extra : ''), bar(p, p >= 76 ? C.green : p >= 31 ? C.yellow : C.red), 'w'); }
+      if (ok(dp) && +dp.state < 100) { const p = +dp.state; h += tile('mdi:hair-dryer', 'Trocknung', (ok(dl) ? 'noch ' + dl.state + ' min' : p + ' %'), bar(p, C.blue), 'w'); }
+      if (ok(lw) && lw.state !== 'no_warning') h += tile('mdi:water-alert', 'Wassertank', fmt(lw), '', 'al w');
+      if (ok(er) && er.state !== 'no_error') h += tile('mdi:alert-circle-outline', 'Fehler', fmt(er), '', 'al w');
+      if (r.querySelector('.tiles').innerHTML !== h) r.querySelector('.tiles').innerHTML = h;
+      const ks = H.states[this._c.floor || 'input_select.karte'];
+      const fl = ks && (ks.attributes.options || []).length > 1 ? ks.attributes.options.map((o) => `<button class="${o === ks.state ? 'on' : ''}" data-floor="${esc(o)}">${esc(o)}</button>`).join('') : '';
+      if (r.querySelector('.fl').innerHTML !== fl) r.querySelector('.fl').innerHTML = fl;
+    }
     _roomName(id, A) { const r = (A.rooms || {})[id]; return r ? (r.custom_name || r.name) : ''; }
     _obstacles(A) {
       const O = A.obstacles || {}, P = A.obstacle_picture || {};
@@ -190,13 +228,12 @@
       const P = (x, y) => { const p = tf(x, y); return [p[0] / G.S, p[1] / G.S]; };
       const pct = (p) => `left:${f1((p[0] - G.vb[0]) / G.vb[2] * 100)}%;top:${f1((p[1] - G.vb[1]) / G.vb[3] * 100)}%`;
       const obs = this._obstacles(A), vp = A.vacuum_position, cpos = A.charger_position, run = v.state === 'cleaning';
-      const sig = JSON.stringify([obs.map((o) => [o.id, o.x, o.y, o.pic]), vp, cpos, A.detected_carpets, A.carpets, [...this._sel], run && V.current_segment, A.rooms && Object.keys(A.rooms)]);
+      const sig = JSON.stringify([obs.map((o) => [o.id, o.x, o.y, o.pic]), vp, cpos, [...this._sel], run && V.current_segment, A.rooms && Object.keys(A.rooms)]);
       if (sig === this._sig) return; this._sig = sig;
       const r = this.shadowRoot;
       r.querySelectorAll('path.rm').forEach((p) => { const id = p.dataset.room, s = this._sel.has(id), cur = run && String(V.current_segment) === id;
         p.setAttribute('fill-opacity', s ? '.55' : '.26'); p.setAttribute('stroke-width', s ? '2' : '1'); p.classList.toggle('cur', cur && !s); });
-      const carp = (A.carpets || []).concat(A.detected_carpets || []).filter((c) => c && c.x0 != null && c.x2 != null);
-      let s = carp.map((c) => 'M' + [[c.x0, c.y0], [c.x1, c.y1], [c.x2, c.y2], [c.x3, c.y3]].map(([x, y]) => P(x, y).map(f1).join(',')).join('L') + 'Z').map((d) => `<path d="${d}" fill="url(#skp)"/>`).join('');
+      let s = '';
       if (cpos && !(vp && Math.hypot(vp.x - cpos.x, vp.y - cpos.y) < 150)) { const [x, y] = P(cpos.x, cpos.y); s += `<rect x="${f1(x - 4)}" y="${f1(y - 4)}" width="8" height="8" rx="2.5" fill="#f2f2f7" stroke="#1c1c1e" stroke-width="1.2"/><path d="M${f1(x - 2)},${f1(y + .6)}L${f1(x)},${f1(y - 1.6)}L${f1(x + 2)},${f1(y + .6)}" fill="none" stroke="#1c1c1e" stroke-width=".9"/>`; }
       if (vp) { const [x, y] = P(vp.x, vp.y), pa = P(vp.x + 300 * Math.cos(((vp.a || 0)) * Math.PI / 180), vp.y + 300 * Math.sin(((vp.a || 0)) * Math.PI / 180)), dx = pa[0] - x, dy = pa[1] - y, dl = Math.hypot(dx, dy) || 1;
         s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="9" fill="${C.green}" fill-opacity=".25"/><circle cx="${f1(x)}" cy="${f1(y)}" r="5.5" fill="#f2f2f7" stroke="#1c1c1e" stroke-width="1.5"/><circle cx="${f1(x + dx / dl * 3)}" cy="${f1(y + dy / dl * 3)}" r="1.4" fill="${C.green}"/>`; }
@@ -212,11 +249,11 @@
       const pin = e.target.closest('.pin');
       if (pin) { const o = this._obstacles(A).find((q) => q.id === pin.dataset.obs); if (!o) return;
         lb.innerHTML = `<div class="lbx"><div class="lbp">${o.pic ? `<img src="${esc(o.pic)}" alt="">` : `<ha-icon icon="${o.icon}" style="--mdc-icon-size:44px"></ha-icon>`}<button class="x" data-close="1" aria-label="Schließen"><ha-icon icon="mdi:close"></ha-icon></button></div>
-          <div class="lbi"><div><b>${esc(o.type)}</b><span>${esc([o.room, o.p != null ? o.p + ' %' : ''].filter(Boolean).join(' · '))}</span></div><button class="btn g" data-ign="${o.id}">Ignorieren</button></div></div>`;
+          <div class="lbi"><div><b>${esc(o.type)}</b><span>${esc([o.room, o.p != null ? o.p + ' %' : ''].filter(Boolean).join(' · '))}</span></div></div></div>`;
         lb.classList.add('on'); return; }
       if (e.target.closest('[data-close]') || e.target === lb) { lb.classList.remove('on'); return; }
-      const ig = e.target.closest('[data-ign]');
-      if (ig) { const o = this._obstacles(A).find((q) => q.id === ig.dataset.ign); if (o) { this._call('dreame_vacuum', 'vacuum_set_obstacle_ignore', { x: o.x, y: o.y, obstacle_ignored: true }); ig.textContent = 'Ignoriert'; setTimeout(() => lb.classList.remove('on'), 900); } return; }
+      const fb = e.target.closest('[data-floor]');
+      if (fb) { this._hass.callService('input_select', 'select_option', { entity_id: this._c.floor || 'input_select.karte', option: fb.dataset.floor }); this._sel.clear(); return; }
       const rm = e.target.closest('path.rm');
       if (rm) { const id = rm.dataset.room; if (this._sel.has(id)) this._sel.delete(id); else this._sel.add(id); this._sig = ''; this._render(); return; }
       const act = e.target.closest('[data-act]');
