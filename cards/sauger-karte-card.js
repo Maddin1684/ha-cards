@@ -1,4 +1,5 @@
-// sauger-karte-card v2.1 (25.11.2026): Wischband nur noch ein Hauch Blau; Etagenschalter dezent (zarte Spur, ausgewaehlte Etage leicht grau, andere in Sekundaerfarbe).
+// sauger-karte-card v2.2 (25.11.2026): ausgewaehlte Raeume dezent in Orange #f56300 statt Blau.
+// v2.1 (25.11.2026): Wischband nur noch ein Hauch Blau; Etagenschalter dezent (zarte Spur, ausgewaehlte Etage leicht grau, andere in Sekundaerfarbe).
 // v2.0 (25.11.2026): Hindernisse als dezente rot getoente Mini-Kapsel mit kleinem Symbol (groessere unsichtbare Tippflaeche).
 // v1.9 (25.11.2026): Reinigungsspur dezenter (Saugspur zartgrau, Wischband nur ein Hauch blau).
 // v1.8 (25.11.2026): Raumnamen ohne Schatten, in leicht transparenter grauer Kapsel.
@@ -18,6 +19,7 @@
   const TAG = 'sauger-karte-card';
   if (customElements.get(TAG)) return;
   const C = { green: '#30d158', yellow: '#ffd60a', orange: '#ff9f0a', red: '#ff453a', purple: '#bf5af2', blue: '#0a84ff', teal: '#64d2ff', pink: '#ff375f' };
+  const SELC = '#f56300'; // ausgewaehlte Raeume (Martins Orange)
   const ROOMC = [C.green, C.blue, C.yellow, C.teal, C.orange, C.purple, C.pink, C.red]; // nach Reinigungsreihenfolge (order)
   const OBST = [[/stecker|kabel|cable|wire/i, 'mdi:power-socket-eu'], [/textil|socke|sock|kleid|cloth/i, 'mdi:tshirt-crew-outline'], [/schuh|shoe/i, 'mdi:shoe-sneaker'],
     [/basis|möbel|fuß|base|furniture/i, 'mdi:table-furniture'], [/kot|poop|exkrement/i, 'mdi:emoticon-poop-outline'], [/haustier|pet|hund|katze/i, 'mdi:paw'], [/waage|scale/i, 'mdi:scale-bathroom'], [/.*/, 'mdi:alert-outline']];
@@ -321,7 +323,7 @@
       if (sig === this._sig) return; this._sig = sig;
       const r = this.shadowRoot;
       r.querySelectorAll('path.rm').forEach((p) => { const id = p.dataset.room, s = this._sel.has(id), cur = run && String(V.current_segment) === id;
-        p.setAttribute('fill', s ? C.blue : '#ffffff'); p.setAttribute('fill-opacity', s ? '.32' : '.07'); p.setAttribute('stroke', s ? C.blue : 'rgba(235,235,245,.35)'); p.classList.toggle('cur', cur && !s); });
+        p.setAttribute('fill', s ? SELC : '#ffffff'); p.setAttribute('fill-opacity', s ? '.18' : '.07'); p.setAttribute('stroke', s ? 'rgba(245,99,0,.6)' : 'rgba(235,235,245,.35)'); p.classList.toggle('cur', cur && !s); });
       let s = '';
       if (cpos && !(vp && Math.hypot(vp.x - cpos.x, vp.y - cpos.y) < 150)) { const [x, y] = P(cpos.x, cpos.y); s += `<rect x="${f1(x - 4)}" y="${f1(y - 4)}" width="8" height="8" rx="2.5" fill="#f2f2f7" stroke="#1c1c1e" stroke-width="1.2"/><path d="M${f1(x - 2)},${f1(y + .6)}L${f1(x)},${f1(y - 1.6)}L${f1(x + 2)},${f1(y + .6)}" fill="none" stroke="#1c1c1e" stroke-width=".9"/>`; }
       if (vp) { const [x, y] = P(vp.x, vp.y), pa = P(vp.x + 300 * Math.cos(((vp.a || 0)) * Math.PI / 180), vp.y + 300 * Math.sin(((vp.a || 0)) * Math.PI / 180)), dx = pa[0] - x, dy = pa[1] - y, dl = Math.hypot(dx, dy) || 1;
