@@ -1,4 +1,5 @@
-// ELMO Sonnen-Kamera-Karte v1.45 (24.11.2026) – Hof-Bild ohne Wolken/Himmel/Sonne, nur Schnee/Reif
+// ELMO Sonnen-Kamera-Karte v1.46 (25.11.2026) – Schleier-Chip je Runde (Logbuch sl/sq) und je Bild (schleier)
+// v1.45 (24.11.2026) – Hof-Bild ohne Wolken/Himmel/Sonne, nur Schnee/Reif
 // v1.44 (24.11.2026) – Kennzeichen Reif (Logbuch rf): eigener Chip statt Schnee, Hof-Bild heisst 'Hof · Schnee/Reif'
 // v1.43 (19.11.2026) – Hoehe halten gegen Springen, grosses Bild mit fester 16:9-Flaeche
 // v1.42 (17.11.2026) – Treffsicherheit: Runden unter der Schattengrenze zaehlen gar nicht mehr (vorher nur Treffer ausgenommen, Widersprueche gezaehlt - drueckte die Quote)
@@ -472,7 +473,7 @@ class ElmoSonnenCamCard extends HTMLElement {
             info += '<div class="info"><b>' + name + ':</b> ' + (d ? hofT + sichChip + (d.begruendung ? ' · ' + this._esc(d.begruendung) : '') : 'keine Auswertung') + '</div>';
             continue;
           }
-          info += '<div class="info"><b>' + name + kompass + ':</b> ' + (d ? this._chip(d.himmel_zustand) + ' ' + Math.round(d.bewoelkung_prozent) + ' % Wolken' + tonBild + (d.sonne_direkt ? ' <span class="kc" style="background:#f0a5002e;color:#f0a500"><ha-icon icon="mdi:weather-sunny"></ha-icon>Sonne</span>' : '') + sichChip + ' · ' + this._esc(d.begruendung) : 'keine Auswertung') + '</div>';
+          info += '<div class="info"><b>' + name + kompass + ':</b> ' + (d ? this._chip(d.himmel_zustand) + ' ' + Math.round(d.bewoelkung_prozent) + ' % Wolken' + tonBild + (d.schleier === 'leicht' || d.schleier === 'dicht' ? ' <span class="kc" style="background:#e6ecf52e;color:#dfe8f5"><ha-icon icon="mdi:weather-hazy"></ha-icon>Schleier' + (d.schleier === 'dicht' ? ' dicht' : '') + '</span>' : '') + (d.sonne_direkt ? ' <span class="kc" style="background:#f0a5002e;color:#f0a500"><ha-icon icon="mdi:weather-sunny"></ha-icon>Sonne</span>' : '') + sichChip + ' · ' + this._esc(d.begruendung) : 'keine Auswertung') + '</div>';
         }
         const g = this._gross[r.id];
         const gross = g && this._urls[r.id + '_' + g] && this._urls[r.id + '_' + g] !== 'x' ? '<img class="gross" data-act="gross" data-id="' + r.id + '" data-v="' + g + '" src="' + this._urls[r.id + '_' + g] + '" onerror="this.remove()">' : '';
@@ -503,6 +504,8 @@ class ElmoSonnenCamCard extends HTMLElement {
         if (r.ez) extra.push(this._farbChip('#8e8e93', 'nur ein Himmelsbild'));
         if (r.xr) extra.push('<span class="kc" style="background:#64d2ff2e;color:#64d2ff"><ha-icon icon="mdi:camera-flip-outline"></ha-icon>Extra-Runde: Licht geändert</span>');
         if (r.sf === true) extra.push('<span class="kc" style="background:#81d4fa2e;color:#4fa3e0"><ha-icon icon="mdi:weather-snowy-heavy"></ha-icon>Schneefall</span>');
+        // Schleier (v1.46): hohe duenne Cirren, durch die die Sonne scheint - Merkmal, keine Stufe
+        if (r.sl === 'leicht' || r.sl === 'dicht') extra.push('<span class="kc" style="background:#e6ecf52e;color:#dfe8f5" title="Hohe, dünne Schleierwolken (Cirren)' + (r.sq ? ' – dazu Quellwolken' : '') + '"><ha-icon icon="mdi:weather-hazy"></ha-icon>Schleier' + (r.sl === 'dicht' ? ' dicht' : '') + (r.sq ? ' + Wolken' : '') + '</span>');
         if (r.rf === true) extra.push('<span class="kc" style="background:#bfe3ff2e;color:#9fd0ff" title="Reif oder Raureif erkannt – kein Schnee"><ha-icon icon="mdi:snowflake-variant"></ha-icon>Reif</span>');
         if (r.sd && r.sd !== 'keine') extra.push('<span class="kc" style="background:#81d4fa2e;color:#4fa3e0"><ha-icon icon="mdi:snowflake"></ha-icon>Schnee ' + r.sd + '</span>');
         const extraHtml = extra.length ? '<div class="info">' + extra.join(' ') + '</div>' : '';
