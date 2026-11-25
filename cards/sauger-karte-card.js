@@ -1,4 +1,5 @@
-// sauger-karte-card v2.2 (25.11.2026): ausgewaehlte Raeume dezent in Orange #f56300 statt Blau.
+// sauger-karte-card v2.3 (25.11.2026): Wischflaeche etwas kraeftiger in hellem Apple-Wasserblau (#64d2ff).
+// v2.2 (25.11.2026): ausgewaehlte Raeume dezent in Orange #f56300 statt Blau.
 // v2.1 (25.11.2026): Wischband nur noch ein Hauch Blau; Etagenschalter dezent (zarte Spur, ausgewaehlte Etage leicht grau, andere in Sekundaerfarbe).
 // v2.0 (25.11.2026): Hindernisse als dezente rot getoente Mini-Kapsel mit kleinem Symbol (groessere unsichtbare Tippflaeche).
 // v1.9 (25.11.2026): Reinigungsspur dezenter (Saugspur zartgrau, Wischband nur ein Hauch blau).
@@ -292,7 +293,7 @@
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
-        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.07; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
+        cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.14; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
         const tk = 'skc-tr-' + (A.map_id || ''), v = this._hass.states[this._c.entity], running = v && ['cleaning', 'paused', 'returning'].includes(v.state);
         if (n > 50) { this._trail = cv.toDataURL(); try { const h = document.createElement('canvas'); h.width = W / 2; h.height = Hh / 2; h.getContext('2d').drawImage(cv, 0, 0, W / 2, Hh / 2); localStorage.setItem(tk, h.toDataURL()); } catch (e) {} }
         else if (!running) { try { this._trail = localStorage.getItem(tk) || ''; } catch (e) { this._trail = ''; } } // Spur der letzten Reinigung
