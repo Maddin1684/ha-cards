@@ -1,4 +1,5 @@
-// sauger-karte-card v1.5 (25.11.2026): Kachelwerte (z. B. Zustand) brechen um statt abgeschnitten zu werden.
+// sauger-karte-card v1.6 (25.11.2026): kompakter – Karte hoechstens 280 px hoch (mittig), engere Abstaende, flachere Kacheln/Knoepfe.
+// v1.5 (25.11.2026): Kachelwerte (z. B. Zustand) brechen um statt abgeschnitten zu werden.
 // v1.4 (25.11.2026): Kopf wie die anderen Karten (z. B. Luftqualitaet): Titel 'Saugroboter' 24 px ohne Symbol, Akku rechts; Untertitel entfaellt (Zustand steht in den Kacheln).
 // v1.3 (25.11.2026): letzte Hindernisse (mit Fotos) und letzte Reinigungsspur werden je Etage gemerkt und weiter gezeigt, wenn die Integration die Karte neu laedt und sie dabei verwirft.
 // v1.2 (25.11.2026): Raeume einfarbig dezent (ausgewaehlt blau, aktueller Raum pulsiert), Reinigungsspur aus dem Kartenbild (gesaugt feine weisse Linie, gewischt zartblaues Band), Hindernisse in Apple-Rot, Fortschritt als Farbverlauf-Balken, Modus-Kapsel antippen = Modus waehlen (nur einstellen, startet nicht).
@@ -22,20 +23,20 @@
 
   const CSS = `
     :host { display:block; }
-    ha-card { padding:4px 16px 14px; overflow:hidden; }
-    .hd { display:flex; align-items:center; gap:12px; padding:12px 0 4px; margin-bottom:6px; }
+    ha-card { padding:2px 14px 12px; overflow:hidden; }
+    .hd { display:flex; align-items:center; gap:12px; padding:6px 0 0; margin-bottom:4px; }
     .ttl { flex:1; min-width:0; font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; color:var(--ha-card-header-color, var(--primary-text-color)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .tl { flex:0 0 34px; height:34px; border-radius:9px; background:rgba(118,118,128,.28); display:flex; align-items:center; justify-content:center; }
     .tl ha-icon { --mdc-icon-size:22px; color:#fff; display:flex; }
     .nm { flex:1; min-width:0; }
     .nm b { display:block; font-size:15px; font-weight:500; color:var(--primary-text-color); }
     .nm span { display:block; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .fl { display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.24); margin-bottom:10px; }
+    .fl { display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.24); margin-bottom:8px; }
     .fl:empty { display:none; }
-    .fl button { flex:1; border:0; background:none; color:var(--primary-text-color); font:inherit; font-size:13px; padding:6px 8px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .fl button { flex:1; border:0; background:none; color:var(--primary-text-color); font:inherit; font-size:13px; padding:4px 8px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .fl button.on { background:#636366; font-weight:500; }
-    .tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:10px; }
-    .tile { background:rgba(118,118,128,.12); border-radius:12px; padding:8px 10px; min-width:0; }
+    .tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:8px; }
+    .tile { background:rgba(118,118,128,.12); border-radius:10px; padding:6px 9px; min-width:0; }
     .tile.w { grid-column:1 / -1; }
     .tile small { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--secondary-text-color); }
     .tile small ha-icon { --mdc-icon-size:14px; display:flex; }
@@ -55,11 +56,11 @@
     .menu button ha-icon { --mdc-icon-size:16px; display:flex; }
     .menu button .ck { margin-left:auto; color:${C.blue}; }
     .menu small { display:block; font-size:11px; color:#8e8e93; padding:6px 10px 4px; }
-    .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px; }
     .chip.btnc { border:0; font:inherit; font-size:12px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:rgba(118,118,128,.24); font-size:12px; color:var(--primary-text-color); white-space:nowrap; }
     .chip ha-icon { --mdc-icon-size:14px; display:flex; }
-    .mw { position:relative; width:100%; }
+    .mw { position:relative; width:100%; margin:0 auto; }
     .mw svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
     .mw path.rm { cursor:pointer; transition:fill-opacity .25s, stroke-width .25s; -webkit-tap-highlight-color:transparent; }
     .mw path.cur { animation:skrm 2.4s ease-in-out infinite; }
@@ -80,10 +81,10 @@
     .lbi div { flex:1; min-width:0; }
     .lbi b { display:block; font-size:15px; font-weight:500; color:#f2f2f7; }
     .lbi span { display:block; font-size:12px; color:#8e8e93; }
-    .btn { border:0; border-radius:10px; padding:9px 12px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+    .btn { border:0; border-radius:10px; padding:7px 12px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; -webkit-tap-highlight-color:transparent; font-family:inherit; }
     .btn ha-icon { --mdc-icon-size:16px; display:flex; }
     .g { background:rgba(118,118,128,.24); color:var(--primary-text-color); }
-    .ft { display:flex; gap:8px; margin-top:10px; align-items:center; }
+    .ft { display:flex; gap:8px; margin-top:8px; align-items:center; }
     .ft .sel { flex:1; min-width:0; font-size:12px; color:var(--secondary-text-color); }
   `;
 
@@ -298,7 +299,7 @@
     _build() {
       this._trKey = '';
       const G = this._geo, mw = this.shadowRoot.querySelector('.mw');
-      mw.style.aspectRatio = `${G.vb[2]} / ${G.vb[3]}`;
+      mw.style.aspectRatio = `${G.vb[2]} / ${G.vb[3]}`; mw.style.width = `min(100%, ${Math.round(280 * G.vb[2] / G.vb[3])}px)`; // Karte hoechstens 280 px hoch
       mw.innerHTML = `<svg viewBox="${G.vb.join(' ')}"><defs><pattern id="skp" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r=".8" fill="#fff" fill-opacity=".28"/></pattern></defs>` +
         G.rooms.map((r) => `<path class="rm" data-room="${r.id}" d="${r.d}" fill="#ffffff" fill-opacity=".07" stroke="rgba(235,235,245,.35)" stroke-width="1" stroke-linejoin="round"/>`).join('') +
         `<g class="tr" style="pointer-events:none"></g><g class="ov" style="pointer-events:none"></g></svg><div class="hl"></div><div class="lb"></div>`;
