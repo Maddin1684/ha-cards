@@ -1,4 +1,4 @@
-// kamera-ki-training-card v1.5 (23.11.2026: SD-Clips ohne KI-Text der letzten 2 Tage als Zeile Keine KI-Beschreibung (korrigierbar/ausblendbar); v1.4: Button KI-Beschreibung nachholen beim neuesten Clip je Kamera; 18.11.2026, nur Meldungen mit SD-Aufnahme, Vorschaubilder, Fehlalarme) – Kamera-KI Training fuer wetter-doku (ELMO-Admin-Portal).
+// kamera-ki-training-card v1.6 (25.11.2026: reine Tier-Clips mit bis zu 5 Min Luecke bilden eine Gruppe (Katze sitzt dauerhaft = eine Zeile); v1.5 (23.11.2026: SD-Clips ohne KI-Text der letzten 2 Tage als Zeile Keine KI-Beschreibung (korrigierbar/ausblendbar); v1.4: Button KI-Beschreibung nachholen beim neuesten Clip je Kamera; 18.11.2026, nur Meldungen mit SD-Aufnahme, Vorschaubilder, Fehlalarme) – Kamera-KI Training fuer wetter-doku (ELMO-Admin-Portal).
 // Zeigt die KI-Texte aus todo.kamera_ki, Korrektur per Stift (script.kamera_ki_korrektur), feste Hinweise
 // (todo.kamera_ki_hinweise, script.kamera_ki_hinweis). Sichtbar/bedienbar nur fuer config.user (Martin).
 // Clip-Wiedergabe ueber die Reolink-Aufnahmen (media_source, cameras[].media {entry, channel}).
@@ -187,7 +187,8 @@
           const groups = [];
           list.forEach((c) => {
             const g = groups[groups.length - 1];
-            if (g && c.st <= g.end + 30) { g.end = Math.max(g.end, c.st + c.du); g.ids.push(c.id); g.ty += ' ' + c.ty; }
+            const tierNur = (t) => /Animal/.test(t) && !/Person|Vehicle/.test(t);
+            if (g && (c.st <= g.end + 30 || (tierNur(g.ty) && tierNur(c.ty || '') && c.st <= g.end + 300))) { g.end = Math.max(g.end, c.st + c.du); g.ids.push(c.id); g.ty += ' ' + c.ty; }
             else groups.push({ st: c.st, end: c.st + c.du, ids: [c.id], ty: c.ty || '' });
           });
           groups.forEach((g) => {

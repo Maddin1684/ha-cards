@@ -1,4 +1,4 @@
-// kamera-live-card v3.26 (23.11.2026: Tiere wieder Gelb in Liste, Zeitleiste und Zaehler-Pillen, Personen Rot; v3.24: Aufnahmen-Symbol mdi:motion-play-outline, Erkennungs-Chip hoeher (direkt unter Kamera-Uhr), Tier-Zaehler Apple-Rot; v3.23: Aufnahmen-Zaehler erscheinen sofort aus dem Geraete-Speicher und werden nach 1,5 s aufgefrischt (statt erst nach 4 s); v3.22: Erkennungs-Chip tiefer (unter Kamera-Zeitstempel), deckendes Apple-Rot; v3.21: Hauptbild loest das Standbild ab, sobald das erste helle Live-Bild da ist (wie die Kacheln), reveal_after Standard 0,3 s, Ueberblendung 0,25 s; v3.20: SD-Dateien einer Kamera mit Luecke <= merge_gap_s (Standard 30 s) gelten als ein Ablauf; v3.19: zusammengefasst werden zu einer Zeile zusammengefasst und nacheinander abgespielt; korrigierte KI-Texte ohne Haken; v3.18: Fehlalarme aus todo.kamera_ki (Text beginnt mit 'Fehlalarm') werden in Aufnahmen-Liste und Zaehlern ausgeblendet; v3.17: Haptik) – Hof/Garten-Kamerakarte: beide Streams (HA-WebRTC) laufen im Hintergrund,
+// kamera-live-card v3.27 (25.11.2026: reine Tier-Clips (ohne Person/Fahrzeug) einer Kamera mit Luecke <= merge_gap_tier_s (Standard 300 s) gelten als ein Ablauf - Katze, die dauerhaft da sitzt, ist ein Eintrag statt vieler; v3.26 (23.11.2026: Tiere wieder Gelb in Liste, Zeitleiste und Zaehler-Pillen, Personen Rot; v3.24: Aufnahmen-Symbol mdi:motion-play-outline, Erkennungs-Chip hoeher (direkt unter Kamera-Uhr), Tier-Zaehler Apple-Rot; v3.23: Aufnahmen-Zaehler erscheinen sofort aus dem Geraete-Speicher und werden nach 1,5 s aufgefrischt (statt erst nach 4 s); v3.22: Erkennungs-Chip tiefer (unter Kamera-Zeitstempel), deckendes Apple-Rot; v3.21: Hauptbild loest das Standbild ab, sobald das erste helle Live-Bild da ist (wie die Kacheln), reveal_after Standard 0,3 s, Ueberblendung 0,25 s; v3.20: SD-Dateien einer Kamera mit Luecke <= merge_gap_s (Standard 30 s) gelten als ein Ablauf; v3.19: zusammengefasst werden zu einer Zeile zusammengefasst und nacheinander abgespielt; korrigierte KI-Texte ohne Haken; v3.18: Fehlalarme aus todo.kamera_ki (Text beginnt mit 'Fehlalarm') werden in Aufnahmen-Liste und Zaehlern ausgeblendet; v3.17: Haptik) – Hof/Garten-Kamerakarte: beide Streams (HA-WebRTC) laufen im Hintergrund,
 // Kachelbilder = Einzelbilder aus den laufenden Streams (1x/s), Wechsel ohne Ladezeit.
 (() => {
   const TAG = 'kamera-live-card';
@@ -589,7 +589,9 @@
         const merged = [];
         asc.forEach((c) => {
           const p = merged[merged.length - 1];
-          if (p && p.ci === c.ci && c.start <= p.start + p.dur + (this._c.merge_gap_s != null ? Number(this._c.merge_gap_s) : 30)) {
+          const tierNur = (x) => x.types.includes('Animal') && !x.types.includes('Person') && !x.types.includes('Vehicle');
+          const gap = p ? c.start - (p.start + p.dur) : 0;
+          if (p && p.ci === c.ci && (gap <= (this._c.merge_gap_s != null ? Number(this._c.merge_gap_s) : 30) || (tierNur(p) && tierNur(c) && gap <= (this._c.merge_gap_tier_s != null ? Number(this._c.merge_gap_tier_s) : 300)))) {
             p.parts.push(c.id);
             p.dur = Math.max(p.dur, c.start + c.dur - p.start);
             c.types.forEach((t) => { if (!p.types.includes(t)) p.types.push(t); });
