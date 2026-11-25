@@ -1,4 +1,5 @@
-// sauger-karte-card v1.2 (25.11.2026): Raeume einfarbig dezent (ausgewaehlt blau, aktueller Raum pulsiert), Reinigungsspur aus dem Kartenbild (gesaugt feine weisse Linie, gewischt zartblaues Band), Hindernisse in Apple-Rot, Fortschritt als Farbverlauf-Balken, Modus-Kapsel antippen = Modus waehlen (nur einstellen, startet nicht).
+// sauger-karte-card v1.3 (25.11.2026): letzte Hindernisse (mit Fotos) und letzte Reinigungsspur werden je Etage gemerkt und weiter gezeigt, wenn die Integration die Karte neu laedt und sie dabei verwirft.
+// v1.2 (25.11.2026): Raeume einfarbig dezent (ausgewaehlt blau, aktueller Raum pulsiert), Reinigungsspur aus dem Kartenbild (gesaugt feine weisse Linie, gewischt zartblaues Band), Hindernisse in Apple-Rot, Fortschritt als Farbverlauf-Balken, Modus-Kapsel antippen = Modus waehlen (nur einstellen, startet nicht).
 // v1.1 (25.11.2026): alles auf einen Blick statt 3 Tabs – Status-Kacheln (Zustand, letzte Reinigung, Fortschritt/Trocknung als Balken, Wassertank/Fehler nur bei Bedarf), Etagenwahl (input_select.karte) als Segmentschalter; Teppiche und 'Ignorieren' entfernt.
 // v1.0 (25.11.2026): Saugroboter-Karte im Apple-Stil – Raumformen aus der Dreame-Karte (camera.*_map)
 // neu gezeichnet (runde Ecken, Apple-Farben halbtransparent, feiner weisser Rand), Teppiche gepunktet, Basis und Roboter,
@@ -173,10 +174,26 @@
     _roomName(id, A) { const r = (A.rooms || {})[id]; return r ? (r.custom_name || r.name) : ''; }
     _obstacles(A) {
       const O = A.obstacles || {}, P = A.obstacle_picture || {};
-      return Object.keys(O).filter((k) => O[k].possibility != null && O[k].ignore_status !== 'Ignored').map((k) => {
+      const live = Object.keys(O).filter((k) => O[k].possibility != null && O[k].ignore_status !== 'Ignored').map((k) => {
         const o = O[k], pk = Object.keys(P).find((p) => p.split(':')[0].trim() === k);
         return { id: k, x: o.x, y: o.y, type: o.type || 'Hindernis', p: o.possibility, room: o.room || '', pic: pk ? P[pk] : '', icon: OBST.find(([re]) => re.test(o.type || ''))[1] };
       });
+      const ck = 'skc-obs-' + (A.map_id || '');
+      if (live.length) { this._cacheObs(ck, live); return live; }
+      // Karte wurde neu geladen und hat die Hindernisse verworfen: letzte gemerkte zeigen
+      if (!this._obsC || this._obsC.k !== ck) { let c = null; try { c = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {} this._obsC = { k: ck, list: (c && c.list) || [] }; }
+      return this._obsC.list;
+    }
+    async _cacheObs(ck, live) {
+      const sig = ck + JSON.stringify(live.map((o) => [o.id, o.x, o.y, o.pic]));
+      if (sig === this._obsSig || this._obsBusy) return; this._obsSig = sig; this._obsBusy = true;
+      const list = [];
+      for (const o of live) { let pic = o.pic;
+        if (pic) try { const bm = await createImageBitmap(await (await fetch(pic)).blob()), k = Math.min(1, 480 / bm.width), c = document.createElement('canvas');
+          c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k); c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height); pic = c.toDataURL('image/jpeg', 0.72); } catch (e) {}
+        list.push(Object.assign({}, o, { pic })); }
+      try { localStorage.setItem(ck, JSON.stringify({ t: Date.now(), list })); } catch (e) {}
+      this._obsC = { k: ck, list }; this._obsBusy = false;
     }
     // Saugerkoordinaten (mm) -> Kartenbild-Pixel ueber die drei Kalibrierpunkte
     _tf(A) {
@@ -264,7 +281,11 @@
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
         cx.clearRect(0, 0, W, Hh); cx.filter = 'blur(3px)'; cx.globalAlpha = 0.32; cx.drawImage(c2, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1; cx.drawImage(c3, 0, 0);
-        this._trail = n > 50 ? cv.toDataURL() : ''; this._trKey = key;
+        const tk = 'skc-tr-' + (A.map_id || ''), v = this._hass.states[this._c.entity], running = v && ['cleaning', 'paused', 'returning'].includes(v.state);
+        if (n > 50) { this._trail = cv.toDataURL(); try { const h = document.createElement('canvas'); h.width = W / 2; h.height = Hh / 2; h.getContext('2d').drawImage(cv, 0, 0, W / 2, Hh / 2); localStorage.setItem(tk, h.toDataURL()); } catch (e) {} }
+        else if (!running) { try { this._trail = localStorage.getItem(tk) || ''; } catch (e) { this._trail = ''; } } // Spur der letzten Reinigung
+        else this._trail = '';
+        this._trKey = key;
         const g = this.shadowRoot.querySelector('.tr');
         if (g) g.innerHTML = this._trail ? `<image href="${this._trail}" x="0" y="0" width="${W / G.S}" height="${Hh / G.S}" preserveAspectRatio="none"/>` : '';
       } catch (e) { this._trKey = key; }
