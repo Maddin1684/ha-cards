@@ -1,4 +1,5 @@
-// sauger-karte-card v1.4 (25.11.2026): Kopf wie die anderen Karten (z. B. Luftqualitaet): Titel 'Saugroboter' 24 px ohne Symbol, Akku rechts; Untertitel entfaellt (Zustand steht in den Kacheln).
+// sauger-karte-card v1.5 (25.11.2026): Kachelwerte (z. B. Zustand) brechen um statt abgeschnitten zu werden.
+// v1.4 (25.11.2026): Kopf wie die anderen Karten (z. B. Luftqualitaet): Titel 'Saugroboter' 24 px ohne Symbol, Akku rechts; Untertitel entfaellt (Zustand steht in den Kacheln).
 // v1.3 (25.11.2026): letzte Hindernisse (mit Fotos) und letzte Reinigungsspur werden je Etage gemerkt und weiter gezeigt, wenn die Integration die Karte neu laedt und sie dabei verwirft.
 // v1.2 (25.11.2026): Raeume einfarbig dezent (ausgewaehlt blau, aktueller Raum pulsiert), Reinigungsspur aus dem Kartenbild (gesaugt feine weisse Linie, gewischt zartblaues Band), Hindernisse in Apple-Rot, Fortschritt als Farbverlauf-Balken, Modus-Kapsel antippen = Modus waehlen (nur einstellen, startet nicht).
 // v1.1 (25.11.2026): alles auf einen Blick statt 3 Tabs – Status-Kacheln (Zustand, letzte Reinigung, Fortschritt/Trocknung als Balken, Wassertank/Fehler nur bei Bedarf), Etagenwahl (input_select.karte) als Segmentschalter; Teppiche und 'Ignorieren' entfernt.
@@ -38,7 +39,7 @@
     .tile.w { grid-column:1 / -1; }
     .tile small { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--secondary-text-color); }
     .tile small ha-icon { --mdc-icon-size:14px; display:flex; }
-    .tile b { display:block; font-size:14px; font-weight:500; color:var(--primary-text-color); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tile b { display:block; font-size:14px; font-weight:500; line-height:1.3; color:var(--primary-text-color); margin-top:2px; overflow-wrap:anywhere; }
     .tile .sx { display:block; font-size:11px; color:var(--secondary-text-color); margin-top:1px; }
     .tile .bar { height:6px; border-radius:3px; background:rgba(118,118,128,.3); margin-top:6px; overflow:hidden; }
     .tile .bar i { display:block; height:100%; border-radius:3px; transition:width .6s; }
