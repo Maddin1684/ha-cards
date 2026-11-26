@@ -1,4 +1,5 @@
-// tuer-kopf-card v1.0 (26.11.2026, Wunsch Martin): Kopf der Karte 'Tueren und Fenster' wie Beleuchtung/Rollos/Sauger – Titel links,
+// tuer-kopf-card v1.1 (26.11.2026, Wunsch Martin): 'Abbrechen' steht rechts an der Stelle der Pille, 'Wirklich öffnen?' links – ein versehentlicher Doppeltipp bricht ab statt zu oeffnen.
+// v1.0 (26.11.2026, Wunsch Martin): Kopf der Karte 'Tueren und Fenster' wie Beleuchtung/Rollos/Sauger – Titel links,
 // rechts Pille 'Haustür öffnen' mit gruenem Schluessel-Symbol. Schutz vor versehentlichem Druecken: erster Tipp zeigt
 // 'Wirklich öffnen?' + 'Abbrechen' (geht nach 5 s von selbst zurueck), erst der zweite Tipp drueckt input_button.turoffner.
 // Ein Dienstaufruf passiert nur beim Tippen, nie beim Anzeigen.
@@ -34,7 +35,7 @@
       }
       const C = this._c, ic = (i, col) => `<ha-icon icon="${i}" style="color:${col}"></ha-icon>`;
       let bt;
-      if (this._mode === 'ask') bt = `<button class="off" data-a="no" aria-label="Abbrechen">${ic('mdi:close', '#ff453a')}Abbrechen</button><button class="off ask" data-a="yes" aria-label="Wirklich öffnen">${ic(C.icon, C.color)}Wirklich öffnen?</button>`;
+      if (this._mode === 'ask') bt = `<button class="off ask" data-a="yes" aria-label="Wirklich öffnen">${ic(C.icon, C.color)}Wirklich öffnen?</button><button class="off" data-a="no" aria-label="Abbrechen">${ic('mdi:close', '#ff453a')}Abbrechen</button>`; // Abbrechen rechts = wo die Pille war (Doppeltipp bricht ab)
       else if (this._mode === 'done') bt = `<button class="off" data-a="" aria-label="Geöffnet">${ic('mdi:check', C.color)}Geöffnet</button>`;
       else bt = `<button class="off" data-a="ask" aria-label="${esc(C.name)}">${ic(C.icon, C.color)}${esc(C.name)}</button>`;
       const html = `<div class="hd"><span>${esc(C.title)}</span><div class="bt">${bt}</div></div>`;
