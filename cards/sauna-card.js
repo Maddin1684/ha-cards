@@ -1,4 +1,5 @@
-// sauna-card v1.2 (26.11.2026): Ziel 80 °C; Kurve hoeher, Aufguss-Bild dahinter weniger beschnitten (Text oben sichtbar); Aufguss-Kacheln ohne grauen Rand; Hinweis auch, wenn der Praesenzmelder nicht verfuegbar ist.
+// sauna-card v1.3 (26.11.2026): Aufguss mit Duftrichtung statt Hinweistext; Kurve bei kalter Sauna eng skaliert (Verlauf sichtbar statt flacher Linie bei 0), ohne Zielmarke.
+// v1.2 (26.11.2026): Ziel 80 °C; Kurve hoeher, Aufguss-Bild dahinter weniger beschnitten (Text oben sichtbar); Aufguss-Kacheln ohne grauen Rand; Hinweis auch, wenn der Praesenzmelder nicht verfuegbar ist.
 // v1.1 (26.11.2026): Aufguss-Kacheln im Format der Originalkarte (100 x 66, Bild oben buendig, nicht mehr abgeschnitten); Heiz-Symbol (pressure-high) neben dem Titel, solange die Sauna heizt.
 // v1.0 (26.11.2026): Sauna als aufklappbare Liste im Stil der Wetterstation – Jetzt (Temperatur mit Kurve, Gaenge als orange Felder, Zielmarke;
 // klappt beim Heizen/Saunieren selbst auf), aktueller Gang, Heute (Ablauf Gang/Pause, Gaenge, Saunazeit), Aufguss (gewaehlter Aufguss, aufgeklappt alle als Bildkacheln),
@@ -19,6 +20,12 @@
     'Quartett der Sinne': 'quartettdersinne', 'Alpenkräuter Symphonie': 'alpenkraeuter', 'Frischekick': 'frischekick', 'Tropenmelodie': 'tropenmelodie', 'Sommerwald': 'sommerwald',
     'Fichtenessenz': 'fichtenessenz', 'Russische Banja': 'banja', 'Lappland': 'lappland', 'Waldsauna': 'waldsauna', 'Wellness': 'wellness', 'Waldbeere': 'waldbeere',
     'Frostiger Beerenzauber': 'frostigerbeerenzauber', 'Eisminze': 'eisminze', 'Herbal Setri': 'herbalsetri', 'Höllenfeuer': 'hoellenfeuer', 'Maracuja': 'maracuja', 'Blutorange': 'blutorange', 'Zitrone-Orange': 'zitroneorange' };
+  // Duftrichtung der Aufguesse (aus dem Popup 'Sauna Aufguesse')
+  const DUFT = { 'Russische Banja': 'Zedernholz, Menthol, Latschenkiefer, Eukalyptus', 'Lappland': 'Pinie, Tannenöl, Menthol', 'Waldsauna': 'Fichtennadel, Latschenkiefer', 'Wellness': 'Melisse, Lemongrass',
+    'Waldbeere': 'Waldfrüchte, Menthol', 'Frostiger Beerenzauber': 'Menthol, Brombeere, Erdbeere, Heidelbeere', 'Eisminze': 'Gletschereis, Menthol, Pfefferminze', 'Herbal Setri': 'Alpenkräuter, Zitrone, Zedernholz',
+    'Höllenfeuer': 'Eukalyptus, Japanische Pfefferminze, Birke, Wacholder, Myrte, Zedernholz, Zitrone', 'Maracuja': 'Maracuja', 'Blutorange': 'Blutorange', 'Zitrone-Orange': 'Zitrone, Orange', 'Johannisbeere': 'Johannisbeere',
+    'Sanibel': 'Zitrone, Limette, Menthol', 'Süße Wüstenbrise': 'Pfirsichblüten, Waldhonig', '1001 Nacht': 'Zeder, Patschuli, Zitrone, Eukalyptus', 'Ruhequelle': 'Lavendel, Mandarine, Zeder', 'Wohlfühlzauber': 'Lavendel, Orange',
+    'Quartett der Sinne': 'Lavendel, Eukalyptus, Johannisbeere, Zeder', 'Alpenkräuter Symphonie': 'Alpenkräuter-Mix', 'Frischekick': 'Zitrone, Limette, Minze, Menthol', 'Tropenmelodie': 'Kiwi, Passionsfrucht', 'Sommerwald': 'Zitrone, Brombeere' };
   const img = (o) => (BILD[o] ? `/local/sauna/${BILD[o]}.png` : '');
 
   const CSS = `
@@ -159,22 +166,25 @@
       const lo = Math.min(...pts.map((p) => p[1])), rise = pts.find((p) => p[1] > lo + 5);
       let t0 = rise ? rise[0] - 20 * 60000 : now - 3 * 3600000; t0 = Math.max(now - 8 * 3600000, Math.min(t0, now - 90 * 60000));
       const P = pts.filter((p) => p[0] >= t0); const pre = pts.filter((p) => p[0] < t0).pop(); if (pre) P.unshift([t0, pre[1]]);
-      const W = 300, Hh = 150, top = 8, bot = 134, ymin = Math.min(0, Math.floor(Math.min(...P.map((p) => p[1])) / 10) * 10), ymax = Math.max(ziel + 10, Math.ceil(Math.max(...P.map((p) => p[1])) / 10) * 10);
+      const vmin = Math.min(...P.map((p) => p[1])), vmax = Math.max(...P.map((p) => p[1])), kalt = vmax < 40;
+      // kalt (Sauna aus): Achse eng um die Werte, damit man den Verlauf sieht; sonst 0 bis Ziel + 10
+      const stp = kalt ? [0.5, 1, 2, 5, 10].find((q) => (vmax - vmin + 2) / q <= 5) || 10 : 20;
+      const W = 300, Hh = 150, top = 8, bot = 134, ymin = kalt ? Math.floor(vmin / stp) * stp - stp : Math.min(0, Math.floor(vmin / 10) * 10), ymax = kalt ? Math.ceil(vmax / stp) * stp + stp : Math.max(ziel + 10, Math.ceil(vmax / 10) * 10);
       const X = (t) => (t - t0) / (now - t0) * W, Y = (v) => bot - (v - ymin) / (ymax - ymin) * (bot - top), f = (v) => v.toFixed(1);
       let d = ''; P.forEach(([t, v], i) => { d += (i ? 'L' : 'M') + f(X(t)) + ',' + f(Y(v)); });
-      const col = cur >= 80 ? C.red : C.orange;
+      const col = kalt ? 'rgba(235,235,245,.85)' : cur >= 80 ? C.red : C.orange;
       let s = `<svg viewBox="0 0 ${W} ${Hh + 14}"><defs><linearGradient id="sacf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`;
       // Gaenge als orange Felder mit Nummer
       this._gangs().forEach(([a, b, live], i) => { if (b < t0) return; const x1 = X(Math.max(a, t0)), x2 = X(Math.min(b, now));
         s += `<rect x="${f(x1)}" y="${top - 2}" width="${f(Math.max(1.5, x2 - x1))}" height="${bot - top + 2}" fill="${C.gang}" opacity="${live ? 0.1 : 0.16}"/><text x="${f((x1 + x2) / 2)}" y="${top + 6}" text-anchor="middle" font-size="9" fill="${C.gang}">${i + 1}</text>`; });
-      for (let v = Math.ceil(ymin / 20) * 20; v <= ymax; v += 20) if (Math.abs(Y(v) - Y(ziel)) > 11) s += `<line x1="0" x2="${W}" y1="${f(Y(v))}" y2="${f(Y(v))}" stroke="rgba(235,235,245,.1)" stroke-width=".6"/><text x="2" y="${f(Y(v) - 2)}" font-size="9" fill="rgba(235,235,245,.45)">${v}°</text>`;
-      s += `<line x1="0" x2="${W}" y1="${f(Y(ziel))}" y2="${f(Y(ziel))}" stroke="${C.green}" stroke-width=".8" stroke-dasharray="3 3" opacity=".75"/><text x="2" y="${f(Y(ziel) - 2)}" font-size="9" fill="${C.green}">${ziel}°</text>`;
+      for (let v = Math.ceil(ymin / stp) * stp; v <= ymax + 1e-9; v += stp) if (kalt || Math.abs(Y(v) - Y(ziel)) > 11) s += `<line x1="0" x2="${W}" y1="${f(Y(v))}" y2="${f(Y(v))}" stroke="rgba(235,235,245,.1)" stroke-width=".6"/><text x="2" y="${f(Y(v) - 2)}" font-size="9" fill="rgba(235,235,245,.45)">${stp < 1 ? fmt(v) : Math.round(v)}°</text>`;
+      if (!kalt) s += `<line x1="0" x2="${W}" y1="${f(Y(ziel))}" y2="${f(Y(ziel))}" stroke="${C.green}" stroke-width=".8" stroke-dasharray="3 3" opacity=".75"/><text x="2" y="${f(Y(ziel) - 2)}" font-size="9" fill="${C.green}">${ziel}°</text>`;
       s += `<path d="${d}L${f(X(now))},${bot}L0,${bot}Z" fill="url(#sacf)"/><path d="${d}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${f(X(now))}" cy="${f(Y(cur))}" r="3" fill="${col}"/>`;
       const span = now - t0, step = span > 4 * 3600000 ? 7200000 : span > 2 * 3600000 ? 3600000 : 1800000;
       for (let t = Math.ceil(t0 / step) * step; t < now - span * 0.12; t += step) s += `<text x="${f(X(t))}" y="${Hh + 10}" text-anchor="middle" font-size="9" fill="rgba(235,235,245,.5)">${hhmm(new Date(t))}</text>`;
       s += `<text x="${W}" y="${Hh + 10}" text-anchor="end" font-size="9" fill="rgba(235,235,245,.5)">jetzt</text></svg>`;
       // Hoechstwert und Aufheizdauer (bis zum ersten Erreichen des Ziels)
-      const mx = P.reduce((m, p) => (p[1] > m[1] ? p : m), P[0]), hit = rise && P.find((p) => p[0] >= rise[0] && p[1] >= ziel);
+      const mx = P.reduce((m, p) => (p[1] > m[1] ? p : m), P[0]), hit = !kalt && rise && P.find((p) => p[0] >= rise[0] && p[1] >= ziel);
       const info = `<div class="ci"><span>max. ${fmt(mx[1])} °C um ${hhmm(new Date(mx[0]))}</span>${hit ? `<span>${ziel}° nach ${Math.round((hit[0] - rise[0]) / 60000)} min</span>` : ''}</div>`;
       const bg = img(this._v('aufguss'));
       return `<div class="ch">${bg ? `<div class="bg" style="background-image:url('${bg}')"></div>` : ''}${s}</div>${info}`;
@@ -234,7 +244,7 @@
         const cur = as.state, opts = (as.attributes.options || []), aOpen = this._aufMan != null ? this._aufMan : false, b = img(cur);
         const tiles = opts.map((o) => `<button class="${o === cur ? 'on' : ''}" data-aufguss="${esc(o)}"><i${img(o) ? ` style="background-image:url('${img(o)}')"` : ' class="no"'}>${img(o) ? '' : ico('mdi:cancel')}</i>${esc(o || 'Kein')}</button>`).join('');
         out.push(this._fold('aufguss', 'Aufguss', 'mdi:water-outline',
-          this._row(E.aufguss, b ? `<span class="th" style="background-image:url('${b}')"></span>` : ico('mdi:water-off-outline'), `${esc(cur || 'Kein Aufguss')}<span class="sec">${cur ? 'als Bild hinter der Kurve' : 'antippen zum Auswählen'}</span>`,
+          this._row(E.aufguss, b ? `<span class="th" style="background-image:url('${b}')"></span>` : ico('mdi:water-off-outline'), `${esc(cur || 'Kein Aufguss')}<span class="sec">${cur ? esc(DUFT[cur] || '') : 'antippen zum Auswählen'}</span>`,
             `<div class="st">${PM}</div><div class="ex"><div><div class="tl">${tiles}</div></div></div>`, aOpen ? ' open' : '', 'data-auf="1"')));
       }
 
