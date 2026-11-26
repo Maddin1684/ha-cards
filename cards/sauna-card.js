@@ -1,4 +1,4 @@
-// sauna-card v1.9 (26.11.2026): Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
+// sauna-card v1.9 (26.11.2026): Duftrichtung Fichtenessenz ergaenzt; Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
 // v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
 // v1.7 (26.11.2026): bei 'Kein Aufguss' wieder das durchgestrichene Tropfen-Symbol statt Kuebel.
 // v1.6 (26.11.2026): Sauna-Kuebel (phu:sauna-bucket) als Symbol des Bereichs Aufguss.
@@ -31,7 +31,7 @@
     'Waldbeere': 'Waldfrüchte, Menthol', 'Frostiger Beerenzauber': 'Menthol, Brombeere, Erdbeere, Heidelbeere', 'Eisminze': 'Gletschereis, Menthol, Pfefferminze', 'Herbal Setri': 'Alpenkräuter, Zitrone, Zedernholz',
     'Höllenfeuer': 'Eukalyptus, Japanische Pfefferminze, Birke, Wacholder, Myrte, Zedernholz, Zitrone', 'Maracuja': 'Maracuja', 'Blutorange': 'Blutorange', 'Zitrone-Orange': 'Zitrone, Orange', 'Johannisbeere': 'Johannisbeere',
     'Sanibel': 'Zitrone, Limette, Menthol', 'Süße Wüstenbrise': 'Pfirsichblüten, Waldhonig', '1001 Nacht': 'Zeder, Patschuli, Zitrone, Eukalyptus', 'Ruhequelle': 'Lavendel, Mandarine, Zeder', 'Wohlfühlzauber': 'Lavendel, Orange',
-    'Quartett der Sinne': 'Lavendel, Eukalyptus, Johannisbeere, Zeder', 'Alpenkräuter Symphonie': 'Alpenkräuter-Mix', 'Frischekick': 'Zitrone, Limette, Minze, Menthol', 'Tropenmelodie': 'Kiwi, Passionsfrucht', 'Sommerwald': 'Zitrone, Brombeere' };
+    'Quartett der Sinne': 'Lavendel, Eukalyptus, Johannisbeere, Zeder', 'Alpenkräuter Symphonie': 'Alpenkräuter-Mix', 'Frischekick': 'Zitrone, Limette, Minze, Menthol', 'Tropenmelodie': 'Kiwi, Passionsfrucht', 'Sommerwald': 'Zitrone, Brombeere', 'Fichtenessenz': 'Fichtennadel' };
   const img = (o) => (BILD[o] ? `/local/sauna/${BILD[o]}.png` : '');
 
   const CSS = `
