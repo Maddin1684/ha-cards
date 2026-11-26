@@ -1,4 +1,4 @@
-// beleuchtung-card v1.3 (25.11.2026: Knopf 'Alle aus' nur sichtbar, wenn mindestens ein Licht an ist; v1.2: Knopf 'Alle aus' neben dem Titel – schaltet alle eingeschalteten Lampen der Karte aus, blass wenn keine an ist; v1.1: Raum-Icons immer weiss, Status bricht um statt den Raumnamen zu kuerzen, Lampen-Karten ohne eigenen Rahmen/Hintergrund; v1.0: Beleuchtung als Liste im Stil der wetterstation-liste-card – jeder Raum ein Kaestchen im Apple-Grau,
+// beleuchtung-card v1.4 (26.11.2026: Knopf heisst jetzt 'Alle ausschalten'; v1.3 (25.11.2026: Knopf 'Alle aus' nur sichtbar, wenn mindestens ein Licht an ist; v1.2: Knopf 'Alle aus' neben dem Titel – schaltet alle eingeschalteten Lampen der Karte aus, blass wenn keine an ist; v1.1: Raum-Icons immer weiss, Status bricht um statt den Raumnamen zu kuerzen, Lampen-Karten ohne eigenen Rahmen/Hintergrund; v1.0: Beleuchtung als Liste im Stil der wetterstation-liste-card – jeder Raum ein Kaestchen im Apple-Grau,
 // Status rechts ('alle ausgeschaltet' / 'x Lichter an' gelb), dezentes Plus/Minus im Kreis zum Aufklappen, aufgeklappt die bisherigen
 // Lampen-Karten (mushroom-light-card) des Raums; ersetzt die Entitaetenkarte mit fold-entity-row).
 // Konfiguration: title, rooms: [{ name, icon, cards: [Karten-Konfigurationen] }] – die Lampen werden aus cards[].entity gelesen.
@@ -99,7 +99,7 @@
     _html() {
       const H = this._hass, out = [];
       const anyOn = this._c.rooms.some((r) => this._lights(r).some((id) => H.states[id] && H.states[id].state === 'on'));
-      if (this._c.title !== false) out.push(`<div class="hd"><span>${esc(this._c.title || 'Beleuchtung')}</span>${anyOn ? '<button class="off" data-alloff="1" aria-label="Alle Lichter aus"><ha-icon icon="mdi:lightbulb-group-off-outline"></ha-icon>Alle aus</button>' : ''}</div>`);
+      if (this._c.title !== false) out.push(`<div class="hd"><span>${esc(this._c.title || 'Beleuchtung')}</span>${anyOn ? '<button class="off" data-alloff="1" aria-label="Alle Lichter ausschalten"><ha-icon icon="mdi:lightbulb-group-off-outline"></ha-icon>Alle ausschalten</button>' : ''}</div>`);
       const rows = this._c.rooms.map((r, i) => {
         const on = this._lights(r).filter((id) => H.states[id] && H.states[id].state === 'on').length;
         const txt = on === 0 ? 'alle ausgeschaltet' : on === 1 ? '1 Licht an' : `${on} Lichter an`;
