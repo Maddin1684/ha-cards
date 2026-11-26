@@ -1,4 +1,5 @@
-// sauger-karte-card v2.7 (26.11.2026, Wunsch Martin): Steuerung als Pille oben rechts wie Beleuchtung/Rollos – Alle reinigen (gruenes Sauger-Symbol), waehrend der Reinigung Pausieren (gelb) und Zur Station (rot), pausiert Fortsetzen (gruen); Akku als Pille neben dem Reinigungsmodus.
+// sauger-karte-card v2.8 (26.11.2026, Wunsch Martin): Pillen Modus/Akku/Hindernisse gleich gross wie die Kopf-Pillen (13 px, 30 px hoch, Symbol 16 px).
+// v2.7 (26.11.2026, Wunsch Martin): Steuerung als Pille oben rechts wie Beleuchtung/Rollos – Alle reinigen (gruenes Sauger-Symbol), waehrend der Reinigung Pausieren (gelb) und Zur Station (rot), pausiert Fortsetzen (gruen); Akku als Pille neben dem Reinigungsmodus.
 // v2.6 (26.11.2026): Karte erscheint auch, wenn die Integration die Kalibrierung verworfen hat (wird je Karte gemerkt; sonst Bild abrufen, damit sie neu gemeldet wird).
 // v2.5 (25.11.2026): Kachelwerte in normaler Schrift statt fett (passend zu den anderen Karten).
 // v2.4 (25.11.2026): Wischflaeche in tieferem Blau (#0058e6, dunkler als Apple-Blau) statt Hellblau.
@@ -70,9 +71,9 @@
     .menu button .ck { margin-left:auto; color:${C.blue}; }
     .menu small { display:block; font-size:11px; color:#8e8e93; padding:6px 10px 4px; }
     .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px; }
-    .chip.btnc { border:0; font:inherit; font-size:12px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:rgba(118,118,128,.24); font-size:12px; color:var(--primary-text-color); white-space:nowrap; }
-    .chip ha-icon { --mdc-icon-size:14px; display:flex; }
+    .chip.btnc { border:0; font:inherit; font-size:13px; line-height:1; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .chip { display:inline-flex; align-items:center; gap:6px; height:30px; box-sizing:border-box; padding:0 12px 0 10px; border-radius:15px; background:rgba(118,118,128,.24); font-size:13px; line-height:1; color:var(--primary-text-color); white-space:nowrap; }
+    .chip ha-icon { --mdc-icon-size:16px; display:flex; }
     .mw { position:relative; width:100%; margin:0 auto; }
     .mw svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
     .mw path.rm { cursor:pointer; transition:fill-opacity .25s, stroke-width .25s; -webkit-tap-highlight-color:transparent; }
