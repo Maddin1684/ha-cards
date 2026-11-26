@@ -1,4 +1,5 @@
-// sauna-card v1.3 (26.11.2026): Aufguss mit Duftrichtung statt Hinweistext; Kurve bei kalter Sauna eng skaliert (Verlauf sichtbar statt flacher Linie bei 0), ohne Zielmarke.
+// sauna-card v1.4 (26.11.2026): Apple-Orange fuer Gaenge; beim Aufheizen eigene Zeile mit animiertem Pfeil-Symbol, Restzeit und Fortschrittsbalken; Zielmarke entfernt, Hoechstwert direkt in der Kurve; Abkuehlpause mit sich fuellendem Glas, laufender Gang pulsiert; Symbole wie in der Originalkarte.
+// v1.3 (26.11.2026): Aufguss mit Duftrichtung statt Hinweistext; Kurve bei kalter Sauna eng skaliert (Verlauf sichtbar statt flacher Linie bei 0), ohne Zielmarke.
 // v1.2 (26.11.2026): Ziel 80 °C; Kurve hoeher, Aufguss-Bild dahinter weniger beschnitten (Text oben sichtbar); Aufguss-Kacheln ohne grauen Rand; Hinweis auch, wenn der Praesenzmelder nicht verfuegbar ist.
 // v1.1 (26.11.2026): Aufguss-Kacheln im Format der Originalkarte (100 x 66, Bild oben buendig, nicht mehr abgeschnitten); Heiz-Symbol (pressure-high) neben dem Titel, solange die Sauna heizt.
 // v1.0 (26.11.2026): Sauna als aufklappbare Liste im Stil der Wetterstation – Jetzt (Temperatur mit Kurve, Gaenge als orange Felder, Zielmarke;
@@ -8,7 +9,7 @@
 (() => {
   const TAG = 'sauna-card';
   if (customElements.get(TAG)) return;
-  const C = { green: '#30d158', yellow: '#ffd60a', orange: '#ff9f0a', red: '#ff453a', blue: '#0a84ff', gang: '#f56300' };
+  const C = { green: '#30d158', yellow: '#ffd60a', orange: '#ff9f0a', red: '#ff453a', blue: '#0a84ff', gang: '#ff9f0a' };
   const DEF = {
     temp: 'sensor.saunatemp_sauna', heizt: 'binary_sensor.sauna_heizt', aufheiz: 'sensor.sauna_aufheizzeit', test: 'input_boolean.sauna_prognose_test',
     gang_aktiv: 'input_boolean.sauna_gang_aktiv', gang_start: 'input_text.sauna_aktueller_gang_start', gang_dauer: 'sensor.sauna_gang_dauer',
@@ -82,6 +83,14 @@
     .seg button { flex:1; border:0; background:none; color:var(--secondary-text-color); font:inherit; font-size:12px; padding:5px 2px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .seg button.on { background:rgba(118,118,128,.26); color:var(--primary-text-color); }
     .wn { border-radius:10px; padding:7px 10px; margin-bottom:4px; font-size:12px; line-height:1.35; display:flex; gap:8px; align-items:center; color:${C.red}; background:rgba(255,69,58,.14); }
+    @keyframes sacup { 0% { transform:translateY(5px); opacity:0; } 50% { opacity:1; } 100% { transform:translateY(0); opacity:1; } }
+    .a-up { animation:sacup 1.4s ease-in-out infinite; }
+    @keyframes sacfill { 0% { clip-path:inset(100% 0 0 0); } 60%, 100% { clip-path:inset(0 0 0 0); } }
+    .a-fill { animation:sacfill 2.4s ease-in-out infinite; }
+    @keyframes sacpulse { 0%, 100% { opacity:1; } 50% { opacity:.45; } }
+    .a-pulse { animation:sacpulse 2s ease-in-out infinite; }
+    .pg { flex:0 0 100%; height:6px; border-radius:3px; background:rgba(118,118,128,.3); overflow:hidden; margin:-4px 0 10px; }
+    .pg i { display:block; height:100%; border-radius:3px; transition:width .6s; }
     .wn ha-icon { --mdc-icon-size:16px; flex:0 0 16px; display:flex; }
   `;
 
@@ -104,7 +113,7 @@
   const fmt = (v, d = 1) => num(v).toFixed(d).replace('.', ',');
   const hhmm = (dt) => String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0');
   const ok = (v) => v != null && !['', 'unknown', 'unavailable'].includes(v);
-  const ico = (icon, col = '') => `<ha-icon icon="${icon}"${col ? ` style="color:${col}"` : ''}></ha-icon>`;
+  const ico = (icon, col = '', cls = '') => `<ha-icon icon="${icon}"${cls ? ` class="${cls}"` : ''}${col ? ` style="color:${col}"` : ''}></ha-icon>`;
   const PM = '<span class="pw"><span class="pc"><ha-icon class="p" icon="mdi:plus-circle-outline"></ha-icon><ha-icon class="m" icon="mdi:minus-circle-outline"></ha-icon></span></span>';
 
   class SaunaCard extends HTMLElement {
@@ -177,15 +186,16 @@
       // Gaenge als orange Felder mit Nummer
       this._gangs().forEach(([a, b, live], i) => { if (b < t0) return; const x1 = X(Math.max(a, t0)), x2 = X(Math.min(b, now));
         s += `<rect x="${f(x1)}" y="${top - 2}" width="${f(Math.max(1.5, x2 - x1))}" height="${bot - top + 2}" fill="${C.gang}" opacity="${live ? 0.1 : 0.16}"/><text x="${f((x1 + x2) / 2)}" y="${top + 6}" text-anchor="middle" font-size="9" fill="${C.gang}">${i + 1}</text>`; });
-      for (let v = Math.ceil(ymin / stp) * stp; v <= ymax + 1e-9; v += stp) if (kalt || Math.abs(Y(v) - Y(ziel)) > 11) s += `<line x1="0" x2="${W}" y1="${f(Y(v))}" y2="${f(Y(v))}" stroke="rgba(235,235,245,.1)" stroke-width=".6"/><text x="2" y="${f(Y(v) - 2)}" font-size="9" fill="rgba(235,235,245,.45)">${stp < 1 ? fmt(v) : Math.round(v)}°</text>`;
-      if (!kalt) s += `<line x1="0" x2="${W}" y1="${f(Y(ziel))}" y2="${f(Y(ziel))}" stroke="${C.green}" stroke-width=".8" stroke-dasharray="3 3" opacity=".75"/><text x="2" y="${f(Y(ziel) - 2)}" font-size="9" fill="${C.green}">${ziel}°</text>`;
+      for (let v = Math.ceil(ymin / stp) * stp; v <= ymax + 1e-9; v += stp) s += `<line x1="0" x2="${W}" y1="${f(Y(v))}" y2="${f(Y(v))}" stroke="rgba(235,235,245,.1)" stroke-width=".6"/><text x="2" y="${f(Y(v) - 2)}" font-size="9" fill="rgba(235,235,245,.45)">${stp < 1 ? fmt(v) : Math.round(v)}°</text>`;
       s += `<path d="${d}L${f(X(now))},${bot}L0,${bot}Z" fill="url(#sacf)"/><path d="${d}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${f(X(now))}" cy="${f(Y(cur))}" r="3" fill="${col}"/>`;
       const span = now - t0, step = span > 4 * 3600000 ? 7200000 : span > 2 * 3600000 ? 3600000 : 1800000;
-      for (let t = Math.ceil(t0 / step) * step; t < now - span * 0.12; t += step) s += `<text x="${f(X(t))}" y="${Hh + 10}" text-anchor="middle" font-size="9" fill="rgba(235,235,245,.5)">${hhmm(new Date(t))}</text>`;
+      for (let t = Math.ceil(t0 / step) * step; t < now - span * 0.12; t += step) if (X(t) > 14) s += `<text x="${f(X(t))}" y="${Hh + 10}" text-anchor="middle" font-size="9" fill="rgba(235,235,245,.5)">${hhmm(new Date(t))}</text>`;
       s += `<text x="${W}" y="${Hh + 10}" text-anchor="end" font-size="9" fill="rgba(235,235,245,.5)">jetzt</text></svg>`;
       // Hoechstwert und Aufheizdauer (bis zum ersten Erreichen des Ziels)
       const mx = P.reduce((m, p) => (p[1] > m[1] ? p : m), P[0]), hit = !kalt && rise && P.find((p) => p[0] >= rise[0] && p[1] >= ziel);
-      const info = `<div class="ci"><span>max. ${fmt(mx[1])} °C um ${hhmm(new Date(mx[0]))}</span>${hit ? `<span>${ziel}° nach ${Math.round((hit[0] - rise[0]) / 60000)} min</span>` : ''}</div>`;
+      { const mxX = X(mx[0]), mxY = Y(mx[1]), an = mxX > W - 40 ? 'end' : mxX < 30 ? 'start' : 'middle';
+        s = s.replace(/<\/svg>$/, `<circle cx="${f(mxX)}" cy="${f(mxY)}" r="2.4" fill="#fff"/><text x="${f(mxX + (an === 'end' ? -4 : an === 'start' ? 4 : 0))}" y="${f(Math.max(9, mxY - 6))}" text-anchor="${an}" font-size="10" fill="#fff">max. ${fmt(mx[1])}°</text></svg>`); }
+      const info = `<div class="ci"><span>max. um ${hhmm(new Date(mx[0]))}</span>${hit ? `<span>aufgeheizt in ${Math.round((hit[0] - rise[0]) / 60000)} min</span>` : ''}</div>`;
       const bg = img(this._v('aufguss'));
       return `<div class="ch">${bg ? `<div class="bg" style="background-image:url('${bg}')"></div>` : ''}${s}</div>${info}`;
     }
@@ -208,15 +218,23 @@
       const mv = this._v('melder'), mo = this._on('melder_offline') || (this._s('melder') && ['unavailable', 'unknown'].includes(mv));
       if (mo) jetzt += `<div class="wn">${ico('mdi:access-point-network-off')}<span><b>Präsenzmelder offline</b> · Gänge werden nicht erkannt</span></div>`;
       const az = this._v('aufheiz'), m = /^(\d+)\s*Minuten?\s*\((\d{1,2}:\d{2})\)/.exec(az);
-      const sub = m ? `bereit in ${m[1]} min · um ${m[2]}` : /erreicht/i.test(az) ? 'Temperatur erreicht' : heizt ? 'heizt' : 'aus';
+      const reached = /erreicht/i.test(az) || (heizt && t >= num(this._c.ziel, 80));
+      const sub = reached && (heizt || t >= 40) ? 'Temperatur erreicht' : heizt ? 'heizt' : t >= 40 ? 'kühlt ab' : 'aus';
       const tc = t >= 80 ? C.red : heizt || t >= 40 ? C.orange : '';
       const open = this._chartOpen();
-      jetzt += this._row(E.temp, ico('mdi:thermometer', tc), `Temperatur<span class="sec"${/erreicht/i.test(az) ? ` style="color:${C.green}"` : ''}>${esc(sub)}</span>`,
+      jetzt += this._row(E.temp, ico('mdi:thermometer', tc), `Temperatur<span class="sec"${sub === 'Temperatur erreicht' ? ` style="color:${C.green}"` : ''}>${esc(sub)}</span>`,
         `<div class="st" style="padding-top:2px"><span${tc ? ` style="color:${tc}"` : ''}>${fmt(t)}</span><small>°C</small>${PM}</div><div class="ex"><div>${open || this._chartHad ? this._chart() : ''}</div></div>`,
         open ? ' open' : '', 'data-chart="1"');
       if (open) this._chartHad = true;
+      // Aufheizen: Restzeit mit animiertem Pfeil-Symbol und Fortschrittsbalken (Farbverlauf gruen - gelb - rot wie bisher)
+      if (heizt && !reached) {
+        const ziel = num(this._c.ziel, 80), pts = this._pts || [], lo = pts.length ? Math.min(...pts.filter((p) => p[0] > Date.now() - 4 * 3600000).map((p) => p[1]).concat([t])) : Math.min(t, 0);
+        const pr = Math.max(0, Math.min(100, (t - lo) / Math.max(1, ziel - lo) * 100)), w = Math.max(1, pr);
+        jetzt += this._row(E.aufheiz, ico('mdi:sort-clock-descending', C.orange, 'a-up'), `Aufheizzeit${m ? `<span class="sec">bereit um ${m[2]}</span>` : ''}`,
+          `<div class="st">${m ? `${m[1]} <small>min</small>` : esc(az)}</div><div class="pg"><i style="width:${w.toFixed(1)}%;background:linear-gradient(90deg,${C.green} 0%,${C.yellow} 50%,${C.red} 100%);background-size:${(10000 / w).toFixed(1)}% 100%"></i></div>`);
+      }
       const gd = this._v('gang_dauer'), gm = /^(\d+)\.\s*Gang\D*(\d+)/.exec(gd), pm = /^Abkühlpause\D*(\d+)/.exec(gd);
-      if (gm || pm || this._on('gang_aktiv')) jetzt += this._row(E.gang_dauer, ico(pm ? 'mdi:snowflake' : 'mdi:timer-play-outline', pm ? C.blue : C.gang), pm ? 'Abkühlpause' : 'Aktueller Gang',
+      if (gm || pm || this._on('gang_aktiv')) jetzt += this._row(E.gang_dauer, ico(pm ? 'mdi:cup-water' : 'mdi:timer-play-outline', pm ? C.blue : C.gang, pm ? 'a-fill' : 'a-pulse'), pm ? 'Abkühlpause' : 'Aktueller Gang',
         `<div class="st" style="color:${pm ? C.blue : C.gang}">${gm ? `Gang ${gm[1]} · ${gm[2]} min` : pm ? `${pm[1]} min` : esc(gd)}</div>`);
       out.push(this._fold('jetzt', 'Jetzt', 'mdi:fire', jetzt));
 
@@ -233,7 +251,7 @@
           heute += `<div class="r" data-more="${esc(E.ablauf)}"><div class="ab"><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span>Ablauf</span><span style="font-size:12px;color:var(--secondary-text-color)">seit ${hhmm(new Date(G[0][0]))}</span></div>
             <div class="bar">${bar}</div><div class="lg"><span><span style="color:${C.gang}">●</span> ${gs} min Gang · <span style="color:${C.blue}">●</span> ${ps} min Pause</span><span>${this._on('session') || last[2] ? 'jetzt' : hhmm(new Date(blocks[blocks.length - 1][2]))}</span></div></div></div>`;
         }
-        heute += this._row(E.gaenge, ico('mdi:walk'), 'Saunagänge', `<div class="st">${gn}</div>`);
+        heute += this._row(E.gaenge, ico('fas:person-walking-arrow-right'), 'Saunagänge', `<div class="st">${gn}</div>`);
         if (ok(zt) && zt !== 'nicht gestartet') heute += this._row(E.zeit, ico('mdi:timer-sand'), 'Saunazeit', `<div class="st">${esc(zt.replace(/Stunden?/, 'h').replace(/Minuten?/, 'min'))}</div>`);
         out.push(this._fold('heute', 'Heute', 'mdi:calendar-today', heute));
       }
@@ -250,18 +268,18 @@
 
       /* ---------- Licht und Ambiente ---------- */
       let licht = '';
-      [['bank', 'LED Bankbeleuchtung', 'mdi:led-strip-variant'], ['lampe', 'Lampe', 'mdi:bulkhead-light']].forEach(([k, n, ic]) => {
+      [['bank', 'LED Bankbeleuchtung', 'phu:light-strip'], ['lampe', 'Lampe', 'mdi:bulkhead-light']].forEach(([k, n, ic]) => {
         const s = this._s(k); if (!s) return; const on = s.state === 'on', br = on && s.attributes.brightness != null ? Math.round(s.attributes.brightness / 2.55) + ' %' : on ? 'an' : 'aus';
         licht += this._row(E[k], ico(ic, on ? C.yellow : ''), n, `<div class="st"${on ? '' : ' style="color:var(--secondary-text-color)"'}>${br}</div>`, '', `data-toggle="${esc(E[k])}"`);
       });
       const am = this._s('ambiente');
-      if (am) licht += `<div class="r" data-more="${esc(E.ambiente)}"><div class="bd">${ico('mdi:earth')}</div><div class="nm">Ambiente</div><div class="seg">${(am.attributes.options || []).map((o) => `<button class="${o === am.state ? 'on' : ''}" data-amb="${esc(o)}">${esc(o)}</button>`).join('')}</div></div>`;
+      if (am) licht += `<div class="r" data-more="${esc(E.ambiente)}"><div class="bd">${ico('phu:twinkly-spritzer')}</div><div class="nm">Ambiente</div><div class="seg">${(am.attributes.options || []).map((o) => `<button class="${o === am.state ? 'on' : ''}" data-amb="${esc(o)}">${esc(o)}</button>`).join('')}</div></div>`;
       out.push(this._fold('licht', 'Licht und Ambiente', 'mdi:lightbulb-outline', licht));
 
       /* ---------- Saison ---------- */
       const ts = this._s('tage'), le = this._v('letzte');
       if (ts) out.push(this._fold('saison', 'Saison ' + new Date().getFullYear(), 'mdi:chart-bar',
-        this._row(E.tage, ico('mdi:calendar-check'), `Saunatage${ok(le) ? `<span class="sec">letzte Sauna ${esc(le)}</span>` : ''}`, `<div class="st">${esc(ts.state)}</div>`)));
+        this._row(E.tage, ico('mdi:home-roof'), `Saunatage${ok(le) ? `<span class="sec">letzte Sauna ${esc(le)}</span>` : ''}`, `<div class="st">${esc(ts.state)}</div>`)));
       return out.join('');
     }
 
