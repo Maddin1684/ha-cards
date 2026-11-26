@@ -1,8 +1,9 @@
-// sauna-card v1.1 (26.11.2026): Aufguss-Kacheln im Format der Originalkarte (100 x 66, Bild oben buendig, nicht mehr abgeschnitten); Heiz-Symbol (pressure-high) neben dem Titel, solange die Sauna heizt.
+// sauna-card v1.2 (26.11.2026): Ziel 80 °C; Kurve hoeher, Aufguss-Bild dahinter weniger beschnitten (Text oben sichtbar); Aufguss-Kacheln ohne grauen Rand; Hinweis auch, wenn der Praesenzmelder nicht verfuegbar ist.
+// v1.1 (26.11.2026): Aufguss-Kacheln im Format der Originalkarte (100 x 66, Bild oben buendig, nicht mehr abgeschnitten); Heiz-Symbol (pressure-high) neben dem Titel, solange die Sauna heizt.
 // v1.0 (26.11.2026): Sauna als aufklappbare Liste im Stil der Wetterstation – Jetzt (Temperatur mit Kurve, Gaenge als orange Felder, Zielmarke;
 // klappt beim Heizen/Saunieren selbst auf), aktueller Gang, Heute (Ablauf Gang/Pause, Gaenge, Saunazeit), Aufguss (gewaehlter Aufguss, aufgeklappt alle als Bildkacheln),
 // Licht und Ambiente, Saison (Saunatage, letzte Sauna). Hinweis, wenn der Praesenzmelder ausfaellt.
-// Konfiguration (alles optional): title, ziel (Zieltemperatur, Standard 90), entities: { ... } zum Ueberschreiben der Standard-Entitaeten.
+// Konfiguration (alles optional): title, ziel (Zieltemperatur, Standard 80), entities: { ... } zum Ueberschreiben der Standard-Entitaeten.
 (() => {
   const TAG = 'sauna-card';
   if (customElements.get(TAG)) return;
@@ -12,7 +13,7 @@
     gang_aktiv: 'input_boolean.sauna_gang_aktiv', gang_start: 'input_text.sauna_aktueller_gang_start', gang_dauer: 'sensor.sauna_gang_dauer',
     session: 'input_boolean.saunazeit', ablauf: 'input_text.sauna_ablauf_heute', gaenge: 'counter.sauna_gange_heute', zeit: 'sensor.saunazeit_heute',
     aufguss: 'input_select.sauna_aufguss_hintergrund', bank: 'light.cob_strip_sauna', lampe: 'light.sauna', ambiente: 'input_select.ambiente',
-    tage: 'counter.uber20', letzte: 'sensor.letzte_sauna', melder_offline: 'binary_sensor.prasenzmelder_sauna_offline',
+    tage: 'counter.uber20', letzte: 'sensor.letzte_sauna', melder_offline: 'binary_sensor.prasenzmelder_sauna_offline', melder: 'binary_sensor.prasenzmelder_sauna_presence',
   };
   const BILD = { 'Johannisbeere': 'johannisbeere', 'Sanibel': 'sanibel', 'Süße Wüstenbrise': 'wuestenbrise', '1001 Nacht': '1001nacht', 'Ruhequelle': 'ruhequelle', 'Wohlfühlzauber': 'wohlfuehlzauber',
     'Quartett der Sinne': 'quartettdersinne', 'Alpenkräuter Symphonie': 'alpenkraeuter', 'Frischekick': 'frischekick', 'Tropenmelodie': 'tropenmelodie', 'Sommerwald': 'sommerwald',
@@ -55,7 +56,7 @@
     .r.open .ex { grid-template-rows:1fr; }
     .ex > div { overflow:hidden; min-height:0; }
     .ch { position:relative; margin:2px 0 4px; border-radius:8px; overflow:hidden; }
-    .ch .bg { position:absolute; inset:0; background:center/cover no-repeat; opacity:.3; }
+    .ch .bg { position:absolute; inset:0; background:25% 18%/cover no-repeat; opacity:.42; }
     .ch svg { position:relative; display:block; width:100%; height:auto; }
     .ci { display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--secondary-text-color); padding:0 0 10px; }
     .bar { display:flex; gap:2px; height:8px; border-radius:4px; overflow:hidden; margin-top:2px; }
@@ -65,7 +66,8 @@
     .tl { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding:4px 0 10px; }
     .tl::-webkit-scrollbar { display:none; }
     .tl button { flex:0 0 100px; border:0; padding:0; background:none; font:inherit; font-size:11px; line-height:1.2; color:var(--secondary-text-color); text-align:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .tl button i { display:block; width:100px; height:66px; border-radius:12px; margin-bottom:4px; background:rgba(118,118,128,.3) center top/cover no-repeat; box-sizing:border-box; border:2px solid transparent; }
+    .tl button i { display:block; width:100px; height:66px; border-radius:12px; margin-bottom:4px; background:center top/cover no-repeat; background-clip:padding-box; box-sizing:border-box; border:2px solid transparent; }
+    .tl button i.no { background-color:rgba(118,118,128,.24); }
     .tl button.on i { border-color:${C.orange}; }
     .tl button.on { color:var(--primary-text-color); }
     .tl button i ha-icon { --mdc-icon-size:22px; display:flex; height:100%; align-items:center; justify-content:center; color:var(--secondary-text-color); }
@@ -150,14 +152,14 @@
     }
 
     _chart() {
-      const pts = (this._pts || []).slice(), cur = num(this._v('temp')), now = Date.now(), ziel = num(this._c.ziel, 90);
+      const pts = (this._pts || []).slice(), cur = num(this._v('temp')), now = Date.now(), ziel = num(this._c.ziel, 80);
       pts.push([now, cur]);
       if (pts.length < 3) return '<div class="ci"><span>Verlauf wird geladen …</span></div>';
       // Zeitfenster: ab etwa 20 min vor dem Aufheizen (erster Wert deutlich ueber dem Tiefststand), mindestens 90 min, hoechstens 8 h
       const lo = Math.min(...pts.map((p) => p[1])), rise = pts.find((p) => p[1] > lo + 5);
       let t0 = rise ? rise[0] - 20 * 60000 : now - 3 * 3600000; t0 = Math.max(now - 8 * 3600000, Math.min(t0, now - 90 * 60000));
       const P = pts.filter((p) => p[0] >= t0); const pre = pts.filter((p) => p[0] < t0).pop(); if (pre) P.unshift([t0, pre[1]]);
-      const W = 300, Hh = 110, top = 8, bot = 94, ymin = Math.min(0, Math.floor(Math.min(...P.map((p) => p[1])) / 10) * 10), ymax = Math.max(ziel + 10, Math.ceil(Math.max(...P.map((p) => p[1])) / 10) * 10);
+      const W = 300, Hh = 150, top = 8, bot = 134, ymin = Math.min(0, Math.floor(Math.min(...P.map((p) => p[1])) / 10) * 10), ymax = Math.max(ziel + 10, Math.ceil(Math.max(...P.map((p) => p[1])) / 10) * 10);
       const X = (t) => (t - t0) / (now - t0) * W, Y = (v) => bot - (v - ymin) / (ymax - ymin) * (bot - top), f = (v) => v.toFixed(1);
       let d = ''; P.forEach(([t, v], i) => { d += (i ? 'L' : 'M') + f(X(t)) + ',' + f(Y(v)); });
       const col = cur >= 80 ? C.red : C.orange;
@@ -193,7 +195,8 @@
 
       /* ---------- Jetzt ---------- */
       let jetzt = '';
-      if (this._on('melder_offline')) jetzt += `<div class="wn">${ico('mdi:access-point-network-off')}<span><b>Präsenzmelder offline</b> · Gänge werden nicht erkannt</span></div>`;
+      const mv = this._v('melder'), mo = this._on('melder_offline') || (this._s('melder') && ['unavailable', 'unknown'].includes(mv));
+      if (mo) jetzt += `<div class="wn">${ico('mdi:access-point-network-off')}<span><b>Präsenzmelder offline</b> · Gänge werden nicht erkannt</span></div>`;
       const az = this._v('aufheiz'), m = /^(\d+)\s*Minuten?\s*\((\d{1,2}:\d{2})\)/.exec(az);
       const sub = m ? `bereit in ${m[1]} min · um ${m[2]}` : /erreicht/i.test(az) ? 'Temperatur erreicht' : heizt ? 'heizt' : 'aus';
       const tc = t >= 80 ? C.red : heizt || t >= 40 ? C.orange : '';
@@ -229,7 +232,7 @@
       const as = this._s('aufguss');
       if (as) {
         const cur = as.state, opts = (as.attributes.options || []), aOpen = this._aufMan != null ? this._aufMan : false, b = img(cur);
-        const tiles = opts.map((o) => `<button class="${o === cur ? 'on' : ''}" data-aufguss="${esc(o)}"><i${img(o) ? ` style="background-image:url('${img(o)}')"` : ''}>${img(o) ? '' : ico('mdi:cancel')}</i>${esc(o || 'Kein')}</button>`).join('');
+        const tiles = opts.map((o) => `<button class="${o === cur ? 'on' : ''}" data-aufguss="${esc(o)}"><i${img(o) ? ` style="background-image:url('${img(o)}')"` : ' class="no"'}>${img(o) ? '' : ico('mdi:cancel')}</i>${esc(o || 'Kein')}</button>`).join('');
         out.push(this._fold('aufguss', 'Aufguss', 'mdi:water-outline',
           this._row(E.aufguss, b ? `<span class="th" style="background-image:url('${b}')"></span>` : ico('mdi:water-off-outline'), `${esc(cur || 'Kein Aufguss')}<span class="sec">${cur ? 'als Bild hinter der Kurve' : 'antippen zum Auswählen'}</span>`,
             `<div class="st">${PM}</div><div class="ex"><div><div class="tl">${tiles}</div></div></div>`, aOpen ? ' open' : '', 'data-auf="1"')));
