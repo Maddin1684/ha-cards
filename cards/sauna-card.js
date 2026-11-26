@@ -1,4 +1,5 @@
-// sauna-card v1.4 (26.11.2026): Apple-Orange fuer Gaenge; beim Aufheizen eigene Zeile mit animiertem Pfeil-Symbol, Restzeit und Fortschrittsbalken; Zielmarke entfernt, Hoechstwert direkt in der Kurve; Abkuehlpause mit sich fuellendem Glas, laufender Gang pulsiert; Symbole wie in der Originalkarte.
+// sauna-card v1.5 (26.11.2026): Orange ueberall Martins #f56300 (Gaenge, Heizen, Aufheiz-Symbol, gewaehlter Aufguss).
+// v1.4 (26.11.2026): Apple-Orange fuer Gaenge; beim Aufheizen eigene Zeile mit animiertem Pfeil-Symbol, Restzeit und Fortschrittsbalken; Zielmarke entfernt, Hoechstwert direkt in der Kurve; Abkuehlpause mit sich fuellendem Glas, laufender Gang pulsiert; Symbole wie in der Originalkarte.
 // v1.3 (26.11.2026): Aufguss mit Duftrichtung statt Hinweistext; Kurve bei kalter Sauna eng skaliert (Verlauf sichtbar statt flacher Linie bei 0), ohne Zielmarke.
 // v1.2 (26.11.2026): Ziel 80 °C; Kurve hoeher, Aufguss-Bild dahinter weniger beschnitten (Text oben sichtbar); Aufguss-Kacheln ohne grauen Rand; Hinweis auch, wenn der Praesenzmelder nicht verfuegbar ist.
 // v1.1 (26.11.2026): Aufguss-Kacheln im Format der Originalkarte (100 x 66, Bild oben buendig, nicht mehr abgeschnitten); Heiz-Symbol (pressure-high) neben dem Titel, solange die Sauna heizt.
@@ -9,7 +10,7 @@
 (() => {
   const TAG = 'sauna-card';
   if (customElements.get(TAG)) return;
-  const C = { green: '#30d158', yellow: '#ffd60a', orange: '#ff9f0a', red: '#ff453a', blue: '#0a84ff', gang: '#ff9f0a' };
+  const C = { green: '#30d158', yellow: '#ffd60a', orange: '#f56300', red: '#ff453a', blue: '#0a84ff', gang: '#f56300' }; // Orange = Martins Orange #f56300
   const DEF = {
     temp: 'sensor.saunatemp_sauna', heizt: 'binary_sensor.sauna_heizt', aufheiz: 'sensor.sauna_aufheizzeit', test: 'input_boolean.sauna_prognose_test',
     gang_aktiv: 'input_boolean.sauna_gang_aktiv', gang_start: 'input_text.sauna_aktueller_gang_start', gang_dauer: 'sensor.sauna_gang_dauer',
