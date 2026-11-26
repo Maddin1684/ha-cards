@@ -1,4 +1,5 @@
-// sauger-karte-card v2.5 (25.11.2026): Kachelwerte in normaler Schrift statt fett (passend zu den anderen Karten).
+// sauger-karte-card v2.6 (26.11.2026): Karte erscheint auch, wenn die Integration die Kalibrierung verworfen hat (wird je Karte gemerkt; sonst Bild abrufen, damit sie neu gemeldet wird).
+// v2.5 (25.11.2026): Kachelwerte in normaler Schrift statt fett (passend zu den anderen Karten).
 // v2.4 (25.11.2026): Wischflaeche in tieferem Blau (#0058e6, dunkler als Apple-Blau) statt Hellblau.
 // v2.3 (25.11.2026): Wischflaeche etwas kraeftiger in hellem Apple-Wasserblau (#64d2ff).
 // v2.2 (25.11.2026): ausgewaehlte Raeume dezent in Orange #f56300 statt Blau.
@@ -117,7 +118,7 @@
       }
       if (!v || !m) { this.shadowRoot.querySelector('.mw').innerHTML = '<div class="msg">Sauger oder Karte nicht gefunden</div>'; return; }
       const A = m.attributes || {}, V = v.attributes || {};
-      const mapKey = (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : '');
+      const mapKey = (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : (this._calKey(A) || ''));
       if (mapKey !== this._mapKey && !this._busy) this._loadMap(A, mapKey);
       this._head(v, V, A);
       if (this._geo) { this._overlay(v, V, A); if (m.state + A.entity_picture !== this._trKey && !this._trBusy && !this._busy) this._loadTrail(A, m.state + A.entity_picture); }
@@ -211,8 +212,13 @@
       this._obsC = { k: ck, list }; this._obsBusy = false;
     }
     // Saugerkoordinaten (mm) -> Kartenbild-Pixel ueber die drei Kalibrierpunkte
+    _calKey(A) { try { return localStorage.getItem('skc-cal-' + (A.map_id || '')) || ''; } catch (e) { return ''; } }
     _tf(A) {
-      const cp = A.calibration_points || [];
+      // Kalibrierung je Karte merken: die Integration liefert sie erst, nachdem das Kartenbild einmal gezeichnet wurde
+      const ck = 'skc-cal-' + (A.map_id || '');
+      let cp = A.calibration_points;
+      if (cp && cp.length) { if (this._calSig !== ck + JSON.stringify(cp)) { this._calSig = ck + JSON.stringify(cp); try { localStorage.setItem(ck, JSON.stringify(cp)); } catch (e) {} } }
+      else { try { cp = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) { cp = null; } cp = cp || []; }
       const g = (vx, vy) => cp.find((p) => p.vacuum.x === vx && p.vacuum.y === vy);
       const a = g(0, 0), b = g(1000, 0), c = g(0, 1000);
       if (!a || !b || !c) return null;
@@ -221,7 +227,10 @@
 
     async _loadMap(A, key) {
       const tf = this._tf(A), url = A.entity_picture;
-      if (!tf || !url) { this.shadowRoot.querySelector('.mw').innerHTML = '<div class="msg">Keine Kalibrierung in der Karte</div>'; return; }
+      if (!tf || !url) {
+        // Bild einmal abrufen: dadurch zeichnet die Integration die Karte und meldet danach die Kalibrierung
+        if (url && this._kick !== url) { this._kick = url; fetch(url).catch(() => {}); }
+        this.shadowRoot.querySelector('.mw').innerHTML = `<div class="msg">${url ? 'Karte wird geladen …' : 'Keine Karte vorhanden'}</div>`; return; }
       let cache = null; try { cache = JSON.parse(localStorage.getItem('skc-geo2') || 'null'); } catch (e) {}
       if (cache && cache.key === key) { this._geo = cache.geo; this._mapKey = key; this._sig = ''; this._build(); this._render(); return; }
       this._busy = true;
