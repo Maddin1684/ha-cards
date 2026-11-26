@@ -1,4 +1,5 @@
-// sauna-card v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
+// sauna-card v1.9 (26.11.2026): Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
+// v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
 // v1.7 (26.11.2026): bei 'Kein Aufguss' wieder das durchgestrichene Tropfen-Symbol statt Kuebel.
 // v1.6 (26.11.2026): Sauna-Kuebel (phu:sauna-bucket) als Symbol des Bereichs Aufguss.
 // v1.5 (26.11.2026): Orange ueberall Martins #f56300 (Gaenge, Heizen, Aufheiz-Symbol, gewaehlter Aufguss).
@@ -50,13 +51,14 @@
     .fb { display:grid; grid-template-rows:1fr; transition:grid-template-rows .3s ease; }
     .fold.closed .fb { grid-template-rows:0fr; }
     .fi { overflow:hidden; min-height:0; margin:0 -8px; }
-    .r { display:flex; flex-wrap:wrap; align-items:center; min-height:44px; column-gap:16px; padding:0 8px; margin-bottom:4px; border-radius:10px; background:rgba(118,118,128,.12); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .r { display:flex; flex-wrap:wrap; align-items:flex-start; min-height:40px; column-gap:16px; padding:0 8px; margin-bottom:4px; border-radius:10px; background:rgba(118,118,128,.12); cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .fi > .r:last-child, .fi > .wn:last-child { margin-bottom:8px; }
     .bd { flex:0 0 28px; width:28px; height:40px; display:flex; align-items:center; justify-content:center; }
     .bd ha-icon { --mdc-icon-size:24px; color:var(--state-icon-color, var(--paper-item-icon-color, #44739e)); display:inline-flex; }
     .bd .th { width:28px; height:28px; border-radius:7px; background:rgba(118,118,128,.3) center/cover no-repeat; }
     .nm { flex:1; min-width:0; font-size:14px; line-height:1.3; padding:10px 0; color:var(--primary-text-color); }
     .nm .sec { display:block; font-size:12px; color:var(--secondary-text-color); line-height:1.35; }
+    .r > .st { padding-top:10px; }
     .st { font-size:14px; line-height:1.3; color:var(--primary-text-color); text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
     .st small { font-size:12px; color:var(--secondary-text-color); margin-left:2px; }
     .pw { display:block; text-align:right; margin:3px -1px -2px 0; line-height:0; }
@@ -83,6 +85,7 @@
     .tl button.on i { border-color:${C.orange}; }
     .tl button.on { color:var(--primary-text-color); }
     .tl button i ha-icon { --mdc-icon-size:22px; display:flex; height:100%; align-items:center; justify-content:center; color:var(--secondary-text-color); }
+    .r > .seg, .r > .pg, .r > .ab, .r > .ex { align-self:stretch; }
     .seg { flex:0 0 100%; display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.12); margin:0 0 10px; }
     .seg button { flex:1; border:0; background:none; color:var(--secondary-text-color); font:inherit; font-size:12px; padding:5px 2px; border-radius:7px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .seg button.on { background:rgba(118,118,128,.26); color:var(--primary-text-color); }
@@ -227,7 +230,7 @@
       const tc = t >= 80 ? C.red : heizt || t >= 40 ? C.orange : '';
       const open = this._chartOpen();
       jetzt += this._row(E.temp, ico('mdi:thermometer', tc), `Temperatur<span class="sec"${sub === 'Temperatur erreicht' ? ` style="color:${C.green}"` : ''}>${esc(sub)}</span>`,
-        `<div class="st" style="padding-top:2px"><span${tc ? ` style="color:${tc}"` : ''}>${fmt(t)}</span><small>°C</small>${PM}</div><div class="ex"><div>${open || this._chartHad ? this._chart() : ''}</div></div>`,
+        `<div class="st"><span${tc ? ` style="color:${tc}"` : ''}>${fmt(t)}</span><small>°C</small>${PM}</div><div class="ex"><div>${open || this._chartHad ? this._chart() : ''}</div></div>`,
         open ? ' open' : '', 'data-chart="1"');
       if (open) this._chartHad = true;
       // Aufheizen: Restzeit mit animiertem Pfeil-Symbol und Fortschrittsbalken (Farbverlauf gruen - gelb - rot wie bisher)
