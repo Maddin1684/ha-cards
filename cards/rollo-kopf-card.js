@@ -1,4 +1,4 @@
-// rollo-kopf-card v1.0 (26.11.2026, Wunsch Martin: Kopf der Rollo-Karte wie die Beleuchtung-Karte – Titel links, rechts Knoepfe
+// rollo-kopf-card v1.1 (26.11.2026: Icons wie in den Rollo-Zeilen - phu:blind-tilt-open / phu:blind-tilt-closed); v1.0 (26.11.2026, Wunsch Martin: Kopf der Rollo-Karte wie die Beleuchtung-Karte – Titel links, rechts Knoepfe
 // 'Alle oeffnen' (weisses offenes Rollo, sichtbar wenn mindestens ein Rollo nicht ganz offen ist) und 'Alle schliessen' (Apple-rotes
 // geschlossenes Rollo, sichtbar wenn mindestens ein Rollo nicht ganz zu ist). Faehrt ein Rollo, heissen beide Knoepfe 'Anhalten'.
 // Der Knopf ruft nur script.rollos_alle (richtung auf/zu) auf – das Skript haelt an, wenn etwas faehrt, sonst faehrt es alle Rollos.
@@ -38,7 +38,7 @@
       const knopf = (r, txt, icon, col) => `<button class="off" data-r="${r}" aria-label="${txt}"><ha-icon icon="${icon}" style="color:${col}"></ha-icon>${txt}</button>`;
       const html = `<div class="hd"><span>${esc(this._c.title || 'Rollos')}</span><div class="bt">`
         + (fahrt ? knopf('zu', 'Anhalten', 'mdi:stop', '#ff453a')
-          : (zeigAuf ? knopf('auf', 'Alle öffnen', 'mdi:window-shutter-open', '#ffffff') : '') + (zeigZu ? knopf('zu', 'Alle schließen', 'mdi:window-shutter', '#ff453a') : ''))
+          : (zeigAuf ? knopf('auf', 'Alle öffnen', 'phu:blind-tilt-open', '#ffffff') : '') + (zeigZu ? knopf('zu', 'Alle schließen', 'phu:blind-tilt-closed', '#ff453a') : ''))
         + '</div></div>';
       if (html !== this._last) { root.querySelector('ha-card').innerHTML = html; this._last = html; }
     }
