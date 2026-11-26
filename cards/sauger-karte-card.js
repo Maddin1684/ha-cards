@@ -1,4 +1,5 @@
-// sauger-karte-card v2.6 (26.11.2026): Karte erscheint auch, wenn die Integration die Kalibrierung verworfen hat (wird je Karte gemerkt; sonst Bild abrufen, damit sie neu gemeldet wird).
+// sauger-karte-card v2.7 (26.11.2026, Wunsch Martin): Steuerung als Pille oben rechts wie Beleuchtung/Rollos – Alle reinigen (gruenes Sauger-Symbol), waehrend der Reinigung Pausieren (gelb) und Zur Station (rot), pausiert Fortsetzen (gruen); Akku als Pille neben dem Reinigungsmodus.
+// v2.6 (26.11.2026): Karte erscheint auch, wenn die Integration die Kalibrierung verworfen hat (wird je Karte gemerkt; sonst Bild abrufen, damit sie neu gemeldet wird).
 // v2.5 (25.11.2026): Kachelwerte in normaler Schrift statt fett (passend zu den anderen Karten).
 // v2.4 (25.11.2026): Wischflaeche in tieferem Blau (#0058e6, dunkler als Apple-Blau) statt Hellblau.
 // v2.3 (25.11.2026): Wischflaeche etwas kraeftiger in hellem Apple-Wasserblau (#64d2ff).
@@ -99,6 +100,12 @@
     .g { background:rgba(118,118,128,.24); color:var(--primary-text-color); }
     .ft { display:flex; gap:8px; margin-top:8px; align-items:center; }
     .ft .sel { flex:1; min-width:0; font-size:12px; color:var(--secondary-text-color); }
+    .ft .sel:empty { display:none; }
+    .ft:has(.sel:empty) { display:none; }
+    .hb { flex:0 0 auto; display:flex; gap:8px; }
+    .off { flex:0 0 auto; display:flex; align-items:center; gap:6px; height:30px; padding:0 12px 0 10px; border:0; border-radius:15px; background:rgba(118,118,128,.24); color:var(--primary-text-color); font:inherit; font-size:13px; line-height:1; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity .2s; white-space:nowrap; }
+    .off ha-icon { --mdc-icon-size:16px; display:flex; }
+    .off:active { opacity:.6; }
   `;
 
   class SaugerKarteCard extends HTMLElement {
@@ -112,7 +119,7 @@
       const v = H.states[this._c.entity], m = H.states[this._c.map];
       if (!this.shadowRoot) {
         const r = this.attachShadow({ mode: 'open' });
-        r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="ttl"></div><span class="chip bat"></span></div>
+        r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="ttl"></div><span class="hb"></span></div>
           <div class="fl"></div><div class="tiles"></div><div class="chips"></div><div class="mw"><div class="msg">Karte wird geladen …</div></div><div class="ft"><span class="sel"></span><span class="acts"></span></div></ha-card>`;
         r.querySelector('ha-card').addEventListener('click', (e) => this._click(e));
       }
@@ -132,19 +139,22 @@
       const set = (sel, html) => { const e = r.querySelector(sel); if (e.innerHTML !== html) e.innerHTML = html; };
       set('.ttl', esc(this._c.title || 'Saugroboter')); void sub;
       const b = V.battery_level != null ? V.battery_level : V.battery, bc = b > 50 ? C.green : b > 20 ? C.yellow : C.red;
-      set('.bat', b != null ? `<ha-icon icon="${V.charging ? 'mdi:battery-charging' : 'mdi:battery'}" style="color:${bc}"></ha-icon>${b} %` : '');
+      const batChip = b != null ? `<span class="chip"><ha-icon icon="${V.charging ? 'mdi:battery-charging' : 'mdi:battery'}" style="color:${bc}"></ha-icon>${b} %</span>` : '';
       this._tiles(v, V);
       const obs = this._obstacles(A).length;
       set('.chips', (obs ? `<span class="chip"><ha-icon icon="mdi:alert-outline" style="color:${C.red}"></ha-icon>${obs} Hindernis${obs === 1 ? '' : 'se'}</span>` : '') +
-        this._modeChip(V));
+        this._modeChip(V) + batChip);
       const n = this._sel.size;
       set('.sel', n ? esc([...this._sel].map((id) => this._roomName(id, A)).join(', ')) : (run ? '' : 'Räume antippen zum Auswählen'));
+      // v2.7: Steuerung als Pillen oben rechts wie Beleuchtung/Rollos (Sauger-Symbol gruen = reinigen, gelb = pausieren, rot = zur Station)
+      const pill = (act, txt, icon, col) => `<button class="off" data-act="${act}" aria-label="${txt}"><ha-icon icon="${icon}" style="color:${col}"></ha-icon>${txt}</button>`;
       let acts;
-      if (st === 'cleaning') acts = `<button class="btn g" data-act="pause"><ha-icon icon="mdi:pause"></ha-icon>Pause</button> <button class="btn g" data-act="home"><ha-icon icon="mdi:home-import-outline"></ha-icon>Zur Basis</button>`;
-      else if (st === 'paused') acts = `<button class="btn" data-act="start" style="background:${C.green};color:#0b3d1a"><ha-icon icon="mdi:play"></ha-icon>Fortsetzen</button> <button class="btn g" data-act="home"><ha-icon icon="mdi:home-import-outline"></ha-icon>Zur Basis</button>`;
-      else if (st === 'returning') acts = `<button class="btn g" data-act="pause"><ha-icon icon="mdi:pause"></ha-icon>Anhalten</button>`;
-      else acts = `<button class="btn" data-act="${n ? 'rooms' : 'start'}" style="background:${C.green};color:#0b3d1a"><ha-icon icon="mdi:play"></ha-icon>${n ? (n === 1 ? 'Raum' : n + ' Räume') + ' reinigen' : 'Alle reinigen'}</button>`;
-      set('.acts', acts);
+      if (st === 'cleaning') acts = pill('pause', 'Pausieren', 'mdi:robot-vacuum', C.yellow) + pill('home', 'Zur Station', 'mdi:robot-vacuum', C.red);
+      else if (st === 'paused') acts = pill('start', 'Fortsetzen', 'mdi:robot-vacuum', C.green) + pill('home', 'Zur Station', 'mdi:robot-vacuum', C.red);
+      else if (st === 'returning') acts = pill('pause', 'Anhalten', 'mdi:robot-vacuum', C.yellow);
+      else acts = pill(n ? 'rooms' : 'start', n ? (n === 1 ? 'Raum' : n + ' Räume') + ' reinigen' : 'Alle reinigen', 'mdi:robot-vacuum', C.green);
+      set('.hb', acts);
+      set('.acts', '');
     }
 
     _st(k) { return this._hass.states[this._c.entity.replace('vacuum.', 'sensor.') + '_' + k]; }
