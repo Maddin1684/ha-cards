@@ -836,8 +836,8 @@
         const wy = this._issWhy(lo, la).t;
         if (a.al > this._horAt(a.az) + 0.3 && /^jetzt sichtbar/.test(wy)) { const x = X(a.az), y = Y(a.al); iss = { az: a.az, al: a.al };
           // ISS wie auf der ELMO-Hauskarte: kleiner warmweisser Punkt (#fff9e8) mit feinem Schein, schimmert (Deckkraft 0,75-1, 1,6 s)
-          this._issSky = { x0: x, y0: y };
-          s += `<g class="wissm"><g class="wiss"><circle cx="${f1(x)}" cy="${f1(y)}" r="2.6" fill="rgb(255,230,160)" fill-opacity=".22"/><circle cx="${f1(x)}" cy="${f1(y)}" r="1.5" fill="rgb(255,250,220)" fill-opacity=".55"/><circle cx="${f1(x)}" cy="${f1(y)}" r=".8" fill="#fff9e8"/></g>` + lab(x, y, 2.6, 'ISS', 'rgba(255,249,232,.9)') + '</g>'; } }
+          this._issSky = { x, y };
+          s += `<g class="wissm" style="transform:translate(${f1(x)}px,${f1(y)}px)"><g class="wiss"><circle r="2.6" fill="rgb(255,230,160)" fill-opacity=".22"/><circle r="1.5" fill="rgb(255,250,220)" fill-opacity=".55"/><circle r=".8" fill="#fff9e8"/></g><g transform="translate(${f1(-x)},${f1(-y)})">` + lab(x, y, 2.6, 'ISS', 'rgba(255,249,232,.9)') + '</g></g>'; } }
       s += `<path d="${near}L${W},${HH}L0,${HH}Z" fill="${ridge[1]}"/><path d="${near}" fill="none" stroke="${ridge[2]}" stroke-width=".8"/>`;
       // Baeume am Horizont: Mischwald, ueberwiegend Nadelbaeume (vor allem Kohlewald, wenige am Ebertsberg)
       // Hoehe in Metern, maszstabsgetreu wie die Windraeder (241 m) umgerechnet
@@ -934,7 +934,7 @@
         const dx = (R + hS) * Math.cos(f) * Math.cos(l) - R * Math.cos(f0) * Math.cos(l0), dy = (R + hS) * Math.cos(f) * Math.sin(l) - R * Math.cos(f0) * Math.sin(l0), dz = (R + hS) * Math.sin(f) - R * Math.sin(f0);
         const e = -Math.sin(l0) * dx + Math.cos(l0) * dy, nn = -Math.sin(f0) * Math.cos(l0) * dx - Math.sin(f0) * Math.sin(l0) * dy + Math.cos(f0) * dz, u = Math.cos(f0) * Math.cos(l0) * dx + Math.cos(f0) * Math.sin(l0) * dy + Math.sin(f0) * dz;
         const az = (Math.atan2(e, nn) / rd + 360) % 360, al = Math.atan2(u, Math.hypot(e, nn)) / rd, Q = this._skyXY;
-        const tx = Q.X(az) - this._issSky.x0, ty = Q.Y(al) - this._issSky.y0, wrap = Math.abs(tx) > Q.W / 2;
+        const tx = Q.X(az), ty = Q.Y(al), wrap = Math.abs(tx - this._issSky.x) > Q.W / 2; this._issSky = { x: tx, y: ty };
         if (wrap) sg.style.transition = 'none';
         sg.style.transform = `translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px)`; sg.style.opacity = al > this._horAt(az) + 0.3 ? '1' : '0';
         if (wrap) requestAnimationFrame(() => { sg.style.transition = ''; }); }
