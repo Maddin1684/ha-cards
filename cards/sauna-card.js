@@ -1,4 +1,5 @@
-// sauna-card v1.7 (26.11.2026): bei 'Kein Aufguss' wieder das durchgestrichene Tropfen-Symbol statt Kuebel.
+// sauna-card v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
+// v1.7 (26.11.2026): bei 'Kein Aufguss' wieder das durchgestrichene Tropfen-Symbol statt Kuebel.
 // v1.6 (26.11.2026): Sauna-Kuebel (phu:sauna-bucket) als Symbol des Bereichs Aufguss.
 // v1.5 (26.11.2026): Orange ueberall Martins #f56300 (Gaenge, Heizen, Aufheiz-Symbol, gewaehlter Aufguss).
 // v1.4 (26.11.2026): Apple-Orange fuer Gaenge; beim Aufheizen eigene Zeile mit animiertem Pfeil-Symbol, Restzeit und Fortschrittsbalken; Zielmarke entfernt, Hoechstwert direkt in der Kurve; Abkuehlpause mit sich fuellendem Glas, laufender Gang pulsiert; Symbole wie in der Originalkarte.
@@ -256,7 +257,7 @@
         }
         heute += this._row(E.gaenge, ico('fas:person-walking-arrow-right'), 'Saunagänge', `<div class="st">${gn}</div>`);
         if (ok(zt) && zt !== 'nicht gestartet') heute += this._row(E.zeit, ico('mdi:timer-sand'), 'Saunazeit', `<div class="st">${esc(zt.replace(/Stunden?/, 'h').replace(/Minuten?/, 'min'))}</div>`);
-        out.push(this._fold('heute', 'Heute', 'mdi:calendar-today', heute));
+        out.push(this._fold('heute', 'Heute', 'phu:sauna-bucket', heute));
       }
 
       /* ---------- Aufguss ---------- */
@@ -264,7 +265,7 @@
       if (as) {
         const cur = as.state, opts = (as.attributes.options || []), aOpen = this._aufMan != null ? this._aufMan : false, b = img(cur);
         const tiles = opts.map((o) => `<button class="${o === cur ? 'on' : ''}" data-aufguss="${esc(o)}"><i${img(o) ? ` style="background-image:url('${img(o)}')"` : ' class="no"'}>${img(o) ? '' : ico('mdi:cancel')}</i>${esc(o || 'Kein')}</button>`).join('');
-        out.push(this._fold('aufguss', 'Aufguss', 'phu:sauna-bucket',
+        out.push(this._fold('aufguss', 'Aufguss', 'mdi:water-outline',
           this._row(E.aufguss, b ? `<span class="th" style="background-image:url('${b}')"></span>` : ico('mdi:water-off-outline'), `${esc(cur || 'Kein Aufguss')}<span class="sec">${cur ? esc(DUFT[cur] || '') : 'antippen zum Auswählen'}</span>`,
             `<div class="st">${PM}</div><div class="ex"><div><div class="tl">${tiles}</div></div></div>`, aOpen ? ' open' : '', 'data-auf="1"')));
       }
