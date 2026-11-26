@@ -1,4 +1,5 @@
-// sauna-card v1.0 (26.11.2026): Sauna als aufklappbare Liste im Stil der Wetterstation – Jetzt (Temperatur mit Kurve, Gaenge als orange Felder, Zielmarke;
+// sauna-card v1.1 (26.11.2026): Aufguss-Kacheln im Format der Originalkarte (100 x 66, Bild oben buendig, nicht mehr abgeschnitten); Heiz-Symbol (pressure-high) neben dem Titel, solange die Sauna heizt.
+// v1.0 (26.11.2026): Sauna als aufklappbare Liste im Stil der Wetterstation – Jetzt (Temperatur mit Kurve, Gaenge als orange Felder, Zielmarke;
 // klappt beim Heizen/Saunieren selbst auf), aktueller Gang, Heute (Ablauf Gang/Pause, Gaenge, Saunazeit), Aufguss (gewaehlter Aufguss, aufgeklappt alle als Bildkacheln),
 // Licht und Ambiente, Saison (Saunatage, letzte Sauna). Hinweis, wenn der Praesenzmelder ausfaellt.
 // Konfiguration (alles optional): title, ziel (Zieltemperatur, Standard 90), entities: { ... } zum Ueberschreiben der Standard-Entitaeten.
@@ -22,6 +23,7 @@
   const CSS = `
     :host { display:block; }
     ha-card { padding:4px 0 8px; overflow:hidden; }
+    .hd .hz { height:44px; width:44px; vertical-align:middle; margin:-6px 0 0 8px; }
     .hd { font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; padding:12px 16px 4px; color:var(--ha-card-header-color, var(--primary-text-color)); }
     .fold { padding:0 16px; }
     .fh { display:flex; align-items:center; gap:16px; height:44px; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; border-bottom:0.5px solid var(--divider-color, rgba(128,128,128,.3)); margin-bottom:4px; }
@@ -62,8 +64,8 @@
     .ab .lg { display:flex; justify-content:space-between; font-size:11px; color:var(--secondary-text-color); margin-top:5px; }
     .tl { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding:4px 0 10px; }
     .tl::-webkit-scrollbar { display:none; }
-    .tl button { flex:0 0 62px; border:0; padding:0; background:none; font:inherit; font-size:10px; line-height:1.2; color:var(--secondary-text-color); text-align:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .tl button i { display:block; width:62px; height:62px; border-radius:12px; margin-bottom:4px; background:rgba(118,118,128,.3) center top/cover no-repeat; box-sizing:border-box; border:2px solid transparent; }
+    .tl button { flex:0 0 100px; border:0; padding:0; background:none; font:inherit; font-size:11px; line-height:1.2; color:var(--secondary-text-color); text-align:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .tl button i { display:block; width:100px; height:66px; border-radius:12px; margin-bottom:4px; background:rgba(118,118,128,.3) center top/cover no-repeat; box-sizing:border-box; border:2px solid transparent; }
     .tl button.on i { border-color:${C.orange}; }
     .tl button.on { color:var(--primary-text-color); }
     .tl button i ha-icon { --mdc-icon-size:22px; display:flex; height:100%; align-items:center; justify-content:center; color:var(--secondary-text-color); }
@@ -186,8 +188,8 @@
 
     _html() {
       const E = this._e, out = [];
-      if (this._c.title !== false) out.push(`<div class="hd">${esc(this._c.title || 'Sauna')}</div>`);
       const t = num(this._v('temp')), heizt = this._on('heizt') || this._on('test'), active = this._active();
+      if (this._c.title !== false) out.push(`<div class="hd">${esc(this._c.title || 'Sauna')}${heizt ? `<img class="hz" src="${esc(this._c.heiz_icon || '/local/icons2/pressure-high.svg')}" alt="heizt">` : ''}</div>`);
 
       /* ---------- Jetzt ---------- */
       let jetzt = '';
