@@ -1,4 +1,5 @@
-// sauger-karte-card v3.1 (27.11.2026): Ausblenden per Raumname und Etage (map_id der Integration wechselt); Loecher unter Raumnamen/Nadeln werden aus der Umgebung gefuellt; leicht abgedunkelte Flaechen (Fugen, Teppich) zaehlen als gereinigt.
+// sauger-karte-card v3.2 (27.11.2026): Teppichflaechen (Schachbrettmuster ohne helles Band) gelten als gereinigt, wo Saugbahnen liegen – z. B. Teppich in Wohnen unter den Kreisen.
+// v3.1 (27.11.2026): Ausblenden per Raumname und Etage (map_id der Integration wechselt); Loecher unter Raumnamen/Nadeln werden aus der Umgebung gefuellt; leicht abgedunkelte Flaechen (Fugen, Teppich) zaehlen als gereinigt.
 // v3.0 (27.11.2026, Wunsch Martin): Reinigungsspur genauer – gereinigte Flaeche je Raum ueber dessen Grundfarbe erkannt (auch gelbe Raeume wie Esszimmer/Spielzimmer), Beschriftungen und Nadeln exakt ausmaskiert statt grosser Kaesten; Bereiche per Konfig 'ausblenden' entfernbar (Terrasse); Hindernis-Pille oeffnet scrollbare Galerie (Foto, was erkannt wurde, Raum, Trefferquote); grosse Partikel mit Staub-Symbol in Apple-Gelb.
 // v2.9 (27.11.2026, Wunsch Martin): am Tag einer erfolgreichen Reinigung gruener Kasten mit Zusammenfassung (Uhrzeit von–bis, Flaeche, Dauer, CleanGenius, nicht erreichte Raeume mit Grund).
 // v2.8 (26.11.2026, Wunsch Martin): Pillen Modus/Akku/Hindernisse gleich gross wie die Kopf-Pillen (13 px, 30 px hoch, Symbol 16 px).
@@ -386,6 +387,13 @@
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b);
           if (mn >= 246) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; n++; }
           else if (d[i + 3] > 250 && clean(r, g, b)) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } }
+        // Teppiche: im Kartenbild ein Schachbrett aus Grundfarbe und abgedunkelter Grundfarbe, ohne helles Reinigungsband.
+        // Teppichflaeche gilt als gereinigt, wo Saugbahnen in der Naehe liegen.
+        { const cd = new Uint8Array(NP), pm = new Uint8Array(NP);
+          for (let q = 0; q < NP; q++) { const i = q * 4; if (o[i + 3]) pm[q] = 1; if (d[i + 3] < 250) continue; const rr = d[i], gg = d[i + 1], bb = d[i + 2];
+            if (BS.some((b) => [0.86, 0.79].some((f) => Math.abs(rr - b[0] * f) <= 6 && Math.abs(gg - b[1] * f) <= 6 && Math.abs(bb - b[2] * f) <= 6))) cd[q] = 1; }
+          const cr = dil(cd, 2), np = dil(pm, 10);
+          for (let q = 0; q < NP; q++) if (cr[q] && np[q] && !mo[q * 4 + 3] && d[q * 4 + 3] > 250 && !o[q * 4 + 3]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
         // ausmaskierte Stellen (Beschriftung, Nadeln) mit der umliegenden gereinigten Flaeche fuellen, damit keine Loecher bleiben
         { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1; const fill = dil(mm, 14);
           for (let q = 0; q < NP; q++) if (skip[q] && fill[q] && d[q * 4 + 3] > 200 && !mm[q]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
