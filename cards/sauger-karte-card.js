@@ -1,4 +1,5 @@
-// sauger-karte-card v3.8 (27.11.2026): Fahrspuren deutlich sichtbar (kraeftiger, etwas breiter) – in der verkleinerten Karte fehlten einzelne Bahnen, z. B. Wohnen oben (Konfig 'spur_deckkraft' 0–255, Standard 180).
+// sauger-karte-card v3.9 (27.11.2026): Fahrspuren wieder wie vorher (zart); Raumbeschriftung nur noch eng um Nummernkreis und Namenspille ausgespart – vorher fiel ein grosser Kasten weg, auf dem Wohnen-Teppich fehlten dadurch Bahnen und die unteren Kreise.
+// v3.8: Fahrspuren kraeftiger (rueckgaengig).
 // v3.7 (27.11.2026): Luecken in gereinigten Flaechen (z. B. Wohnen) werden geschlossen (Konfig 'luecken' in px, Standard 30).
 // v3.6 (27.11.2026): Trocknungsbalken mit Verlauf rot -> gruen wie Fortschritt.
 // v3.5 (27.11.2026): gereinigte Flaeche zusaetzlich als Band um die Saugbahnen (halbe Saugerbreite) – unabhaengig von Farben, damit iPhone/iPad und Teppiche wie in der Dreame-App aussehen.
@@ -369,9 +370,10 @@
         // Grundfarbe je Raum (ungereinigt): kraeftigste haeufige Farbe im Raumrechteck, ohne Beschriftung
         const rooms = Object.values(A.rooms || {}).filter((r) => r.visibility !== 'Hidden'), bases = [], lbx = [];
         rooms.forEach((r) => { const pts = [tf(r.x0, r.y0), tf(r.x1, r.y1)], X0 = Math.max(0, Math.min(pts[0][0], pts[1][0]) | 0), X1 = Math.min(W, Math.max(pts[0][0], pts[1][0]) | 0), Y0 = Math.max(0, Math.min(pts[0][1], pts[1][1]) | 0), Y1 = Math.min(Hh, Math.max(pts[0][1], pts[1][1]) | 0);
-          const L = r.x != null ? tf(r.x, r.y) : null; if (L) lbx.push([L[0] - 95, L[1] - 70, L[0] + 95, L[1] + 42]);
+          const L = r.x != null ? tf(r.x, r.y) : null, hw = String(r.custom_name || r.name || '').length * 6.5 + 18;
+          if (L) { lbx.push([L[0] - hw, L[1] - 20, L[0] + hw, L[1] + 20]); lbx.push([L[0] - 24, L[1] - 80, L[0] + 24, L[1] - 32]); }
           const cnt = new Map(); let tot = 0;
-          for (let y = Y0; y < Y1; y += 1) for (let x = X0; x < X1; x += 1) { if (L && x > L[0] - 95 && x < L[0] + 95 && y > L[1] - 70 && y < L[1] + 42) continue; const i = (y * W + x) * 4; if (d[i + 3] < 250) continue;
+          for (let y = Y0; y < Y1; y += 1) for (let x = X0; x < X1; x += 1) { if (L && x > L[0] - 95 && x < L[0] + 95 && y > L[1] - 80 && y < L[1] + 22) continue; const i = (y * W + x) * 4; if (d[i + 3] < 250) continue;
             const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb); if (mn >= 240 || mx - mn < 12 || (mx - mn) / mx >= 0.7) continue; const k = (rr << 16) | (gg << 8) | bb; cnt.set(k, (cnt.get(k) || 0) + 1); tot++; }
           const sat = (k) => { const c = [k >> 16 & 255, k >> 8 & 255, k & 255]; return (Math.max(...c) - Math.min(...c)) / Math.max(...c); };
           const cand = [...cnt].filter(([, n]) => n >= tot * 0.015); if (!cand.length) return; const ms = Math.max(...cand.map(([k]) => sat(k)));
@@ -386,7 +388,7 @@
         const seedL = new Uint8Array(NP), seedP = new Uint8Array(NP), inL = new Uint8Array(NP); lbx.forEach(([a, b, c, e]) => box(a, b, c, e, inL));
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 250) continue; const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb);
           if (mx > 0 && (mx - mn) / mx > 0.62) seedP[q] = 1; else if (inL[q] && mn < 240 && mx - mn >= 12 && !near(rr, gg, bb) && !clean(rr, gg, bb)) seedL[q] = 1; }
-        const mL = dil(seedL, 4), mP = dil(seedP, 3); for (let q = 0; q < NP; q++) if (mL[q] || mP[q]) skip[q] = 1;
+        const mP = dil(seedP, 3); for (let q = 0; q < NP; q++) if (inL[q] || mP[q]) skip[q] = 1; void seedL;
         Object.values(A.obstacles || {}).forEach((o) => { const [x, y] = tf(o.x, o.y); box(x - 17, y - 46, x + 17, y + 3); });
         [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 24, y - 24, x + 24, y + 24); } });
         const pth = cx.createImageData(W, Hh), mop = cx.createImageData(W, Hh), o = pth.data, mo = mop.data; let n = 0;
@@ -412,10 +414,6 @@
         { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1;
           const R = this._c.luecken != null ? +this._c.luecken : 30, dd = dil(mm, R), inv = new Uint8Array(NP); for (let q = 0; q < NP; q++) inv[q] = dd[q] ? 0 : 1;
           const ero = dil(inv, R); for (let q = 0; q < NP; q++) if (!ero[q] && !mm[q] && d[q * 4 + 3] > 200) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
-        // Fahrspuren kraeftiger und 1 px breiter: die Karte wird stark verkleinert angezeigt (ca. 1:4), duenne Linien verschwanden sonst –
-        // vor allem einzelne geschwungene Bahnen (z. B. Wohnen oben)
-        { const pm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (o[q * 4 + 3]) pm[q] = 1; const th = dil(pm, 1), al = this._c.spur_deckkraft != null ? +this._c.spur_deckkraft : 180;
-          for (let q = 0; q < NP; q++) if (th[q] && d[q * 4 + 3] > 200) { const i = q * 4; o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = al; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
