@@ -1,4 +1,4 @@
-// wind-kompass-card v1.1 (27.11.2026: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.2 (27.11.2026: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -43,10 +43,12 @@
     .pills span { flex:1; text-align:center; font-size:12px; line-height:16px; padding:4px 0; border-radius:6px; color:var(--secondary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background .2s, color .2s; }
     .pills span.on { background:rgba(255,255,255,.18); color:var(--primary-text-color); }
     .bars { margin:12px 16px 0; display:flex; flex-direction:column; gap:8px; }
-    .br { display:grid; grid-template-columns:44px 1fr 62px; align-items:center; gap:8px; font-size:12px; color:var(--secondary-text-color); }
+    .br { display:grid; grid-template-columns:40px 1fr; align-items:center; gap:8px; font-size:12px; color:var(--secondary-text-color); }
     .br .vv { text-align:right; color:var(--primary-text-color); font-variant-numeric:tabular-nums; white-space:nowrap; }
     .br .vv small { color:var(--secondary-text-color); font-size:10px; }
-    .tk { position:relative; height:8px; border-radius:4px; background:rgba(118,118,128,.22); overflow:visible; }
+    .tk { display:flex; height:16px; border-radius:5px; background:rgba(118,118,128,.22); overflow:hidden; }
+    .tk i { display:flex; align-items:center; justify-content:center; font-style:normal; font-size:9px; font-weight:500; color:rgba(0,0,0,.75); white-space:nowrap; overflow:hidden; }
+    .tk i + i { border-left:1px solid rgba(28,28,30,.6); }
     .tk .z { position:absolute; top:0; bottom:0; opacity:.28; }
     .tk .f { position:absolute; left:0; top:0; bottom:0; border-radius:4px; transition:width .8s ease; }
     .tk .mx { position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; border-radius:1px; background:rgba(255,255,255,.55); }
@@ -94,10 +96,12 @@
         const D = ser(this._c.direction_entity), S = ser(this._c.speed_entity), G = this._c.gust_entity ? ser(this._c.gust_entity) : [];
         // gleichmaessig abtasten (je nach Zeitraum 1–5 min) und Richtung/Geschwindigkeit paaren
         const step = hrs <= 3 ? 60000 : hrs <= 24 ? 120000 : 300000;
-        const cnt = Array.from({ length: 16 }, () => BINS.map(() => 0)); let calm = 0, n = 0, i = 0, j = 0, d = null, s = null, smax = 0, sum = 0;
+        const cnt = Array.from({ length: 16 }, () => BINS.map(() => 0)), gb = BINS.map(() => 0); let calm = 0, n = 0, i = 0, j = 0, q = 0, d = null, s = null, g = null, gn = 0, gcalm = 0, smax = 0, sum = 0;
         for (let t = from; t <= now; t += step) {
           while (i < D.length && D[i].t <= t) d = D[i++].v;
           while (j < S.length && S[j].t <= t) s = S[j++].v;
+          while (q < G.length && G[q].t <= t) g = G[q++].v;
+          if (g != null) { gn++; if (g < 1) gcalm++; else gb[BINS.findIndex((x) => g < x.to)]++; }
           if (d == null || s == null) continue;
           n++; sum += s; smax = Math.max(smax, s);
           if (s < 1) { calm++; continue; }
@@ -105,7 +109,7 @@
           cnt[sec][b]++;
         }
         const gmax = G.filter((x) => x.t >= from).reduce((m, x) => Math.max(m, x.v), 0);
-        if (per === this._per) { this._hist = { cnt, calm, n, smax, avg: n ? sum / n : 0, gmax }; this._last.k = null; this._render(true); }
+        if (per === this._per) { this._hist = { cnt, calm, n, smax, avg: n ? sum / n : 0, gmax, gb, gn, gcalm }; this._last.k = null; this._render(true); }
       } catch (e) { console.warn(TAG, e); }
       this._busy = false;
     }
@@ -162,16 +166,17 @@
         sky += `<div class="sky" style="${pos(num(mo.attributes.moon_azimuth, 0))}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
       }
       this._set('sky', sky);
-      // Wind und Boeen als Balken (Skala 0–75 km/h, Zonen in Windfarben, Strich = Maximum im Zeitraum)
-      const MAXS = 75, gs = c.gust_entity && H.states[c.gust_entity], gu = gs ? num(gs.state, NaN) : NaN;
-      const zones = [[0, 29, C.green], [29, 62, C.yellow], [62, MAXS, C.red]].map(([a, b, cc]) => `<i class="z" style="left:${a / MAXS * 100}%;width:${(b - a) / MAXS * 100}%;background:${cc};${a === 0 ? 'border-radius:4px 0 0 4px;' : ''}${b === MAXS ? 'border-radius:0 4px 4px 0;' : ''}"></i>`).join('');
-      const bar = (lb, v, mx) => isNaN(v) ? '' : `<div class="br"><span>${lb}</span><div class="tk">${zones}<i class="f" style="width:${Math.min(100, v / MAXS * 100).toFixed(1)}%;background:${wcol(v)}"></i>${mx > 0 ? `<i class="mx" style="left:${Math.min(100, mx / MAXS * 100).toFixed(1)}%"></i>` : ''}</div><span class="vv">${dc(v)} <small>km/h</small></span></div>`;
-      this._set('bars', bar('Wind', sp, h ? h.smax : 0) + bar('Böen', gu, h ? h.gmax : 0) + `<div class="br sc"><span></span><div style="position:relative;height:10px">${[[0, '0'], [29, '29'], [62, '62'], [75, '75+']].map(([v, t]) => `<span style="position:absolute;left:${(v / MAXS * 100).toFixed(1)}%;transform:translateX(${v === 0 ? '0' : v === 75 ? '-100%' : '-50%'})">${t}</span>`).join('')}</div><span></span></div>`);
+      // Wind und Boeen: Anteile der Geschwindigkeitsklassen im Zeitraum als gestapelter Balken
+      const dist = (arr, calm, tot) => { if (!tot) return ''; const seg = [['rgba(255,255,255,.22)', calm]].concat(BINS.map((b, k) => [b.c, arr[k]]));
+        return seg.filter((x) => x[1] > 0).map(([cc, v]) => { const pc = v / tot * 100; return `<i style="width:${pc.toFixed(2)}%;background:${cc}">${pc >= 9 ? Math.round(pc) + '%' : ''}</i>`; }).join(''); };
+      const bars = h && h.n ? `<div class="br"><span>Wind</span><div class="tk">${dist(h.cnt.reduce((m, a) => m.map((x, k) => x + a[k]), BINS.map(() => 0)), h.calm, h.n)}</div></div>`
+        + (h.gn ? `<div class="br"><span>Böen</span><div class="tk">${dist(h.gb, h.gcalm, h.gn)}</div></div>` : '') : '';
+      this._set('bars', bars);
       // Zeitraum und Legende
       this._set('pills', c.rose ? PER.map(([k, l]) => `<span data-p="${k}" class="${k === this._per ? 'on' : ''}">${l}</span>`).join('') : '');
       if (c.rose && h && h.n) {
         const tot = h.n, sums = BINS.map((_, b) => h.cnt.reduce((m, a) => m + a[b], 0));
-        this._set('lg', BINS.map((b, i) => (sums[i] ? `<span><i style="background:${b.c}"></i>${b.l} <b>${Math.round(sums[i] / tot * 100)} %</b></span>` : '')).join('') + `<span><i style="background:rgba(255,255,255,.25)"></i>Windstill <b>${Math.round(h.calm / tot * 100)} %</b></span>`);
+        const gsum = h.gb || []; this._set('lg', `<span><i style="background:rgba(255,255,255,.25)"></i>still</span>` + BINS.map((b, i) => (sums[i] || gsum[i] ? `<span><i style="background:${b.c}"></i>${b.l}</span>` : '')).join('') + '<span>km/h</span>');
         this._set('info', `Ø <b>${dc(h.avg)} km/h</b> · max. <b>${dc(h.smax)} km/h</b>${h.gmax ? ` · Böen bis <b style="color:${wcol(h.gmax)}">${dc(h.gmax)} km/h</b>` : ''}`);
       } else { this._set('lg', c.rose ? '<span>Verlauf wird geladen …</span>' : ''); this._set('info', ''); }
     }
