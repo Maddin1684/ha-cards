@@ -1,4 +1,4 @@
-// wetter-karte-card v1.10 (27.11.2026: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.11 (27.11.2026: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -107,7 +107,8 @@
     .hrs { flex:1; min-width:0; display:flex; }
     .h { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; color:var(--secondary-text-color); min-width:0; }
     .h .tv { font-size:13px; color:var(--primary-text-color); font-variant-numeric:tabular-nums; }
-    .h .tb { display:block; align-self:stretch; height:4px; margin:1px 0 2px; }
+    .h .tb { position:relative; display:block; align-self:stretch; height:2px; margin:3px 0 4px; }
+    .h .tb b { position:absolute; left:50%; top:50%; width:7px; height:7px; margin:-3.5px 0 0 -3.5px; border-radius:50%; }
     .h:first-child .tb { border-radius:2px 0 0 2px; margin-left:6px; } .h:last-child .tb { border-radius:0 2px 2px 0; margin-right:6px; }
     .h .t { color:var(--primary-text-color); opacity:.85; }
     .h .t.n { color:${C.orange}; opacity:1; }
@@ -162,7 +163,7 @@
     .cc { display:flex; flex-direction:column; align-items:center; min-width:0; }
     .cg .d { font-size:15px; color:var(--primary-text-color); }
     .cg .d.n { color:${C.orange}; }
-    .cg .cc > img, .cg .cc > ha-icon { width:42px; height:42px; --mdc-icon-size:38px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .cg .cc > img, .cg .cc > ha-icon { width:50px; height:50px; --mdc-icon-size:46px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
     .ca { position:relative; margin:2px 0 0; }
     .ca .sp { position:absolute; top:4px; bottom:4px; border-left:1px dashed rgba(255,255,255,.14); }
     .ca .z0 { position:absolute; left:0; right:0; border-top:1px dashed rgba(100,210,255,.28); }
@@ -333,7 +334,7 @@
         const d = new Date(x.datetime), hc = this._cond(x.condition, this._isNightAt(d)), p = Math.round(num(x.precipitation_probability));
         // Verlaufsbalken: Farbe gleitet von Stunde zu Stunde (Temperaturfarben der Aussentemperatur-Grafik)
         const t = T[i], a = i ? (T[i - 1] + t) / 2 : t, b = i < T.length - 1 ? (T[i + 1] + t) / 2 : t;
-        return `<div class="h"><span class="t">${d.getHours()} Uhr</span>${this._img(hc)}<span class="tv">${r0(t)}°</span><i class="tb" style="background:linear-gradient(90deg,${tc(a)},${tc(t)},${tc(b)})"></i><span class="p${p >= 30 ? ' wet' : ''}">${p} %</span></div>`;
+        return `<div class="h"><span class="t">${d.getHours()} Uhr</span>${this._img(hc)}<span class="tv">${r0(t)}°</span><i class="tb" style="background:linear-gradient(90deg,${tc(a)},${tc(t)},${tc(b)})"><b style="background:${tc(t)}"></b></i><span class="p${p >= 30 ? ' wet' : ''}">${p} %</span></div>`;
       }).join('');
       this._set('hrs', hrs);
     }
