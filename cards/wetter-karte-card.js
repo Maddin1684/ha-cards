@@ -1,4 +1,4 @@
-// wetter-karte-card v1.2 (27.11.2026: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.3 (27.11.2026: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -10,7 +10,7 @@
     entity: 'weather.weather_fusion_ai_elm', icons_path: '/local/wettericons', sun: 'sun.sun',
     temperature_entity: 'sensor.wohnen_wohnen_wohnen_aussen_temperature',
     dwd_entity: 'sensor.stadt_schluchtern_aktuelle_warnstufe', dwd_advance_entity: 'sensor.stadt_schluchtern_vorwarnstufe',
-    nina_match: 'warning_schluchtern_stadt_main_kinzig_kreis_hessen_', title: 'Wetter Elm', forecast_style: 'linie', hours: 5, days: 7, test: false,
+    nina_match: 'warning_schluchtern_stadt_main_kinzig_kreis_hessen_', title: 'Wetter Elm', forecast_style: 'balken', hours: 5, days: 7, test: false,
   };
   // Farbschwellen wie Aussentemperatur-Grafik (statistics-graph-chart-card)
   const TH = [[-10, [140, 52, 253]], [-5, [140, 52, 253]], [2, [10, 132, 255]], [5, [66, 245, 227]], [10, [121, 210, 179]], [14, [48, 209, 88]], [19, [255, 214, 10]], [30, [255, 99, 0]], [35, [255, 69, 58]]];
@@ -35,7 +35,7 @@
   const WICO = [[/gewitter/i, 'mdi:weather-lightning'], [/orkan|sturm|wind|b(oe|ö)en/i, 'mdi:weather-windy'], [/starkregen|dauerregen|regen/i, 'mdi:weather-pouring'], [/schnee/i, 'mdi:weather-snowy-heavy'],
     [/glatteis|gl(ae|ä)tte|reif/i, 'mdi:car-traction-control'], [/frost/i, 'mdi:snowflake-thermometer'], [/nebel/i, 'mdi:weather-fog'], [/hitze/i, 'mdi:thermometer-high'], [/uv/i, 'mdi:weather-sunny-alert'],
     [/tauwetter/i, 'mdi:snowflake-melt'], [/hochwasser|flut|pegel/i, 'mdi:home-flood'], [/brand|feuer/i, 'mdi:fire'], [/strom/i, 'mdi:flash-off'], [/gefahrstoff|chemi/i, 'mdi:biohazard'], [/.*/, 'mdi:alert-outline']];
-  const TESTS = [['live', 'Live'], ['sunny', 'Sonne'], ['partlycloudy', 'Teils bewölkt'], ['cloudy', 'Wolken'], ['rainy', 'Regen'], ['snowy', 'Schnee'], ['clear-night', 'Klare Nacht'], ['lightning-rainy', 'Gewitter'], ['fog', 'Nebel']];
+  const TESTS = [['live', 'Live'], ['sunny', 'Sonne'], ['partlycloudy', 'Teils bewölkt'], ['partlycloudy-night', 'Teils bewölkt Nacht'], ['cloudy', 'Wolken'], ['rainy', 'Regen'], ['snowy', 'Schnee'], ['clear-night', 'Klare Nacht'], ['lightning-rainy', 'Gewitter'], ['fog', 'Nebel']];
   const WTESTS = [['live', 'Live'], ['keine', 'Keine'], ['beispiel', 'Beispiel']];
 
   const CSS = `
@@ -135,7 +135,7 @@
     .cc { display:flex; flex-direction:column; align-items:center; min-width:0; }
     .cg .d { font-size:15px; color:var(--primary-text-color); }
     .cg .d.n { color:${C.orange}; }
-    .cg img, .cg .cc > ha-icon:not([icon="mdi:navigation"]) { width:34px; height:34px; --mdc-icon-size:30px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .cg .cc > img, .cg .cc > ha-icon { width:34px; height:34px; --mdc-icon-size:30px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
     .ca { position:relative; margin:2px 0 0; }
     .ca .sp { position:absolute; top:4px; bottom:4px; border-left:1px dashed rgba(255,255,255,.14); }
     .ca .z0 { position:absolute; left:0; right:0; border-top:1px dashed rgba(100,210,255,.28); }
@@ -149,11 +149,14 @@
     .cg.pr { margin-top:2px; }
     .cg .pb { height:12px; width:62%; display:flex; align-items:flex-end; }
     .cg .pb span { display:block; width:100%; border-radius:2px; }
-    .cg .pv { font-size:12px; margin-top:3px; color:var(--secondary-text-color); white-space:nowrap; }
-    .cg .pv.wet { color:${C.teal}; }
+    .cg .pv { font-size:12px; margin-top:3px; color:var(--secondary-text-color); white-space:nowrap; display:flex; align-items:center; justify-content:center; gap:1px; }
+    .cg .pv small { font-size:10px; }
+    .cg .pv ha-icon { --mdc-icon-size:12px; width:12px; height:12px; display:flex; flex:none; }
     .cg.wd { margin:6px 0 10px; }
-    .cg.wd .cc { flex-direction:row; justify-content:center; gap:2px; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; }
-    .cg.wd ha-icon { --mdc-icon-size:13px; width:13px; height:13px; display:flex; }
+    .cg.wd .cc { gap:2px; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; }
+    .cg.wd .wa { width:16px; height:16px; display:flex; align-items:center; justify-content:center; }
+    .cg.wd .wa ha-icon { --mdc-icon-size:14px; width:14px; height:14px; display:flex; }
+    .cg.wd .wv { line-height:14px; }
     .cg.wd small { font-size:10px; }
     .bsvg { display:block; width:100%; }
     .err { padding:10px 16px; font-size:12px; color:${C.red}; }
@@ -398,7 +401,7 @@
     _fcast(we) {
       const D = this._days(we);
       if (!D.length) { this._set('fl', `<div class="lg">Vorhersage wird geladen …</div>`); this._set('ffx', ''); return; }
-      const style = /balken|zeilen/.test(this._c.forecast_style || '') ? 'balken' : 'linie';
+      const style = /linie/.test(this._c.forecast_style || '') ? 'linie' : 'balken';
       this._set('ffx', this._open.fc === 'zu' ? 'Anzeigen' : 'Einklappen');
       const tNow = this._c.temperature_entity && this._hass.states[this._c.temperature_entity] ? num(this._hass.states[this._c.temperature_entity].state, num(we.attributes.temperature)) : num(we.attributes.temperature);
       this._set('fl', this._chart(D, tNow, style));
@@ -433,11 +436,11 @@
       s += `</div>`;
       // Niederschlag
       s += `<div class="cg pr" style="${col}">${D.map((x) => {
-        const h = x.pr > 0.04 ? Math.max(3, x.pr / pMax * 12) : 0, c = x.snow ? 'rgba(255,255,255,.85)' : x.pr >= 0.5 ? C.blue : 'rgba(10,132,255,.55)';
-        return `<div class="cc"><div class="pb"><span style="height:${h.toFixed(1)}px;background:${c}"></span></div><div class="pv${x.pr >= 0.5 ? ' wet' : ''}">${x.snow ? dc(Math.max(0.1, x.cm)) + ' cm' : dc(x.pr) + ' mm'}</div></div>`;
+        const h = x.pr > 0.04 ? Math.max(3, x.pr / pMax * 12) : 0, c = x.snow ? '#fff' : C.blue;
+        return `<div class="cc"><div class="pb"><span style="height:${h.toFixed(1)}px;background:${c}"></span></div><div class="pv"><ha-icon icon="${x.snow ? 'mdi:snowflake' : 'mdi:water'}" style="color:${c}"></ha-icon>${x.snow ? dc(Math.max(0.1, x.cm)) + '<small> cm</small>' : dc(x.pr) + '<small> mm</small>'}</div></div>`;
       }).join('')}</div>`;
       // Wind
-      s += `<div class="cg wd" style="${col}">${D.map((x) => isNaN(x.ws) ? '<div class="cc"></div>' : `<div class="cc"><ha-icon icon="mdi:navigation" style="color:${wc(x.ws)};transform:rotate(${isNaN(x.wb) ? 0 : Math.round(x.wb + 180)}deg)"></ha-icon><span>${Math.round(x.ws)} <small>km/h</small></span></div>`).join('')}</div>`;
+      s += `<div class="cg wd" style="${col}">${D.map((x) => isNaN(x.ws) ? '<div class="cc"></div>' : `<div class="cc"><span class="wa"><ha-icon icon="mdi:navigation" style="color:${wc(x.ws)};transform:rotate(${isNaN(x.wb) ? 0 : Math.round(x.wb + 180)}deg)"></ha-icon></span><span class="wv">${Math.round(x.ws)}<small> km/h</small></span></div>`).join('')}</div>`;
       return s;
     }
 
