@@ -1,4 +1,5 @@
-// waschmaschine-plan-card v0.1 (27.11.2026, Testkarte): Miele MobileStart mit Programm-Vorwahl.
+// waschmaschine-plan-card v0.2 (27.11.2026): Vorgabe = zuletzt genutzte Zeiten (sonst 06:00–09:00, typisch abends beladen, morgens starten), Schnellwahl 05–08 Uhr / Sofort.
+// v0.1 (27.11.2026, Testkarte): Miele MobileStart mit Programm-Vorwahl.
 // Pille oben rechts 'Programm planen' (Programm, Startzeit, Endzeit) – gespeichert in Helfern, gestartet von der Automation
 // 'Waschmaschine geplanter Start (MobileStart)': ab Startzeit, sobald MobileStart aktiv ist, bis spaetestens Endzeit (danach verfaellt der Plan).
 // Zweite Pille: Hinweis 'Waschmaschine leeren' (Alexa/TV-Ansage) an/aus.
@@ -46,6 +47,9 @@
     .pg { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; max-height:132px; overflow-y:auto; }
     .pg button { border:0; font:inherit; font-size:13px; padding:6px 11px; border-radius:15px; background:rgba(118,118,128,.24); color:var(--primary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .pg button.on { background:${C.orange}; color:#fff; }
+    .qk { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+    .qk button { border:0; font:inherit; font-size:13px; padding:5px 11px; border-radius:15px; background:rgba(118,118,128,.24); color:var(--primary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .qk button.on { background:rgba(245,99,0,.3); }
     .tm { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
     .tm label { display:block; background:rgba(118,118,128,.18); border-radius:10px; padding:6px 10px; }
     .tm label span { display:block; font-size:11px; color:var(--secondary-text-color); }
@@ -109,12 +113,14 @@
       r.querySelector('.pn').classList.toggle('on', !!this._open);
       if (this._open) {
         const now = new Date();
-        if (!this._f) { const s0 = akt ? pStart : new Date(Math.ceil((now.getTime() + 10 * 6e4) / 9e5) * 9e5), e0 = akt ? pEnd : new Date(s0.getTime() + 6 * 36e5);
-          this._f = { start: hm(s0), end: hm(e0), id: akt ? +this._v('p_id') : null, name: akt ? this._v('p_name') : '' }; }
+        // Vorgabe: zuletzt genutzte Uhrzeiten (meist morgens), sonst 06:00 – 09:00; Programm ebenfalls vom letzten Plan
+        if (!this._f) { const lt = (k, d) => { const m = /(\d{2}):(\d{2})/.exec(this._v(k) || ''); return m && this._v(k).indexOf('1970') < 0 ? m[1] + ':' + m[2] : d; };
+          this._f = { start: lt('p_start', '06:00'), end: lt('p_end', '09:00'), id: +this._v('p_id') || null, name: this._v('p_name') || '' }; }
         const ds = next(this._f.start, new Date(now.getTime() - 6e4)), de = next(this._f.end, ds), L = this._list || [];
         const can = this._live && this._f.id != null && this._f.name;
         set('.box', `<div class="lb">Programm${this._pBusy ? '<small>wird geladen …</small>' : !this._live && L.length ? '<small>Vorschau – Maschine aus</small>' : ''}</div>
           <div class="pg">${L.map((p) => `<button data-p="${esc(p.id)}" data-n="${esc(p.name)}" class="${(p.id != null ? p.id === this._f.id : p.name === this._f.name) ? 'on' : ''}">${esc(p.name)}</button>`).join('')}</div>
+          <div class="lb">Start</div><div class="qk">${['05:00', '06:00', '07:00', '08:00'].map((t) => `<button data-q="${t}" class="${this._f.start === t ? 'on' : ''}">${t}</button>`).join('')}<button data-q="now">Sofort</button></div>
           <div class="tm"><label><span>Start frühestens</span><input type="time" data-t="start" value="${this._f.start}"><i>${tag(ds)}</i></label>
             <label><span>Ende – Plan verfällt</span><input type="time" data-t="end" value="${this._f.end}"><i>${tag(de)}</i></label></div>
           <div class="ac"><span class="hn">${esc(this._pErr || (mob ? 'MobileStart ist aktiv – Start zur Startzeit.' : 'Startet, sobald MobileStart an der Maschine aktiv ist.'))}</span>
@@ -135,7 +141,10 @@
     }
 
     _click(e) {
-      const H = this._hass, c = this._c, b = e.target.closest('[data-a],[data-p]'); if (!b) return;
+      const H = this._hass, c = this._c, b = e.target.closest('[data-a],[data-p],[data-q]'); if (!b) return;
+      if (b.dataset.q) { const q = b.dataset.q, sh = (t, h) => { const [a, m] = t.split(':').map(Number), d = new Date(2000, 0, 1, a, m); d.setTime(d.getTime() + h * 36e5); return hm(d); };
+        const dur = ((+this._f.end.slice(0, 2) * 60 + +this._f.end.slice(3)) - (+this._f.start.slice(0, 2) * 60 + +this._f.start.slice(3)) + 1440) % 1440 || 180;
+        this._f.start = q === 'now' ? hm(new Date(Date.now() + 6e4)) : q; this._f.end = sh(this._f.start, dur / 60); this._render(); return; }
       if (b.dataset.p !== undefined) { this._f.id = b.dataset.p === '' ? null : +b.dataset.p; this._f.name = b.dataset.n; this._render(); return; }
       const a = b.dataset.a;
       if (a === 'notify') { H.callService('automation', this._v('notify_automation') === 'on' ? 'turn_off' : 'turn_on', { entity_id: c.notify_automation }); return; }
