@@ -1,4 +1,4 @@
-// wind-kompass-card v1.10 (27.11.2026: Himmelsrichtungen kleiner (16) und leicht transparent; v1.9: Variante layout: umschalter – 'Aktuell' (nur Kompass) / 'Rueckblick' (Windrose, Wind-/Boeen-Anteile, Zeitraum); v1.8: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.11 (27.11.2026: Himmelsrichtungen wieder wie vorher; Text im Kreis kleiner und leicht transparent; Windnadel faehrt weich auf kuerzestem Weg um den Kreis; v1.10: Himmelsrichtungen kleiner (16) und leicht transparent; v1.9: Variante layout: umschalter – 'Aktuell' (nur Kompass) / 'Rueckblick' (Windrose, Wind-/Boeen-Anteile, Zeitraum); v1.8: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -54,11 +54,12 @@
     .tst span { font-size:12px; padding:3px 10px; border-radius:6px; background:rgba(118,118,128,.24); color:var(--secondary-text-color); cursor:pointer; }
     .tst span.on { background:${C.orange}; color:#fff; }
     .wrap svg.k { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
-    .arr { transition:transform 1s ease; transform-origin:150px 150px; }
+    .arr { transition:transform 1.6s cubic-bezier(.4,0,.2,1); transform-origin:150px 150px; }
+    .arr path { transition:fill .6s, stroke .6s; }
     .ctr { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none; text-shadow:0 1px 6px rgba(0,0,0,.6); }
-    .ctr .d { font-size:24px; font-weight:500; line-height:26px; color:rgba(255,255,255,.85); }
-    .ctr .v { font-size:30px; font-weight:400; line-height:32px; color:#fff; white-space:nowrap; }
-    .ctr .v small { font-size:15px; color:rgba(255,255,255,.8); margin-left:4px; }
+    .ctr .d { font-size:20px; font-weight:500; line-height:22px; color:rgba(255,255,255,.72); }
+    .ctr .v { font-size:26px; font-weight:400; line-height:28px; color:rgba(255,255,255,.88); white-space:nowrap; }
+    .ctr .v small { font-size:13px; color:rgba(255,255,255,.7); margin-left:4px; }
     .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
     .sky img { width:100%; height:100%; object-fit:contain; display:block; }
     .sky.sun { width:26%; }
@@ -100,7 +101,7 @@
       const r = this.shadowRoot || this.attachShadow({ mode: 'open' });
       this._root = r;
       r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"></div><div class="tst" id="tst"></div><div class="seg" id="seg"></div>
-        <div class="main"><div class="wrap" id="wrap"><svg class="k" id="k" viewBox="0 0 300 300"></svg><div id="sky"></div><div class="ctr" id="ctr"></div></div>
+        <div class="main"><div class="wrap" id="wrap"><svg class="k" id="k" viewBox="0 0 300 300"></svg><svg class="k" viewBox="0 0 300 300"><defs><linearGradient id="wka" x1="0" y1="0" x2="0" y2="1"><stop id="wka1" offset="0"/><stop id="wka2" offset="1" stop-opacity=".25"/></linearGradient></defs><g class="arr" id="arrg"><path id="arrp" d="M150,66 L139,38 L150,46 L161,38 Z" fill="url(#wka)" stroke-width="1" stroke-linejoin="round"/></g></svg><div id="sky"></div><div class="ctr" id="ctr"></div></div>
         <div class="vb" id="bars"></div><div class="lg" id="lg"></div></div><div class="pills" id="pills"></div></ha-card>`;
       r.querySelector('ha-card').addEventListener('click', (ev) => {
         const mm = ev.target.closest('[data-m]'); if (mm) { this._mode = mm.dataset.m; this._last = {}; this._render(true); return; }
@@ -183,16 +184,24 @@
       // Himmelsrichtung ausblenden, wenn Sonne/Mond direkt davor steht (Abstand < 25°)
       const bodyAz = sunUp ? sunAz : moonUp ? moonAz : null;
       const near = (a) => bodyAz != null && Math.abs(((bodyAz - a + 540) % 360) - 180) < 25;
-      const lbl = [['N', 0], ['O', 90], ['S', 180], ['W', 270]].map(([t, a]) => { const an = (a - 90) * Math.PI / 180, rr = R + 17; return `<text x="${(cx + rr * Math.cos(an)).toFixed(1)}" y="${(cy + rr * Math.sin(an)).toFixed(1)}" fill="${C.orange}" font-size="16" text-anchor="middle" dominant-baseline="central" opacity="${near(a) ? 0.15 : 0.8}" style="transition:opacity .6s">${t}</text>`; }).join('');
+      const lbl = [['N', 0], ['O', 90], ['S', 180], ['W', 270]].map(([t, a]) => { const an = (a - 90) * Math.PI / 180, rr = R + 17; return `<text x="${(cx + rr * Math.cos(an)).toFixed(1)}" y="${(cy + rr * Math.sin(an)).toFixed(1)}" fill="${C.orange}" font-size="20" text-anchor="middle" dominant-baseline="central" opacity="${near(a) ? 0.15 : 1}" style="transition:opacity .6s">${t}</text>`; }).join('');
       const svg = `<defs><clipPath id="wkc"><circle cx="150" cy="150" r="${R}"/></clipPath>
         <radialGradient id="wkd"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
-        <linearGradient id="wka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity=".25"/></linearGradient></defs>
+</defs>
         <g clip-path="url(#wkc)"><rect x="${cx - R}" y="${cy - R}" width="${2 * R}" height="${2 * R}" fill="#1c1c1e"/>
         ${c.background_image ? `<image href="${esc(c.background_image)}" x="${cx - R}" y="${cy - R}" width="${2 * R}" height="${2 * R}" preserveAspectRatio="xMidYMid slice" opacity="${num(c.background_opacity, 0.6)}"/>` : ''}
         <g opacity=".9">${rose}</g><circle cx="150" cy="150" r="62" fill="url(#wkd)"/></g>
         <circle cx="150" cy="150" r="${R}" fill="none" stroke="${C.orange}" stroke-width="3"/>${lbl}
-        <g class="arr" style="transform:rotate(${Math.round(dir)}deg)"><path d="M150,${cy - R + 2} L139,${cy - R - 26} L150,${cy - R - 18} L161,${cy - R - 26} Z" fill="url(#wka)" stroke="${col}" stroke-width="1" stroke-linejoin="round"/></g>`;
+`;
       this._set('k', svg);
+      // Windnadel faehrt auf kuerzestem Weg um den Kreis (kein Springen)
+      const ap = this._root.getElementById('arrp'), ag = this._root.getElementById('arrg');
+      if (ap && ag) {
+        ap.setAttribute('d', `M150,${cy - R + 2} L139,${cy - R - 26} L150,${cy - R - 18} L161,${cy - R - 26} Z`); ap.setAttribute('stroke', col);
+        this._root.getElementById('wka1').setAttribute('stop-color', col); this._root.getElementById('wka2').setAttribute('stop-color', col);
+        if (this._ang == null) { this._ang = dir; ag.style.transition = 'none'; ag.style.transform = `rotate(${dir}deg)`; void ag.getBoundingClientRect(); ag.style.transition = ''; }
+        else { const cur = ((this._ang % 360) + 360) % 360, d = ((dir - cur + 540) % 360) - 180; if (Math.abs(d) > 0.5) { this._ang += d; ag.style.transform = `rotate(${this._ang}deg)`; } }
+      }
       const dirTxt = DIRS[Math.round((((dir % 360) + 360) % 360) / 22.5) % 16];
       this._set('ctr', `<div class="d">${dirTxt}</div><div class="v">${Math.round(sp)}<small>km/h</small></div>`);
       // Sonne / Mond am Rand
