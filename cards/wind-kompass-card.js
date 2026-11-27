@@ -1,4 +1,4 @@
-// wind-kompass-card v1.4 (27.11.2026: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.5 (27.11.2026: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -166,7 +166,10 @@
         });
       }
       // Kompass: Luftbild, Rose, Ring, Himmelsrichtungen, Pfeil (zeigt von der Windherkunft zur Mitte)
-      const lbl = [['N', 0], ['O', 90], ['S', 180], ['W', 270]].map(([t, a]) => { const an = (a - 90) * Math.PI / 180, rr = R + 18; return `<text x="${(cx + rr * Math.cos(an)).toFixed(1)}" y="${(cy + rr * Math.sin(an)).toFixed(1)}" fill="${C.orange}" font-size="20" text-anchor="middle" dominant-baseline="central">${t}</text>`; }).join('');
+      // Himmelsrichtung ausblenden, wenn Sonne/Mond direkt davor steht (Abstand < 25°)
+      const bodyAz = sunUp ? sunAz : moonUp ? moonAz : null;
+      const near = (a) => bodyAz != null && Math.abs(((bodyAz - a + 540) % 360) - 180) < 25;
+      const lbl = [['N', 0], ['O', 90], ['S', 180], ['W', 270]].map(([t, a]) => { const an = (a - 90) * Math.PI / 180, rr = R + 18; return `<text x="${(cx + rr * Math.cos(an)).toFixed(1)}" y="${(cy + rr * Math.sin(an)).toFixed(1)}" fill="${C.orange}" font-size="20" text-anchor="middle" dominant-baseline="central" opacity="${near(a) ? 0.15 : 1}" style="transition:opacity .6s">${t}</text>`; }).join('');
       const svg = `<defs><clipPath id="wkc"><circle cx="150" cy="150" r="${R}"/></clipPath>
         <radialGradient id="wkd"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
         <linearGradient id="wka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity=".25"/></linearGradient></defs>
