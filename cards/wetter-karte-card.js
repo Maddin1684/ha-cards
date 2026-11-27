@@ -1,4 +1,4 @@
-// wetter-karte-card v1.19 (27.11.2026: Warnungszaehler mit Doppelpunkt (DWD: 2 · NINA: 1); v1.18: alle Wettersymbole als eingebettetes SVG (fluessig, je Einfuegung eigene IDs); Sonnenauf-/-untergang in der Stundenleiste (eigene Symbole sunrise/sunset.svg, Uhrzeit, interpolierte Temperatur); v1.17: Effekte wieder ueber den ganzen Kopfbereich; Hauptsymbol 70 px (schmal 62 px); v1.16: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.20 (27.11.2026: grafischer Editor (Wetter-Entitaet, Titel, Darstellung, Quellen, Warnungen, Anzeige); v1.19: Warnungszaehler mit Doppelpunkt (DWD: 2 · NINA: 1); v1.18: alle Wettersymbole als eingebettetes SVG (fluessig, je Einfuegung eigene IDs); Sonnenauf-/-untergang in der Stundenleiste (eigene Symbole sunrise/sunset.svg, Uhrzeit, interpolierte Temperatur); v1.17: Effekte wieder ueber den ganzen Kopfbereich; Hauptsymbol 70 px (schmal 62 px); v1.16: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -228,6 +228,7 @@
     getCardSize() { return 8; }
     getGridOptions() { return { columns: 12, rows: 'auto' }; }
     static getStubConfig() { return {}; }
+    static getConfigElement() { return document.createElement('wetter-karte-card-editor'); }
 
     connectedCallback() {
       this._on = true;
@@ -597,6 +598,53 @@
   }
 
   customElements.define(TAG, WetterKarteCard);
+
+  /* ---------- Grafischer Editor ---------- */
+  const LBL = { entity: 'Wetter-Entität', title: 'Titel', forecast_style: 'Darstellung Vorhersage', icons_path: 'Ordner Wetter-Icons', temperature_entity: 'Außentemperatur (Sensor)',
+    dwd_entity: 'DWD aktuelle Warnungen', dwd_advance_entity: 'DWD Vorabwarnungen', nina_match: 'NINA-Sensoren (Namensteil)', hours: 'Stunden im Kopfbereich', days: 'Tage in der Vorhersage', test: 'Test-Auswahl anzeigen' };
+  const SCHEMA = [
+    { name: 'entity', required: true, selector: { entity: { domain: 'weather' } } },
+    { name: 'title', selector: { text: {} } },
+    { name: 'forecast_style', selector: { select: { mode: 'dropdown', options: [{ value: 'balken', label: 'Balken' }, { value: 'linie', label: 'Linie' }] } } },
+    { type: 'expandable', name: 'g_quellen', title: 'Quellen', flatten: true, schema: [
+      { name: 'temperature_entity', selector: { entity: { domain: 'sensor' } } },
+      { name: 'icons_path', selector: { text: {} } },
+    ] },
+    { type: 'expandable', name: 'g_warn', title: 'Warnungen', flatten: true, schema: [
+      { name: 'dwd_entity', selector: { entity: { domain: 'sensor' } } },
+      { name: 'dwd_advance_entity', selector: { entity: { domain: 'sensor' } } },
+      { name: 'nina_match', selector: { text: {} } },
+    ] },
+    { type: 'expandable', name: 'g_anz', title: 'Anzeige', flatten: true, schema: [
+      { name: 'hours', selector: { number: { min: 3, max: 8, step: 1, mode: 'slider' } } },
+      { name: 'days', selector: { number: { min: 3, max: 8, step: 1, mode: 'slider' } } },
+      { name: 'test', selector: { boolean: {} } },
+    ] },
+  ];
+  class WetterKarteCardEditor extends HTMLElement {
+    setConfig(c) { this._config = Object.assign({}, c || {}); this._render(); }
+    set hass(h) { this._hass = h; if (this._form) this._form.hass = h; }
+    _render() {
+      if (!this._form) {
+        this._form = document.createElement('ha-form');
+        this._form.computeLabel = (sc) => LBL[sc.name] || sc.title || sc.name;
+        this._form.addEventListener('value-changed', (ev) => {
+          const v = ev.detail.value || {}, out = { type: this._config.type || 'custom:' + TAG };
+          // nur Abweichungen vom Standard speichern (YAML bleibt kurz)
+          Object.keys(v).forEach((k) => { const x = v[k]; if (x === undefined || x === null || x === '') return; if (k !== 'entity' && k !== 'title' && x === DEF[k]) return; out[k] = x; });
+          Object.keys(this._config).forEach((k) => { if (!(k in out) && !(k in DEF) && k !== 'type') out[k] = this._config[k]; });
+          this._config = out;
+          this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: out }, bubbles: true, composed: true }));
+        });
+        this.appendChild(this._form);
+      }
+      this._form.hass = this._hass;
+      this._form.schema = SCHEMA;
+      const d = {}; Object.keys(LBL).forEach((k) => { d[k] = k in this._config ? this._config[k] : DEF[k]; });
+      this._form.data = d;
+    }
+  }
+  if (!customElements.get(TAG + '-editor')) customElements.define(TAG + '-editor', WetterKarteCardEditor);
   window.customCards = window.customCards || [];
   window.customCards.push({ type: TAG, name: 'Wetter-Karte', description: 'Aktuelles Wetter mit Effekten, Warnungen (DWD/NINA) und Vorhersage' });
 })();
