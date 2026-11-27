@@ -1,4 +1,4 @@
-// wetter-karte-card v1.4 (27.11.2026: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.5 (27.11.2026: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -35,6 +35,14 @@
   const WICO = [[/gewitter/i, 'mdi:weather-lightning'], [/orkan|sturm|wind|b(oe|ö)en/i, 'mdi:weather-windy'], [/starkregen|dauerregen|regen/i, 'mdi:weather-pouring'], [/schnee/i, 'mdi:weather-snowy-heavy'],
     [/glatteis|gl(ae|ä)tte|reif/i, 'mdi:car-traction-control'], [/frost/i, 'mdi:snowflake-thermometer'], [/nebel/i, 'mdi:weather-fog'], [/hitze/i, 'mdi:thermometer-high'], [/uv/i, 'mdi:weather-sunny-alert'],
     [/tauwetter/i, 'mdi:snowflake-melt'], [/hochwasser|flut|pegel/i, 'mdi:home-flood'], [/brand|feuer/i, 'mdi:fire'], [/strom/i, 'mdi:flash-off'], [/gefahrstoff|chemi/i, 'mdi:biohazard'], [/.*/, 'mdi:alert-outline']];
+  // Icon-Map wie Warn-Laufband (DWD-Warncode -> Symbol)
+  const DWDICO = (() => { const m = {}, set = (ks, i) => ks.forEach((k) => { m[k] = i; });
+    set([11, 12, 13, 14, 15, 16, 51, 52, 53, 54, 55, 56, 57, 58], 'mdi:weather-windy'); set([22, 82], 'mdi:thermometer-chevron-down');
+    set([31, 90], 'mdi:weather-lightning'); set([33, 34, 36, 38, 40, 41, 42, 44, 45, 91, 92, 93], 'mdi:weather-lightning-rainy'); set([46, 48, 49, 95, 96], 'mdi:weather-hail');
+    set([59], 'mdi:weather-fog'); set([61, 62, 63, 64, 65, 66], 'mdi:weather-pouring'); set([70, 71], 'mdi:weather-snowy'); set([72, 73, 74, 75, 76], 'mdi:weather-snowy-heavy');
+    set([83], 'mdi:snowflake-thermometer'); set([84, 85, 86, 87], 'mdi:car-traction-control'); set([88, 89], 'mdi:snowflake-melt'); set([98, 99], 'mdi:alert');
+    set([246], 'mdi:sun-wireless'); set([247, 248], 'mdi:sun-thermometer'); return m; })();
+  const NINA_IMG = '/local/IMG_0074.png';
   const TESTS = [['live', 'Live'], ['sunny', 'Sonne'], ['partlycloudy', 'Teils bewölkt'], ['partlycloudy-night', 'Teils bewölkt Nacht'], ['cloudy', 'Wolken'], ['rainy', 'Regen'], ['snowy', 'Schnee'], ['clear-night', 'Klare Nacht'], ['lightning-rainy', 'Gewitter'], ['fog', 'Nebel']];
   const WTESTS = [['live', 'Live'], ['keine', 'Keine'], ['beispiel', 'Beispiel']];
 
@@ -119,6 +127,7 @@
     .w .row { display:flex; align-items:center; gap:10px; }
     .w .bx { flex:0 0 30px; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
     .w .bx ha-icon { --mdc-icon-size:18px; display:flex; }
+    .w .bx img { width:24px; height:24px; object-fit:contain; }
     .w .tx { flex:1; min-width:0; }
     .w .nm { font-size:14px; line-height:1.3; color:var(--primary-text-color); }
     .w .tg { font-size:11px; padding:1px 6px; border-radius:6px; margin-left:4px; white-space:nowrap; }
@@ -327,9 +336,9 @@
       if (this._wtest === 'beispiel') {
         const n = new Date(), e = new Date(Date.now() + 18 * 3600000);
         return [
-          { k: 'x1', src: 'DWD', lv: 2, name: 'Sturmböen', head: 'Amtliche WARNUNG vor STURMBÖEN', desc: 'Es treten Sturmböen mit Geschwindigkeiten um 70 km/h aus westlicher Richtung auf.', ins: 'Achten Sie auf herabstürzende Äste und herumfliegende Gegenstände.', s: n, e },
-          { k: 'x2', src: 'DWD', lv: 1, name: 'Glätte', head: 'Amtliche WARNUNG vor GLÄTTE', desc: 'Es besteht Glättegefahr.', ins: 'Verhalten im Straßenverkehr anpassen.', s: n, e },
-          { k: 'x3', src: 'DWD', lv: 3, name: 'Schwere Gewitter', adv: true, head: 'Vorabinformation UNWETTER vor schwerem Gewitter', desc: 'Für morgen Nachmittag sind schwere Gewitter mit Hagel möglich.', ins: '', s: new Date(Date.now() + 20 * 3600000), e: new Date(Date.now() + 28 * 3600000) },
+          { k: 'x1', src: 'DWD', code: 52, lv: 2, name: 'Sturmböen', head: 'Amtliche WARNUNG vor STURMBÖEN', desc: 'Es treten Sturmböen mit Geschwindigkeiten um 70 km/h aus westlicher Richtung auf.', ins: 'Achten Sie auf herabstürzende Äste und herumfliegende Gegenstände.', s: n, e },
+          { k: 'x2', src: 'DWD', code: 84, lv: 1, name: 'Glätte', head: 'Amtliche WARNUNG vor GLÄTTE', desc: 'Es besteht Glättegefahr.', ins: 'Verhalten im Straßenverkehr anpassen.', s: n, e },
+          { k: 'x3', src: 'DWD', code: 41, lv: 3, name: 'Schwere Gewitter', adv: true, head: 'Vorabinformation UNWETTER vor schwerem Gewitter', desc: 'Für morgen Nachmittag sind schwere Gewitter mit Hagel möglich.', ins: '', s: new Date(Date.now() + 20 * 3600000), e: new Date(Date.now() + 28 * 3600000) },
           { k: 'x4', src: 'NINA', lv: 2, sev: 'mäßig', name: 'Stromausfall Schlüchtern', head: 'Stromausfall im Stadtgebiet', desc: 'Im Stadtgebiet Schlüchtern kommt es zu einem großflächigen Stromausfall.', ins: 'Informieren Sie sich über Radio und Warn-Apps. Halten Sie Notrufnummern frei.', s: n, e: null },
         ];
       }
@@ -339,7 +348,7 @@
         for (let i = 1; i <= n; i++) {
           const nm = a[`warning_${i}_name`]; if (!nm) continue;
           const name = String(nm).charAt(0) + String(nm).slice(1).toLowerCase();
-          out.push({ k: `${adv ? 'v' : 'd'}${i}${nm}`, src: 'DWD', adv, lv: Math.max(1, Math.min(4, num(a[`warning_${i}_level`], 1))), name,
+          out.push({ k: `${adv ? 'v' : 'd'}${i}${nm}`, src: 'DWD', adv, code: num(a[`warning_${i}_type`], 0), lv: Math.max(1, Math.min(4, num(a[`warning_${i}_level`], 1))), name,
             head: a[`warning_${i}_headline`], desc: a[`warning_${i}_description`], ins: a[`warning_${i}_instruction`], s: new Date(a[`warning_${i}_start`]), e: new Date(a[`warning_${i}_end`]) });
         }
       };
@@ -376,7 +385,7 @@
         const left = w.e && !isNaN(w.e) && w.e > Date.now() && (!w.s || w.s <= Date.now()) ? (() => { const m = Math.round((w.e - Date.now()) / 60000); return m < 60 ? `noch ${m} min` : `noch ${Math.round(m / 60)} h`; })() : '';
         const det = [w.head && `<b>${esc(w.head)}</b>`, w.desc && esc(w.desc), w.ins && `<b>Empfehlung:</b> ${esc(String(w.ins).replace(/^Hinweis auf:.*?\n?Handlungsempfehlungen:\s*\n?/s, '').trim())}`,
           (w.s || w.e) && `<b>Gültig:</b> ${w.s && !isNaN(w.s) ? when(w.s) : ''}${w.e && !isNaN(w.e) ? ' bis ' + when(w.e) : ''}`].filter(Boolean).join('\n');
-        return `<div class="w${w.adv ? ' adv' : ''}${this._wop[w.k] ? ' op' : ''}" data-k="${esc(w.k)}"><div class="row"><span class="bx" style="background:${col}26">${ico(this._wicon(w.name + ' ' + (w.head || '')), col)}</span>
+        return `<div class="w${w.adv ? ' adv' : ''}${this._wop[w.k] ? ' op' : ''}" data-k="${esc(w.k)}"><div class="row"><span class="bx" style="background:${col}26">${w.src === 'NINA' ? `<img src="${NINA_IMG}" alt="">` : ico(this._c.icon_map && this._wicon(w.name) !== 'mdi:alert-outline' ? this._wicon(w.name) : (DWDICO[w.code] || this._wicon(w.name + ' ' + (w.head || ''))), col)}</span>
           <div class="tx"><div class="nm">${esc(w.name)}<span class="tg" style="color:${col};background:${col}22">${esc(tag)}</span></div><div class="sb">${esc([sub, left].filter(Boolean).join(' · '))}</div></div>${ico('mdi:chevron-down')}</div>
           <div class="ds"><div>${det}</div></div></div>`.replace('<ha-icon icon="mdi:chevron-down">', '<ha-icon class="cv" icon="mdi:chevron-down">');
       }).join('');
