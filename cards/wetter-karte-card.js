@@ -1,4 +1,4 @@
-// wetter-karte-card v1.6 (27.11.2026: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.7 (27.11.2026: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -140,6 +140,19 @@
     .w.op .ds > div { padding-top:6px; padding-bottom:2px; }
     .w .ds b { font-weight:400; color:var(--secondary-text-color); }
     .w.adv { opacity:.7; }
+    .fsc { overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; overscroll-behavior-x:contain; }
+    .fsc::-webkit-scrollbar { display:none; }
+    /* schmale Karte (iPad 3 Spalten): kompakter Kopf, Vorhersage seitlich scrollbar */
+    @container (max-width: 380px) {
+      .hd { font-size:22px; line-height:40px; padding:10px 12px 2px; }
+      .hero, .tst { margin-left:12px; margin-right:12px; } .tst { padding:0 0 10px; }
+      .fold { padding:0 12px; }
+      .cur { flex:0 0 74px; } .cur img, .cur ha-icon { width:54px; height:54px; --mdc-icon-size:48px; }
+      .now { padding:0 8px; gap:6px; }
+      .h { min-width:0; flex:1; } .h:nth-child(n+5) { display:none; }
+      .h img, .h ha-icon { width:22px; height:22px; --mdc-icon-size:20px; }
+    }
+    @container (max-width: 300px) { .h:nth-child(n+4) { display:none; } }
     .cg { display:grid; text-align:center; font-variant-numeric:tabular-nums; }
     .cc { display:flex; flex-direction:column; align-items:center; min-width:0; }
     .cg .d { font-size:15px; color:var(--primary-text-color); }
@@ -430,7 +443,7 @@
       const style = /linie/.test(this._c.forecast_style || '') ? 'linie' : 'balken';
       this._set('ffx', this._open.fc === 'zu' ? 'Anzeigen' : 'Einklappen');
       const tNow = this._c.temperature_entity && this._hass.states[this._c.temperature_entity] ? num(this._hass.states[this._c.temperature_entity].state, num(we.attributes.temperature)) : num(we.attributes.temperature);
-      this._set('fl', this._chart(D, tNow, style));
+      this._set('fl', `<div class="fsc"><div class="fin" style="min-width:${D.length * 54}px">${this._chart(D, tNow, style)}</div></div>`);
     }
     _dayName(x) { return x.i === 0 && sameDay(x.d, new Date()) ? 'Heute' : WD[x.d.getDay()]; }
     _chart(D, tNow, mode) {
