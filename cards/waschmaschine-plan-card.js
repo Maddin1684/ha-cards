@@ -1,4 +1,5 @@
-// waschmaschine-plan-card v0.6 (27.11.2026): Programm wie in der App in der Karte waehlen (Liste von Miele bei aktivem MobileStart); Dauer aus den eigenen Waschgaengen der letzten 60 Tage, sonst Schaetzung; an der Maschine gewaehltes Programm wird weiter direkt uebernommen.
+// waschmaschine-plan-card v0.7 (27.11.2026): nur noch Pille 'Planen' (gruen) oben rechts, Hinweis-Pille entfernt.
+// v0.6 (27.11.2026): Programm wie in der App in der Karte waehlen (Liste von Miele bei aktivem MobileStart); Dauer aus den eigenen Waschgaengen der letzten 60 Tage, sonst Schaetzung; an der Maschine gewaehltes Programm wird weiter direkt uebernommen.
 // v0.5 (27.11.2026): wie in der Miele-App – Programm an der Maschine waehlen (+ MobileStart),
 // Programm und Dauer kommen direkt von der Maschine; in der Karte nur 'Start um' oder 'Fertig um' festlegen, die andere Zeit wird berechnet.
 // Gestartet wird von der Automation 'Waschmaschine geplanter Start (MobileStart)' per Start-Knopf der Maschine; Plan verfaellt 2 h nach Startzeit.
@@ -49,7 +50,7 @@
       color:var(--primary-text-color); font:inherit; font-size:13px; line-height:1; cursor:pointer; -webkit-tap-highlight-color:transparent; white-space:nowrap; transition:opacity .2s, background .2s; }
     .pl ha-icon { --mdc-icon-size:16px; display:flex; }
     .pl:active { opacity:.6; }
-    .pl.on { background:rgba(245,99,0,.22); }
+    .pl.on { background:rgba(48,209,88,.2); }
     .pn { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
     .pn.on { grid-template-rows:1fr; }
     .pn > div { overflow:hidden; min-height:0; }
@@ -133,8 +134,8 @@
       const pStart = akt ? new Date(this._v('p_start').replace(' ', 'T')) : null;
       set('.ttl', esc(this._c.title));
       const showPlan = mob || akt || this._c.test !== false;
-      set('.pls', (showPlan ? `<button class="pl${this._open || akt ? ' on' : ''}" data-a="open"><ha-icon icon="mdi:calendar-clock" style="color:${C.orange}"></ha-icon>${akt ? 'Start ' + (tag(pStart) === 'heute' ? '' : tag(pStart) + ' ') + hm(pStart) : 'Planen'}</button>` : '')
-        + `<button class="pl" data-a="notify" aria-label="Hinweis Wäsche leeren"><ha-icon icon="${nt ? 'mdi:bell-ring' : 'mdi:bell-off-outline'}" style="color:${nt ? C.green : C.gray}"></ha-icon>Hinweis</button>`);
+      set('.pls', (showPlan ? `<button class="pl${this._open || akt ? ' on' : ''}" data-a="open"><ha-icon icon="mdi:calendar-clock" style="color:${C.green}"></ha-icon>${akt ? 'Start ' + (tag(pStart) === 'heute' ? '' : tag(pStart) + ' ') + hm(pStart) : 'Planen'}</button>` : '')
+);
       r.querySelector('.pn').classList.toggle('on', !!this._open);
       if (this._open) {
         const now = new Date();
