@@ -1,4 +1,4 @@
-// wetter-karte-card v1.17 (27.11.2026: Effekte wieder ueber den ganzen Kopfbereich; Hauptsymbol 70 px (schmal 62 px); v1.16: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.18 (27.11.2026: alle Wettersymbole als eingebettetes SVG (fluessig, je Einfuegung eigene IDs); Sonnenauf-/-untergang in der Stundenleiste (eigene Symbole sunrise/sunset.svg, Uhrzeit, interpolierte Temperatur); v1.17: Effekte wieder ueber den ganzen Kopfbereich; Hauptsymbol 70 px (schmal 62 px); v1.16: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -27,7 +27,7 @@
     'partlycloudy-night': 'Teils bewölkt', pouring: 'Starkregen', rainy: 'Regen', snowy: 'Schnee', 'snowy-rainy': 'Schneeregen', sunny: 'Sonnig', windy: 'Windig', 'windy-variant': 'Windig' };
   const MDI = { 'clear-night': 'mdi:weather-night', cloudy: 'mdi:weather-cloudy', exceptional: 'mdi:alert-circle-outline', fog: 'mdi:weather-fog', hail: 'mdi:weather-hail', lightning: 'mdi:weather-lightning',
     'lightning-rainy': 'mdi:weather-lightning-rainy', partlycloudy: 'mdi:weather-partly-cloudy', 'partlycloudy-night': 'mdi:weather-night-partly-cloudy', pouring: 'mdi:weather-pouring', rainy: 'mdi:weather-rainy',
-    snowy: 'mdi:weather-snowy', 'snowy-rainy': 'mdi:weather-snowy-rainy', sunny: 'mdi:weather-sunny', windy: 'mdi:weather-windy', 'windy-variant': 'mdi:weather-windy-variant' };
+    snowy: 'mdi:weather-snowy', 'snowy-rainy': 'mdi:weather-snowy-rainy', sunny: 'mdi:weather-sunny', windy: 'mdi:weather-windy', 'windy-variant': 'mdi:weather-windy-variant', sunrise: 'mdi:weather-sunset-up', sunset: 'mdi:weather-sunset-down' };
   // Effekt je Zustand
   const FXOF = { sunny: 'sun', 'clear-night': 'night', partlycloudy: 'cloud', 'partlycloudy-night': 'night', cloudy: 'cloud', fog: 'fog', rainy: 'rain', pouring: 'rain', 'snowy-rainy': 'snow', snowy: 'snow',
     hail: 'rain', lightning: 'storm', 'lightning-rainy': 'storm', windy: 'cloud', 'windy-variant': 'cloud', exceptional: 'storm' };
@@ -107,13 +107,15 @@
     .rgt { position:relative; flex:1; min-width:0; align-self:stretch; display:flex; align-items:center; margin-right:-12px; padding-right:12px; }
     .hrs { position:relative; z-index:1; flex:1; min-width:0; display:flex; }
     .h { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; color:var(--secondary-text-color); min-width:0; }
+    .si { display:flex; align-items:center; justify-content:center; flex:none; }
+    .si svg, .si ha-icon { display:block; }
     .h .tv { font-size:13px; color:var(--primary-text-color); font-variant-numeric:tabular-nums; }
     .h .tb { position:relative; display:block; align-self:stretch; height:2px; margin:3px 0 4px; }
     .h .tb b { position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2.5px 0 0 -2.5px; border-radius:50%; }
     .h:first-child .tb { border-radius:2px 0 0 2px; margin-left:6px; } .h:last-child .tb { border-radius:0 2px 2px 0; margin-right:6px; }
     .h .t { color:var(--primary-text-color); opacity:.85; }
     .h .t.n { color:${C.orange}; opacity:1; }
-    .h img, .h ha-icon { width:26px; height:26px; --mdc-icon-size:22px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .h img, .h ha-icon, .h .si, .h .si svg { width:26px; height:26px; --mdc-icon-size:22px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
     .h .p { font-variant-numeric:tabular-nums; }
     .h .p.wet { color:${C.teal}; }
     .fold { padding:0 16px; }
@@ -158,14 +160,14 @@
       .fh .fx .vb, .fh .fx .vb + .dt { display:none; }
       .now { padding:0 8px; gap:6px; } .rgt { margin-right:-8px; padding-right:8px; }
       .h:nth-child(n+5) { display:none; } .h:nth-child(4) .tb { border-radius:0 2px 2px 0; margin-right:6px; }
-      .h img, .h ha-icon { width:22px; height:22px; --mdc-icon-size:20px; }
+      .h img, .h ha-icon, .h .si, .h .si svg { width:22px; height:22px; --mdc-icon-size:20px; }
     }
     @container (max-width: 300px) { .h:nth-child(n+4) { display:none; } .h:nth-child(3) .tb { border-radius:0 2px 2px 0; margin-right:6px; } }
     .cg { display:grid; text-align:center; font-variant-numeric:tabular-nums; }
     .cc { display:flex; flex-direction:column; align-items:center; min-width:0; }
     .cg .d { font-size:15px; color:var(--primary-text-color); }
     .cg .d.n { color:${C.orange}; }
-    .cg .cc > img, .cg .cc > ha-icon { width:40px; height:40px; --mdc-icon-size:38px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .cg .cc > img, .cg .cc > ha-icon, .cg .cc > .si, .cg .cc > .si svg { width:40px; height:40px; --mdc-icon-size:38px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
     .ca { position:relative; margin:2px 0 0; }
     .ca .sp { position:absolute; top:4px; bottom:4px; border-left:1px dashed rgba(255,255,255,.14); }
     .ca .z0 { position:absolute; left:0; right:0; border-top:1px dashed rgba(100,210,255,.28); }
@@ -197,9 +199,10 @@
   let svgN = 0;
   const svgText = (url) => SVGC[url] || (SVGC[url] = fetch(url).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); }).then((t) => {
     const i = t.indexOf('<svg'); if (i < 0) throw new Error('kein svg');
-    const p = 'wk' + (++svgN) + '-';
-    return t.slice(i).replace(/<script[\s\S]*?<\/script>/gi, '').replace(/\bid="([^"]+)"/g, `id="${p}$1"`).replace(/url\(#([^)]+)\)/g, `url(#${p}$1)`).replace(/href="#([^"]+)"/g, `href="#${p}$1"`);
+    return t.slice(i).replace(/<script[\s\S]*?<\/script>/gi, '').replace(/\son\w+="[^"]*"/gi, '').replace(/\bid="([^"]+)"/g, 'id="@@P@@$1"').replace(/url\(#([^)]+)\)/g, 'url(#@@P@@$1)').replace(/href="#([^"]+)"/g, 'href="#@@P@@$1"');
   }).catch((e) => { delete SVGC[url]; throw e; }));
+  // jede Einfuegung bekommt eigene IDs (gleiches Symbol mehrfach in der Karte)
+  const svgUse = (t) => t.replace(/@@P@@/g, 'wk' + (++svgN) + '-');
   const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
   const num = (v, d = 0) => { const n = parseFloat(v); return isNaN(n) ? d : n; };
   const r0 = (v) => { const x = Math.round(v); return x === 0 ? '0' : String(x).replace('-', '−'); };
@@ -273,7 +276,15 @@
       if ('ResizeObserver' in window) { this._ro = new ResizeObserver(() => { const w = root.getElementById('fl').clientWidth; if (w && Math.abs(w - (this._fw || 0)) > 2) { this._fw = w; this._render(true); } }); this._ro.observe(root.getElementById('fl')); }
       this._render(true);
     }
-    _set(id, html) { if (this._last[id] === html) return; this._last[id] = html; const e = this._root.getElementById(id); if (e) e.innerHTML = html; }
+    _set(id, html) { if (this._last[id] === html) return; this._last[id] = html; const e = this._root.getElementById(id); if (e) { e.innerHTML = html; this._hydrate(e); } }
+    // Wettersymbole als eingebettetes SVG (fluessige Animation), sonst MDI-Ersatz
+    _hydrate(root) {
+      root.querySelectorAll('.si:not([data-ok])').forEach((el) => {
+        el.setAttribute('data-ok', '1');
+        svgText(el.dataset.src).then((t) => { if (el.isConnected) el.innerHTML = svgUse(t); })
+          .catch(() => { if (el.isConnected) el.innerHTML = ico(el.dataset.f); });
+      });
+    }
     _click(ev) {
       const t = ev.target;
       const tb = t.closest('[data-t]'); if (tb) { this._test = tb.dataset.t; this._render(true); return; }
@@ -289,7 +300,7 @@
     _img(cond) {
       const p = this._c.icons_path;
       if (!p) return ico(MDI[cond] || 'mdi:weather-cloudy');
-      return `<img src="${esc(p.replace(/\/$/, ''))}/${esc(cond)}.svg" alt="" data-f="${MDI[cond] || 'mdi:weather-cloudy'}" onerror="this.outerHTML='<ha-icon icon=&quot;'+this.dataset.f+'&quot;></ha-icon>'">`;
+      return `<span class="si" data-src="${esc(p.replace(/\/$/, ''))}/${esc(cond)}.svg" data-f="${MDI[cond] || 'mdi:weather-cloudy'}"></span>`;
     }
     _isNightAt(d) {
       const s = this._hass.states[this._c.sun]; if (!s) return d.getHours() < 7 || d.getHours() >= 17;
@@ -343,17 +354,30 @@
         el.innerHTML = `<div class="mi"></div><div class="cn">${esc(NAMES[c] || c)}</div>`;
         const mi = el.firstChild, path = this._c.icons_path;
         if (!path) mi.innerHTML = ico(MDI[c] || 'mdi:weather-cloudy');
-        else svgText(`${path.replace(/\/$/, '')}/${c}.svg`).then((t) => { if (this._last.cur === c && mi.isConnected) mi.innerHTML = t; })
-          .catch(() => { if (this._last.cur === c) mi.innerHTML = this._img(c); });
+        else svgText(`${path.replace(/\/$/, '')}/${c}.svg`).then((t) => { if (this._last.cur === c && mi.isConnected) mi.innerHTML = svgUse(t); })
+          .catch(() => { if (this._last.cur === c) mi.innerHTML = ico(MDI[c] || 'mdi:weather-cloudy'); });
       }
       // naechste Stunden
       const hf = (this._fc.hourly || []).filter((x) => Date.parse(x.datetime) > Date.now()).slice(0, Math.max(3, num(this._c.hours, 5)));
-      const T = hf.map((x) => num(x.temperature));
-      const hrs = hf.map((x, i) => {
-        const d = new Date(x.datetime), hc = this._cond(x.condition, this._isNightAt(d)), p = Math.round(num(x.precipitation_probability));
+      const it = hf.map((x) => { const d = new Date(x.datetime); return { d, t: num(x.temperature), c: this._cond(x.condition, this._isNightAt(d)), p: Math.round(num(x.precipitation_probability)) }; });
+      // Sonnenauf-/-untergang an passender Stelle einfuegen (Temperatur dazwischen interpoliert)
+      const su = this._hass.states[this._c.sun];
+      if (su && it.length > 1) {
+        const end = it[it.length - 1].d.getTime();
+        [['next_rising', 'sunrise', 'Aufg.', '#ffd60a'], ['next_setting', 'sunset', 'Unterg.', '#a937f5']].forEach(([k, ic, lb, col]) => {
+          const ev = new Date(su.attributes[k]); if (isNaN(ev) || ev <= Date.now() || ev >= end) return;
+          const j = it.findIndex((x) => x.d > ev);
+          const A = j > 0 ? it[j - 1] : null, B = it[j], f = A ? (ev - A.d) / (B.d - A.d) : 0;
+          it.splice(j, 0, { d: ev, t: A ? A.t + (B.t - A.t) * f : B.t, c: ic, sun: lb, col });
+        });
+      }
+      const T = it.map((x) => x.t);
+      const hrs = it.map((x, i) => {
         // Verlaufsbalken: Farbe gleitet von Stunde zu Stunde (Temperaturfarben der Aussentemperatur-Grafik)
         const t = T[i], a = i ? (T[i - 1] + t) / 2 : t, b = i < T.length - 1 ? (T[i + 1] + t) / 2 : t;
-        return `<div class="h"><span class="t">${d.getHours()} Uhr</span>${this._img(hc)}<span class="p${p >= 30 ? ' wet' : ''}">${p} %</span><i class="tb" style="background:linear-gradient(90deg,${tc(a)},${tc(t)},${tc(b)})"><b style="background:${tc(t)}"></b></i><span class="tv">${r0(t)}°</span></div>`;
+        const top = x.sun ? `<span class="t" style="color:${x.col}">${hhmm(x.d)}</span>${this._img(x.c)}<span class="p" style="color:${x.col}">${x.sun}</span>`
+          : `<span class="t">${x.d.getHours()} Uhr</span>${this._img(x.c)}<span class="p${x.p >= 30 ? ' wet' : ''}">${x.p} %</span>`;
+        return `<div class="h">${top}<i class="tb" style="background:linear-gradient(90deg,${tc(a)},${tc(t)},${tc(b)})"><b style="background:${tc(t)}"></b></i><span class="tv">${r0(t)}°</span></div>`;
       }).join('');
       this._set('hrs', hrs);
     }
