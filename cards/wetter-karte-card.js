@@ -1,4 +1,4 @@
-// wetter-karte-card v1.5 (27.11.2026: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.6 (27.11.2026: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -160,7 +160,7 @@
     .cg .pb span { display:block; width:100%; border-radius:2px; }
     .cg .pv { font-size:12px; margin-top:3px; color:var(--secondary-text-color); white-space:nowrap; display:flex; align-items:center; justify-content:center; gap:1px; }
     .cg .pv small { font-size:10px; }
-    .cg .pv ha-icon { --mdc-icon-size:12px; width:12px; height:12px; display:flex; flex:none; }
+    .cg .pv ha-icon { --mdc-icon-size:9px; width:9px; height:9px; display:flex; flex:none; margin-right:1px; }
     .cg.wd { margin:6px 0 10px; }
     .cg.wd .cc { gap:2px; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; }
     .cg.wd .wa { width:16px; height:16px; display:flex; align-items:center; justify-content:center; }
@@ -455,7 +455,6 @@
         D.forEach((x, i) => {
           const t = y(x.hi), b = y(x.lo), h = Math.max(8, b - t);
           s += `<b class="bar" style="left:${X(i)}%;top:${t.toFixed(1)}px;height:${h.toFixed(1)}px;background:linear-gradient(180deg,${tc(x.hi)},${tc((x.hi + x.lo) / 2)},${tc(x.lo)})"></b>`;
-          if (i === 0 && today0) s += `<b class="tn" style="left:${X(i)}%;top:${y(Math.max(lo, Math.min(hi, tNow))).toFixed(1)}px"></b>`;
         });
       }
       D.forEach((x, i) => { s += `<span class="vh" style="left:${X(i)}%;top:${(y(x.hi) - 21).toFixed(1)}px">${r0(x.hi)}°</span><span class="vl" style="left:${X(i)}%;top:${(y(x.lo) + 7).toFixed(1)}px">${r0(x.lo)}°</span>`; });
