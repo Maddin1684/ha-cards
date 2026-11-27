@@ -1,4 +1,4 @@
-// wind-kompass-card v1.5 (27.11.2026: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.6 (27.11.2026: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -7,7 +7,7 @@
   const C = { green: '#30d158', yellow: '#ffd60a', red: '#ff453a', purple: '#a927f5', orange: '#f56300' };
   const DEF = {
     title: 'Wind', direction_entity: 'sensor.gw1100a_v2_2_5_wind_direction', speed_entity: 'sensor.gw1100a_v2_2_5_wind_speed', gust_entity: 'sensor.gw1100a_v2_2_5_wind_gust',
-    background_image: '/local/drohnenaufnahme.jpeg', background_opacity: 0.6, sun: 'sun.sun', sun_image: '/local/moonphases/sun.png',
+    background_image: '/local/drohnenaufnahme.jpeg', background_opacity: 0.6, sun: 'sun.sun', sun_image: 'css',
     moon_entity: 'sensor.moon_api', moon_phase_entity: 'sensor.moon_phase_index', moon_images_path: '/local/mond2', period: '3h', rose: true,
   };
   // Windfarben wie bisher (compass-card bands)
@@ -54,8 +54,10 @@
     .ctr .v small { font-size:15px; color:rgba(255,255,255,.8); margin-left:4px; }
     .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
     .sky img { width:100%; height:100%; object-fit:contain; display:block; }
-    .sky.sun { width:18%; }
     .sky.sun img { filter:drop-shadow(0 0 8px rgba(255,200,80,.7)); }
+    .sky .sd { display:block; width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 40% 38%, #fffbe8 0%, #ffe38a 38%, #ffc23d 72%, #ff9f0a 100%);
+      box-shadow:0 0 6px 2px rgba(255,214,10,.55), 0 0 16px 6px rgba(255,159,10,.28); animation:wkk-sun 3s ease-in-out infinite; }
+    @keyframes wkk-sun { 0%, 100% { box-shadow:0 0 6px 2px rgba(255,214,10,.55), 0 0 16px 6px rgba(255,159,10,.28); } 50% { box-shadow:0 0 8px 3px rgba(255,214,10,.7), 0 0 22px 9px rgba(255,159,10,.35); } }
     .pills { display:flex; margin:12px 16px 0; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; }
     .pills:empty { display:none; }
     .pills span { flex:1; text-align:center; font-size:12px; line-height:16px; padding:4px 0; border-radius:6px; color:var(--secondary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background .2s, color .2s; }
@@ -184,7 +186,7 @@
       // Sonne / Mond am Rand
       let sky = '';
       const pos = (az) => { const an = (az - 90) * Math.PI / 180, rr = R + 44; return `left:${((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
-      if (sunUp) sky += `<div class="sky sun" style="${pos(sunAz)}"><img src="${esc(c.sun_image)}" alt=""></div>`;
+      if (sunUp) sky += `<div class="sky sun" style="${pos(sunAz)}">${c.sun_image && c.sun_image !== 'css' ? `<img src="${esc(c.sun_image)}" alt="">` : '<b class="sd"></b>'}</div>`;
       if (moonUp) {
         const ph = c.moon_phase_entity && H.states[c.moon_phase_entity] ? Math.max(0, Math.min(7, Math.round(num(H.states[c.moon_phase_entity].state, 4)))) : 4;
         sky += `<div class="sky" style="${pos(moonAz)}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
