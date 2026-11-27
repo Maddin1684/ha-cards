@@ -1,4 +1,5 @@
-// sauger-karte-card v3.2 (27.11.2026): Teppichflaechen (Schachbrettmuster ohne helles Band) gelten als gereinigt, wo Saugbahnen liegen – z. B. Teppich in Wohnen unter den Kreisen.
+// sauger-karte-card v3.3 (27.11.2026): Luecken unter Raumnamen (Nummer + Name) vollstaendig aus der Umgebung gefuellt.
+// v3.2 (27.11.2026): Teppichflaechen (Schachbrettmuster ohne helles Band) gelten als gereinigt, wo Saugbahnen liegen – z. B. Teppich in Wohnen unter den Kreisen.
 // v3.1 (27.11.2026): Ausblenden per Raumname und Etage (map_id der Integration wechselt); Loecher unter Raumnamen/Nadeln werden aus der Umgebung gefuellt; leicht abgedunkelte Flaechen (Fugen, Teppich) zaehlen als gereinigt.
 // v3.0 (27.11.2026, Wunsch Martin): Reinigungsspur genauer – gereinigte Flaeche je Raum ueber dessen Grundfarbe erkannt (auch gelbe Raeume wie Esszimmer/Spielzimmer), Beschriftungen und Nadeln exakt ausmaskiert statt grosser Kaesten; Bereiche per Konfig 'ausblenden' entfernbar (Terrasse); Hindernis-Pille oeffnet scrollbare Galerie (Foto, was erkannt wurde, Raum, Trefferquote); grosse Partikel mit Staub-Symbol in Apple-Gelb.
 // v2.9 (27.11.2026, Wunsch Martin): am Tag einer erfolgreichen Reinigung gruener Kasten mit Zusammenfassung (Uhrzeit von–bis, Flaeche, Dauer, CleanGenius, nicht erreichte Raeume mit Grund).
@@ -395,7 +396,7 @@
           const cr = dil(cd, 2), np = dil(pm, 10);
           for (let q = 0; q < NP; q++) if (cr[q] && np[q] && !mo[q * 4 + 3] && d[q * 4 + 3] > 250 && !o[q * 4 + 3]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
         // ausmaskierte Stellen (Beschriftung, Nadeln) mit der umliegenden gereinigten Flaeche fuellen, damit keine Loecher bleiben
-        { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1; const fill = dil(mm, 14);
+        { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1; const fill = dil(mm, 34);
           for (let q = 0; q < NP; q++) if (skip[q] && fill[q] && d[q * 4 + 3] > 200 && !mm[q]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
