@@ -1,4 +1,4 @@
-// wetter-karte-card v1.15 (27.11.2026: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.16 (27.11.2026: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -100,9 +100,9 @@
     @keyframes wk-fog { 0% { transform:translateX(-4%) scaleX(1) scaleY(.96); opacity:calc(var(--fog-opacity,.15) * .62); } 50% { transform:translateX(4%) scaleX(1.06) scaleY(1.04); opacity:var(--fog-opacity,.15); } 100% { transform:translateX(-4%) scaleX(1) scaleY(.96); opacity:calc(var(--fog-opacity,.15) * .62); } }
 
     .now { position:absolute; inset:0; z-index:3; display:flex; align-items:center; padding:0 12px; gap:10px; }
-    .cur { transform:translateZ(0); will-change:transform; flex:0 0 96px; display:flex; flex-direction:column; align-items:center; }
-    .cur img, .cur ha-icon { width:45px; height:45px; --mdc-icon-size:45px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
-    .cur .cn { font-size:17px; font-weight:500; line-height:1.2; margin-top:2px; color:var(--primary-text-color); text-align:center; }
+    .cur { flex:0 0 96px; display:flex; flex-direction:column; align-items:center; }
+    .cur img, .cur ha-icon, .cur .mi, .cur .mi svg { width:60px; height:60px; --mdc-icon-size:60px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .cur .cn { font-size:14px; font-weight:500; line-height:1.2; margin-top:2px; color:var(--primary-text-color); text-align:center; }
     .sep { width:.5px; align-self:stretch; margin:18px 0; background:rgba(255,255,255,.15); }
     .rgt { position:relative; flex:1; min-width:0; align-self:stretch; display:flex; align-items:center; margin-right:-12px; padding-right:12px; }
     .hrs { position:relative; z-index:1; flex:1; min-width:0; display:flex; }
@@ -154,7 +154,7 @@
       .hd { font-size:22px; line-height:40px; padding:10px 12px 2px; }
       .hero, .tst { margin-left:12px; margin-right:12px; } .tst { padding:0 0 10px; }
       .fold { padding:0 12px; }
-      .cur { flex:0 0 74px; } .cur img, .cur ha-icon { width:45px; height:45px; --mdc-icon-size:45px; }
+      .cur { flex:0 0 74px; }
       .fh .fx .vb, .fh .fx .vb + .dt { display:none; }
       .now { padding:0 8px; gap:6px; } .rgt { margin-right:-8px; padding-right:8px; }
       .h:nth-child(n+5) { display:none; } .h:nth-child(4) .tb { border-radius:0 2px 2px 0; margin-right:6px; }
@@ -192,6 +192,14 @@
     .err { padding:10px 16px; font-size:12px; color:${C.red}; }
   `;
 
+  // SVG-Dateien einmal laden und zwischenspeichern; IDs eindeutig machen (Verlaeufe/Masken kollidieren sonst)
+  const SVGC = {};
+  let svgN = 0;
+  const svgText = (url) => SVGC[url] || (SVGC[url] = fetch(url).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); }).then((t) => {
+    const i = t.indexOf('<svg'); if (i < 0) throw new Error('kein svg');
+    const p = 'wk' + (++svgN) + '-';
+    return t.slice(i).replace(/<script[\s\S]*?<\/script>/gi, '').replace(/\bid="([^"]+)"/g, `id="${p}$1"`).replace(/url\(#([^)]+)\)/g, `url(#${p}$1)`).replace(/href="#([^"]+)"/g, `href="#${p}$1"`);
+  }).catch((e) => { delete SVGC[url]; throw e; }));
   const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
   const num = (v, d = 0) => { const n = parseFloat(v); return isNaN(n) ? d : n; };
   const r0 = (v) => { const x = Math.round(v); return x === 0 ? '0' : String(x).replace('-', '−'); };
@@ -328,7 +336,16 @@
       const night = this._test === 'live' ? this._night() : c === 'clear-night' || c === 'partlycloudy-night';
       const key = [c, night ? 'n' : 't', el < 10 && !night ? 'g' : '', Math.floor(Date.now() / 3600000)].join('|');
       if (key !== this._fxKey) { this._fxKey = key; const e = this._root.getElementById('fx'); if (e) e.innerHTML = this._fxHtml(c, night, el); }
-      this._set('cur', `${this._img(c)}<div class="cn">${esc(NAMES[c] || c)}</div>`);
+      // Hauptsymbol als eingebettetes SVG (nicht als <img>): Animation laeuft dann wie bei der weather-forecast-card fluessig
+      if (this._last.cur !== c) {
+        this._last.cur = c;
+        const el = this._root.getElementById('cur');
+        el.innerHTML = `<div class="mi"></div><div class="cn">${esc(NAMES[c] || c)}</div>`;
+        const mi = el.firstChild, path = this._c.icons_path;
+        if (!path) mi.innerHTML = ico(MDI[c] || 'mdi:weather-cloudy');
+        else svgText(`${path.replace(/\/$/, '')}/${c}.svg`).then((t) => { if (this._last.cur === c && mi.isConnected) mi.innerHTML = t; })
+          .catch(() => { if (this._last.cur === c) mi.innerHTML = this._img(c); });
+      }
       // naechste Stunden
       const hf = (this._fc.hourly || []).filter((x) => Date.parse(x.datetime) > Date.now()).slice(0, Math.max(3, num(this._c.hours, 5)));
       const T = hf.map((x) => num(x.temperature));
