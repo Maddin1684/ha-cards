@@ -1,4 +1,4 @@
-// luftqualitaet-card v1.12 (24.11.2026: jede Zeile als leicht aufgehelltes Kaestchen im Apple-Grau (118,118,128 / 12 %, Radius 10, 4 px Abstand) wie in der Wetterstation; v1.11: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.10 (23.11.2026): Schalter 80 %, gleich gross wie die Schalter der Entitaetenkarten; v1.9: Schalter 68 %; v1.8: Schalter als ha-switch im Theme-Stil wie die uebrigen Karten; v1.7: Legende ersetzt durch Inline-Symbol vor dem Max-Wert; v1.6: Max-Werte gecacht gegen Nachrutschen beim Laden; v1.5: kein Springen mehr – DOM wird nur noch gezielt aktualisiert; v1.4: Skalen mit Farbverlauf ueber die Stufen; v1.3: Umbruch ohne Trennstriche, Wert immer auf Hoehe der ersten Namenszeile; v1.2: lange Namen umbrechen; v1.1: Untertext ueber volle Breite, schmale Karte (iPad) mit kleineren Zusatztexten und sauberen Umbruechen; v1.0) – Luftqualitaet Wohnen als Entitaetenliste im Stil der wetterstation-liste-card:
+// luftqualitaet-card v1.13 (27.11.2026: Hinweis 'Bitte lüften' als erste Zeile unter dem Titel, gelb bzw. rot ab 1600 ppm; v1.12 (24.11.2026: jede Zeile als leicht aufgehelltes Kaestchen im Apple-Grau (118,118,128 / 12 %, Radius 10, 4 px Abstand) wie in der Wetterstation; v1.11: Skalen 6 px hoch, rund, 3 px Luecke, Dreieck mit weichem Schatten, Max-Linie 16 px; v1.10 (23.11.2026): Schalter 80 %, gleich gross wie die Schalter der Entitaetenkarten; v1.9: Schalter 68 %; v1.8: Schalter als ha-switch im Theme-Stil wie die uebrigen Karten; v1.7: Legende ersetzt durch Inline-Symbol vor dem Max-Wert; v1.6: Max-Werte gecacht gegen Nachrutschen beim Laden; v1.5: kein Springen mehr – DOM wird nur noch gezielt aktualisiert; v1.4: Skalen mit Farbverlauf ueber die Stufen; v1.3: Umbruch ohne Trennstriche, Wert immer auf Hoehe der ersten Namenszeile; v1.2: lange Namen umbrechen; v1.1: Untertext ueber volle Breite, schmale Karte (iPad) mit kleineren Zusatztexten und sauberen Umbruechen; v1.0) – Luftqualitaet Wohnen als Entitaetenliste im Stil der wetterstation-liste-card:
 // Schalter fuer Luftbefeuchter/Luftreiniger, Wassertank, Feinstaub und CO2 mit Stufenskala
 // (erreichte Stufen kraeftig, Rest blass, Dreieck = aktuell, gestrichelt = max. heute), Bewertungstext als Untertext.
 (() => {
@@ -9,7 +9,7 @@
   const DEF = {
     humidifier: 'input_boolean.luftbefeuchter', tank: 'binary_sensor.luftbefeuchter_wohnen_water_empty',
     purifier: 'fan.zhimi_mb3_0651_air_purifier_2', pm25: 'sensor.zhimi_mb3_0651_pm25_2', pm25_text: 'sensor.luftqualitat_pm2_5',
-    co2: 'sensor.wohnen_co2', co2_text: 'sensor.luftqualitat_co2',
+    co2: 'sensor.wohnen_co2', co2_text: 'sensor.luftqualitat_co2', luften: 'input_boolean.luften',
   };
 
   const CSS = `
@@ -22,6 +22,7 @@
     .body { padding:0 16px 4px; }
     .body > .r { padding:0 8px; margin:0 -8px 4px; border-radius:10px; background:rgba(118,118,128,.12); }
     .body > .r:last-child { margin-bottom:4px; }
+    .body > .r.al { cursor:default; }
     .r { display:flex; flex-wrap:wrap; align-items:flex-start; min-height:40px; column-gap:16px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .r > .st { padding-top:10px; }
     .r > .sw { margin-top:5px; }
@@ -165,6 +166,15 @@
       const E = this._e, out = [];
       if (this._c.title !== false) out.push(`<div class="hd">${esc(this._c.title || 'Luftqualität Wohnen')}</div>`);
       const rows = [];
+      // Hinweis 'Bitte lüften' als erste Zeile unter dem Titel: gelb, ab 1600 ppm rot (wie Waschgang-Hinweis)
+      if (this._v('luften') === 'on') {
+        const v = num(this._v('co2')), rot = v >= 1600, cc = rot ? C.red : C.yellow, rgb = rot ? '255,69,58' : '255,214,10';
+        const ls = this._s('luften'), min = ls ? Math.max(0, Math.round((Date.now() - new Date(ls.last_changed)) / 60000)) : null;
+        const seit = min == null ? '' : min < 60 ? min + ' Min.' : min < 2880 ? Math.round(min / 60) + ' Std.' : Math.round(min / 1440) + ' Tagen';
+        rows.push(`<div class="r al" style="background:rgba(${rgb},.16)"><div class="bd">${ico('mdi:window-open-variant', rot ? 'a-blink' : '', cc)}</div>`
+          + `<div class="nm"><span style="color:${cc};font-weight:500">Bitte lüften!</span><span class="sec">Hoher CO₂-Gehalt${isNaN(v) ? '' : ' · ' + Math.round(v) + ' ppm'}</span></div>`
+          + (seit ? `<div class="st" style="color:var(--secondary-text-color);font-size:12px">seit ${seit}</div>` : '') + '</div>');
+      }
       const sw = (k) => `<ha-switch class="sw" data-on="${this._v(k) === 'on' ? 1 : 0}" data-toggle="${esc(E[k])}"></ha-switch>`;
 
       if (this._s('humidifier')) {
