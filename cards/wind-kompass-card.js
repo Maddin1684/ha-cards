@@ -1,4 +1,4 @@
-// wind-kompass-card v1.3 (27.11.2026: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.4 (27.11.2026: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -54,6 +54,7 @@
     .ctr .v small { font-size:15px; color:rgba(255,255,255,.8); margin-left:4px; }
     .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
     .sky img { width:100%; height:100%; object-fit:contain; display:block; }
+    .sky.sun { width:18%; }
     .sky.sun img { filter:drop-shadow(0 0 8px rgba(255,200,80,.7)); }
     .pills { display:flex; margin:12px 16px 0; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; }
     .pills:empty { display:none; }
