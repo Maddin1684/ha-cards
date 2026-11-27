@@ -1,4 +1,5 @@
-// sauger-karte-card v3.3 (27.11.2026): Luecken unter Raumnamen (Nummer + Name) vollstaendig aus der Umgebung gefuellt.
+// sauger-karte-card v3.4 (27.11.2026): Kartenbild ohne Farbraum-Umrechnung lesen (iPhone/iPad lieferte leicht andere Farben); Teppichmuster toleranter erkannt.
+// v3.3 (27.11.2026): Luecken unter Raumnamen (Nummer + Name) vollstaendig aus der Umgebung gefuellt.
 // v3.2 (27.11.2026): Teppichflaechen (Schachbrettmuster ohne helles Band) gelten als gereinigt, wo Saugbahnen liegen – z. B. Teppich in Wohnen unter den Kreisen.
 // v3.1 (27.11.2026): Ausblenden per Raumname und Etage (map_id der Integration wechselt); Loecher unter Raumnamen/Nadeln werden aus der Umgebung gefuellt; leicht abgedunkelte Flaechen (Fugen, Teppich) zaehlen als gereinigt.
 // v3.0 (27.11.2026, Wunsch Martin): Reinigungsspur genauer – gereinigte Flaeche je Raum ueber dessen Grundfarbe erkannt (auch gelbe Raeume wie Esszimmer/Spielzimmer), Beschriftungen und Nadeln exakt ausmaskiert statt grosser Kaesten; Bereiche per Konfig 'ausblenden' entfernbar (Terrasse); Hindernis-Pille oeffnet scrollbare Galerie (Foto, was erkannt wurde, Raum, Trefferquote); grosse Partikel mit Staub-Symbol in Apple-Gelb.
@@ -354,9 +355,9 @@
       const tf = this._tf(A), G = this._geo; if (!tf || !A.entity_picture) return;
       this._trBusy = true;
       try {
-        const bmp = await createImageBitmap(await (await fetch(A.entity_picture)).blob());
+        const bmp = await createImageBitmap(await (await fetch(A.entity_picture)).blob(), { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
         const W = bmp.width, Hh = bmp.height, cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
-        const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0); const id = cx.getImageData(0, 0, W, Hh), d = id.data;
+        const cx = cv.getContext('2d', { willReadFrequently: true, colorSpace: 'srgb' }); cx.drawImage(bmp, 0, 0); const id = cx.getImageData(0, 0, W, Hh, { colorSpace: 'srgb' }), d = id.data;
         const NP = W * Hh, skip = new Uint8Array(NP), box = (x0, y0, x1, y1, m = skip) => { for (let y = Math.max(0, y0 | 0); y < Math.min(Hh, y1); y++) for (let x = Math.max(0, x0 | 0); x < Math.min(W, x1); x++) m[y * W + x] = 1; };
         const dil = (m, r) => { const t = new Uint8Array(NP), o = new Uint8Array(NP);
           for (let y = 0; y < Hh; y++) { let c = 0; for (let x = -r; x < W + r; x++) { if (x + r < W && m[y * W + x + r]) c++; if (x - r - 1 >= 0 && m[y * W + x - r - 1]) c--; if (x >= 0 && x < W && c) t[y * W + x] = 1; } }
@@ -392,7 +393,7 @@
         // Teppichflaeche gilt als gereinigt, wo Saugbahnen in der Naehe liegen.
         { const cd = new Uint8Array(NP), pm = new Uint8Array(NP);
           for (let q = 0; q < NP; q++) { const i = q * 4; if (o[i + 3]) pm[q] = 1; if (d[i + 3] < 250) continue; const rr = d[i], gg = d[i + 1], bb = d[i + 2];
-            if (BS.some((b) => [0.86, 0.79].some((f) => Math.abs(rr - b[0] * f) <= 6 && Math.abs(gg - b[1] * f) <= 6 && Math.abs(bb - b[2] * f) <= 6))) cd[q] = 1; }
+            if (BS.some((b) => { const f = [rr / b[0], gg / b[1], bb / b[2]], lo = Math.min(...f), hi = Math.max(...f); return hi - lo < 0.045 && lo > 0.72 && hi < 0.93; })) cd[q] = 1; }
           const cr = dil(cd, 2), np = dil(pm, 10);
           for (let q = 0; q < NP; q++) if (cr[q] && np[q] && !mo[q * 4 + 3] && d[q * 4 + 3] > 250 && !o[q * 4 + 3]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
         // ausmaskierte Stellen (Beschriftung, Nadeln) mit der umliegenden gereinigten Flaeche fuellen, damit keine Loecher bleiben
