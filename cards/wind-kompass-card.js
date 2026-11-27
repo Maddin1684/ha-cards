@@ -1,4 +1,4 @@
-// wind-kompass-card v1.11 (27.11.2026: Himmelsrichtungen wieder wie vorher; Text im Kreis kleiner und leicht transparent; Windnadel faehrt weich auf kuerzestem Weg um den Kreis; v1.10: Himmelsrichtungen kleiner (16) und leicht transparent; v1.9: Variante layout: umschalter – 'Aktuell' (nur Kompass) / 'Rueckblick' (Windrose, Wind-/Boeen-Anteile, Zeitraum); v1.8: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.12 (27.11.2026: Windrichtung im Kreis kleiner; grafischer Editor fuer Sensoren, Sonne/Mond und Darstellung; v1.11: Himmelsrichtungen wieder wie vorher; Text im Kreis kleiner und leicht transparent; Windnadel faehrt weich auf kuerzestem Weg um den Kreis; v1.10: Himmelsrichtungen kleiner (16) und leicht transparent; v1.9: Variante layout: umschalter – 'Aktuell' (nur Kompass) / 'Rueckblick' (Windrose, Wind-/Boeen-Anteile, Zeitraum); v1.8: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -57,7 +57,7 @@
     .arr { transition:transform 1.6s cubic-bezier(.4,0,.2,1); transform-origin:150px 150px; }
     .arr path { transition:fill .6s, stroke .6s; }
     .ctr { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none; text-shadow:0 1px 6px rgba(0,0,0,.6); }
-    .ctr .d { font-size:20px; font-weight:500; line-height:22px; color:rgba(255,255,255,.72); }
+    .ctr .d { font-size:16px; font-weight:500; line-height:19px; color:rgba(255,255,255,.72); }
     .ctr .v { font-size:26px; font-weight:400; line-height:28px; color:rgba(255,255,255,.88); white-space:nowrap; }
     .ctr .v small { font-size:13px; color:rgba(255,255,255,.7); margin-left:4px; }
     .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
@@ -93,6 +93,7 @@
     getCardSize() { return 8; }
     getGridOptions() { return { columns: 12, rows: 'auto' }; }
     static getStubConfig() { return {}; }
+    static getConfigElement() { return document.createElement(TAG + '-editor'); }
     connectedCallback() { if (!this._root) this._build(); this._iv = setInterval(() => { this._histAt = 0; this._load(); }, 300000); this._load(); }
     disconnectedCallback() { clearInterval(this._iv); }
     set hass(h) { this._hass = h; if (!this._root) this._build(); this._load(); this._render(); }
@@ -230,6 +231,52 @@
     }
   }
   customElements.define(TAG, WindKompassCard);
+
+  /* ---------- Grafischer Editor ---------- */
+  const SCHEMA = [
+    { name: 'title', selector: { text: {} } },
+    { type: 'expandable', name: '', title: 'Wind-Sensoren', expanded: true, schema: [
+      { name: 'direction_entity', selector: { entity: { domain: 'sensor' } } },
+      { name: 'speed_entity', selector: { entity: { domain: 'sensor' } } },
+      { name: 'gust_entity', selector: { entity: { domain: 'sensor' } } },
+    ] },
+    { type: 'expandable', name: '', title: 'Sonne und Mond', schema: [
+      { name: 'sun', selector: { entity: { domain: 'sun' } } },
+      { name: 'sun_image', selector: { text: {} } },
+      { name: 'moon_entity', selector: { entity: {} } },
+      { name: 'moon_phase_entity', selector: { entity: { domain: 'sensor' } } },
+      { name: 'moon_images_path', selector: { text: {} } },
+    ] },
+    { type: 'expandable', name: '', title: 'Darstellung', schema: [
+      { name: 'background_image', selector: { text: {} } },
+      { name: 'background_opacity', selector: { number: { min: 0, max: 1, step: 0.05, mode: 'slider' } } },
+      { name: 'rose', selector: { boolean: {} } },
+      { name: 'period', selector: { select: { mode: 'dropdown', options: PER.map(([v, l]) => ({ value: v, label: l })) } } },
+    ] },
+  ];
+  const LBL = { title: 'Titel', direction_entity: 'Windrichtung (°)', speed_entity: 'Windgeschwindigkeit (km/h)', gust_entity: 'Böen (km/h)',
+    sun: 'Sonne', sun_image: 'Sonnen-Grafik', moon_entity: 'Mond (mit moon_azimuth)', moon_phase_entity: 'Mondphase (Index 0–7)', moon_images_path: 'Ordner Mondbilder',
+    background_image: 'Hintergrundbild', background_opacity: 'Deckkraft Hintergrund', rose: 'Windrose und Anteile anzeigen', period: 'Zeitraum (Start)' };
+  class WindKompassEditor extends HTMLElement {
+    setConfig(c) { this._c = Object.assign({}, c || {}); this._draw(); }
+    set hass(h) { this._hass = h; if (this._f) this._f.hass = h; else this._draw(); }
+    _draw() {
+      if (!this._hass || !this._c) return;
+      if (!this._f) {
+        this._f = document.createElement('ha-form');
+        this._f.computeLabel = (s) => LBL[s.name] || s.name;
+        this._f.addEventListener('value-changed', (ev) => {
+          const v = Object.assign({}, this._c, ev.detail.value);
+          Object.keys(v).forEach((k) => { if (k !== 'type' && (v[k] === '' || v[k] == null)) delete v[k]; });
+          this._c = v; this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: v }, bubbles: true, composed: true }));
+        });
+        this.appendChild(this._f);
+      }
+      this._f.hass = this._hass; this._f.schema = SCHEMA;
+      const d = Object.assign({}, DEF, this._c); delete d.type; this._f.data = d;
+    }
+  }
+  if (!customElements.get(TAG + '-editor')) customElements.define(TAG + '-editor', WindKompassEditor);
   window.customCards = window.customCards || [];
   window.customCards.push({ type: TAG, name: 'Wind-Kompass', description: 'Windrichtung und -geschwindigkeit mit Luftbild, Sonne/Mond und Windrose' });
 })();
