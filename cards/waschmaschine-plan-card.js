@@ -1,4 +1,5 @@
-// waschmaschine-plan-card v0.3 (27.11.2026): Vorgabe 06:00–09:00, solange noch nie geplant wurde (neue Helfer stehen auf 00:00).
+// waschmaschine-plan-card v0.4 (27.11.2026): Dauer je Programm (Schaetzung, mit +/- anpassbar, lernt die echte Prognose der Maschine), wahlweise 'Start um' oder 'Fertig um' – die andere Zeit wird berechnet; Plan verfaellt 2 h nach Startzeit.
+// v0.3 (27.11.2026): Vorgabe 06:00–09:00, solange noch nie geplant wurde (neue Helfer stehen auf 00:00).
 // v0.2 (27.11.2026): Vorgabe = zuletzt genutzte Zeiten (sonst 06:00–09:00, typisch abends beladen, morgens starten), Schnellwahl 05–08 Uhr / Sofort.
 // v0.1 (27.11.2026, Testkarte): Miele MobileStart mit Programm-Vorwahl.
 // Pille oben rechts 'Programm planen' (Programm, Startzeit, Endzeit) – gespeichert in Helfern, gestartet von der Automation
@@ -18,6 +19,15 @@
   const DE = { cottons: 'Baumwolle', eco_40_60: 'ECO 40-60', minimum_iron: 'Pflegeleicht', delicates: 'Feinwäsche', woollens: 'Wolle', silks: 'Seide', quick_power_wash: 'QuickPowerWash',
     express_20: 'Express 20', automatic_plus: 'Automatic plus', shirts: 'Oberhemden', denim: 'Jeans', sportswear: 'Sportwäsche', outerwear: 'Outdoor', bed_linen: 'Bettwäsche',
     towels: 'Handtücher', dark_garments: 'Dunkle Wäsche', down_duvets: 'Daunen', pillows: 'Kopfkissen', rinse: 'Spülen', drain_spin: 'Abpumpen/Schleudern', clean_machine: 'Maschine reinigen' };
+  // typische Laufzeiten in Minuten (Miele W1, Standardoptionen) – Schaetzung, bis die Karte die echte Prognose der Maschine gelernt hat
+  const DUR = { cottons: 159, eco_40_60: 199, minimum_iron: 109, delicates: 59, woollens: 39, silks: 44, quick_power_wash: 59, express_20: 20, automatic_plus: 99,
+    shirts: 89, denim: 89, sportswear: 79, outerwear: 79, bed_linen: 119, towels: 129, dark_garments: 89, dark_jeans: 89, down_duvets: 99, pillows: 109, rinse: 29,
+    drain_spin: 15, clean_machine: 89, baby_clothes: 129, curtains: 79, hand_wash: 49, cottons_hygiene: 169, steam_care: 50, freshen_up: 30, trainers: 70, first_wash: 70 };
+  const keyOf = (name) => { const n = String(name || '').toLowerCase().replace(/[^a-z0-9äöüß]/g, '');
+    for (const [k, v] of Object.entries(DE)) if (v.toLowerCase().replace(/[^a-z0-9äöüß]/g, '') === n) return k;
+    for (const [k, v] of Object.entries(DE)) { const w = v.toLowerCase().replace(/[^a-z0-9äöüß]/g, ''); if (n.includes(w) || w.includes(n)) return k; }
+    return n.replace(/ /g, '_'); };
+  const hmin = (m) => Math.floor(m / 60) + ':' + p2(m % 60) + ' h';
   const PREVIEW = ['cottons', 'eco_40_60', 'minimum_iron', 'delicates', 'quick_power_wash', 'express_20', 'automatic_plus', 'bed_linen', 'towels', 'sportswear', 'woollens', 'shirts'];
   const STAT = { off: 'Aus', on: 'An', idle: 'Bereit', in_use: 'Läuft', programmed: 'Programmiert', waiting_to_start: 'Wartet auf Start', pause: 'Pause',
     program_ended: 'Fertig', program_interrupted: 'Unterbrochen', failure: 'Störung', not_connected: 'Nicht verbunden' };
@@ -51,6 +61,16 @@
     .qk { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
     .qk button { border:0; font:inherit; font-size:13px; padding:5px 11px; border-radius:15px; background:rgba(118,118,128,.24); color:var(--primary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .qk button.on { background:rgba(245,99,0,.3); }
+    .du { display:flex; align-items:center; gap:8px; background:rgba(118,118,128,.18); border-radius:10px; padding:6px 6px 6px 10px; margin-bottom:10px; }
+    .du ha-icon { --mdc-icon-size:18px; color:${C.orange}; display:flex; }
+    .du span { flex:1; font-size:14px; } .du b { font-weight:500; } .du small { margin-left:6px; font-size:11px; color:var(--secondary-text-color); }
+    .du button { width:30px; height:30px; border:0; border-radius:15px; background:rgba(118,118,128,.28); color:var(--primary-text-color); font:inherit; font-size:18px; line-height:1; cursor:pointer; }
+    .sg { display:flex; padding:2px; border-radius:9px; background:rgba(118,118,128,.18); margin-bottom:8px; }
+    .sg button { flex:1; border:0; background:none; color:var(--secondary-text-color); font:inherit; font-size:13px; padding:5px 8px; border-radius:7px; cursor:pointer; }
+    .sg button.on { background:rgba(118,118,128,.36); color:var(--primary-text-color); font-weight:500; }
+    .cv { background:rgba(118,118,128,.1); border-radius:10px; padding:6px 10px; }
+    .cv span { display:block; font-size:11px; color:var(--secondary-text-color); } .cv b { display:block; font-size:20px; font-weight:400; padding:2px 0; }
+    .cv i { display:block; font-style:normal; font-size:11px; color:var(--secondary-text-color); }
     .tm { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
     .tm label { display:block; background:rgba(118,118,128,.18); border-radius:10px; padding:6px 10px; }
     .tm label span { display:block; font-size:11px; color:var(--secondary-text-color); }
@@ -77,6 +97,9 @@
     getGridOptions() { return { columns: 12, rows: 'auto' }; }
     set hass(h) { this._hass = h; this._render(); }
     _s(k) { return this._hass.states[this._c[k]]; }
+    _durs() { if (!this._D) { try { this._D = JSON.parse(localStorage.getItem('wpc-dur') || '{}'); } catch (e) { this._D = {}; } } return this._D; }
+    _dur(name) { const k = keyOf(name), D = this._durs(); if (D[k]) return { m: D[k].m, src: D[k].src || 'gemessen' }; return { m: DUR[k] || 120, src: DUR[k] ? 'Schätzung' : 'unbekannt' }; }
+    _learn(k, m, src) { const D = this._durs(); if (!k || !(m > 5) || (D[k] && D[k].m === m && D[k].src === src)) return; D[k] = { m, src }; try { localStorage.setItem('wpc-dur', JSON.stringify(D)); } catch (e) {} }
     _v(k) { const s = this._s(k); return s ? s.state : ''; }
 
     async _programs() {
@@ -100,7 +123,7 @@
         r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="ttl"></div><span class="pls" style="display:flex;gap:8px"></span></div>
           <div class="pn"><div><div class="box"></div></div></div><div class="rows"></div></ha-card>`;
         r.querySelector('ha-card').addEventListener('click', (e) => this._click(e));
-        r.querySelector('ha-card').addEventListener('change', (e) => { if (e.target.dataset.t) { this._f[e.target.dataset.t] = e.target.value; this._last = ''; this._render(); } });
+        r.querySelector('ha-card').addEventListener('change', (e) => { if (e.target.dataset.t && e.target.value) { this._f[e.target.dataset.t] = e.target.value; this._last = ''; this._render(); } });
       }
       const r = this.shadowRoot, set = (sel, html) => { const e = r.querySelector(sel); if (e && e.innerHTML !== html) e.innerHTML = html; };
       const mob = this._v('mobile') === 'on', akt = this._v('aktiv') === 'on', nt = this._v('notify_automation') === 'on';
@@ -115,26 +138,37 @@
       if (this._open) {
         const now = new Date();
         // Vorgabe: zuletzt genutzte Uhrzeiten (meist morgens), sonst 06:00 – 09:00; Programm ebenfalls vom letzten Plan
-        if (!this._f) { const lt = (k, d) => { const m = /(\d{2}):(\d{2})/.exec(this._v(k) || ''); return m && +this._v('p_id') > 0 ? m[1] + ':' + m[2] : d; }; // erst nach dem ersten Plan gemerkt
-          this._f = { start: lt('p_start', '06:00'), end: lt('p_end', '09:00'), id: +this._v('p_id') || null, name: this._v('p_name') || '' }; }
-        const ds = next(this._f.start, new Date(now.getTime() - 6e4)), de = next(this._f.end, ds), L = this._list || [];
-        const can = this._live && this._f.id != null && this._f.name;
+        // Vorgabe: zuletzt genutzte Art (Start um / Fertig um) und Uhrzeit, sonst Start 06:00
+        if (!this._f) { let ls = null; try { ls = JSON.parse(localStorage.getItem('wpc-last') || 'null'); } catch (e) {}
+          const id = +this._v('p_id') || null, name = this._v('p_name') || '';
+          this._f = { id, name, mode: (ls && ls.mode) || 'start', time: (ls && ls.time) || '06:00', dur: this._dur(name).m }; }
+        const f = this._f, L = this._list || [], d = this._dur(f.name), dur = f.dur || d.m;
+        let ds, fe;
+        if (f.mode === 'start') { ds = next(f.time, new Date(now.getTime() - 6e4)); fe = new Date(ds.getTime() + dur * 6e4); }
+        else { fe = next(f.time, new Date(now.getTime() + dur * 6e4 - 6e4)); ds = new Date(fe.getTime() - dur * 6e4); }
+        this._calc = { ds, fe, dur };
+        const can = this._live && f.id != null && f.name;
+        const QK = f.mode === 'start' ? ['05:00', '06:00', '07:00', '08:00'] : ['06:00', '07:00', '08:00', '09:00'];
         set('.box', `<div class="lb">Programm${this._pBusy ? '<small>wird geladen …</small>' : !this._live && L.length ? '<small>Vorschau – Maschine aus</small>' : ''}</div>
-          <div class="pg">${L.map((p) => `<button data-p="${esc(p.id)}" data-n="${esc(p.name)}" class="${(p.id != null ? p.id === this._f.id : p.name === this._f.name) ? 'on' : ''}">${esc(p.name)}</button>`).join('')}</div>
-          <div class="lb">Start</div><div class="qk">${['05:00', '06:00', '07:00', '08:00'].map((t) => `<button data-q="${t}" class="${this._f.start === t ? 'on' : ''}">${t}</button>`).join('')}<button data-q="now">Sofort</button></div>
-          <div class="tm"><label><span>Start frühestens</span><input type="time" data-t="start" value="${this._f.start}"><i>${tag(ds)}</i></label>
-            <label><span>Ende – Plan verfällt</span><input type="time" data-t="end" value="${this._f.end}"><i>${tag(de)}</i></label></div>
-          <div class="ac"><span class="hn">${esc(this._pErr || (mob ? 'MobileStart ist aktiv – Start zur Startzeit.' : 'Startet, sobald MobileStart an der Maschine aktiv ist.'))}</span>
+          <div class="pg">${L.map((p) => `<button data-p="${esc(p.id)}" data-n="${esc(p.name)}" class="${(p.id != null ? p.id === f.id : p.name === f.name) ? 'on' : ''}">${esc(p.name)}</button>`).join('')}</div>
+          ${f.name ? `<div class="du"><ha-icon icon="mdi:timer-outline"></ha-icon><span>Dauer <b>${f.dur !== d.m ? '' : d.src === 'gemessen' ? '' : 'ca. '}${hmin(dur)}</b><small>${f.dur !== d.m ? 'angepasst' : d.src}</small></span>
+            <button data-d="-5" aria-label="5 Minuten weniger">−</button><button data-d="5" aria-label="5 Minuten mehr">+</button></div>` : ''}
+          <div class="sg"><button data-m="start" class="${f.mode === 'start' ? 'on' : ''}">Start um</button><button data-m="end" class="${f.mode === 'end' ? 'on' : ''}">Fertig um</button></div>
+          <div class="qk">${QK.map((t) => `<button data-q="${t}" class="${f.time === t ? 'on' : ''}">${t}</button>`).join('')}${f.mode === 'start' ? '<button data-q="now">Sofort</button>' : ''}</div>
+          <div class="tm"><label><span>${f.mode === 'start' ? 'Start um' : 'Fertig um'}</span><input type="time" data-t="time" value="${f.time}"><i>${tag(f.mode === 'start' ? ds : fe)}</i></label>
+            <div class="cv"><span>${f.mode === 'start' ? 'Fertig ca.' : 'Start um'}</span><b>${hm(f.mode === 'start' ? fe : ds)}</b><i>${tag(f.mode === 'start' ? fe : ds)}</i></div></div>
+          <div class="ac"><span class="hn">${esc(this._pErr || (mob ? 'MobileStart ist aktiv.' : 'Startet nur, wenn MobileStart an der Maschine aktiv ist.'))}</span>
             ${akt ? '<button class="bt del" data-a="del"><ha-icon icon="mdi:close"></ha-icon>Plan löschen</button>' : ''}
             <button class="bt ok" data-a="save"${can ? '' : ' disabled'}><ha-icon icon="mdi:check"></ha-icon>${akt ? 'Ändern' : 'Planen'}</button></div>`);
         r.querySelectorAll('input[data-t]').forEach((i) => { if (i !== r.activeElement && i.value !== this._f[i.dataset.t]) i.value = this._f[i.dataset.t]; });
       }
       // Zeilen: Plan, Status, MobileStart
-      const st = this._s('status'), rem = this._s('remaining'), ende = this._s('ende');
+      const st = this._s('status'), rem = this._s('remaining'), ende = this._s('ende'), el = H.states['sensor.waschmaschine_verstrichene_zeit'];
+      if (st && st.state === 'in_use' && rem && el && !isNaN(+rem.state) && !isNaN(+el.state) && +el.state < 0.25) this._learn(this._v('program'), Math.round((+rem.state + +el.state) * 60), 'gemessen');
       const row = (ic, col, nm, sub, val, bg) => `<div class="r"${bg ? ` style="background:${bg}"` : ''}><div class="bd"><ha-icon icon="${ic}"${col ? ` style="color:${col}"` : ''}></ha-icon></div><div class="nm">${nm}${sub ? `<small>${sub}</small>` : ''}</div><div class="st">${val}</div></div>`;
       let h = '';
       if (akt) h += row('mdi:calendar-clock', C.orange, `<span style="color:${C.orange};font-weight:500">${esc(this._v('p_name') || 'Programm')}</span>`,
-        `Start ab ${tag(pStart)} ${hm(pStart)} · verfällt ${tag(pEnd)} ${hm(pEnd)}`, mob ? '<span style="color:#30d158">bereit</span>' : '<span style="color:var(--secondary-text-color)">wartet auf MobileStart</span>', 'rgba(245,99,0,.16)');
+        `Start ${tag(pStart)} ${hm(pStart)} · fertig ca. ${hm(new Date(pStart.getTime() + this._dur(this._v('p_name')).m * 6e4))}`, mob ? '<span style="color:#30d158">bereit</span>' : '<span style="color:var(--secondary-text-color)">wartet auf MobileStart</span>', 'rgba(245,99,0,.16)');
       h += row('mdi:washing-machine', st && st.state === 'in_use' ? C.green : '', 'Status', '', esc(STAT[st && st.state] || (st ? st.state : '–')));
       h += row(mob ? 'mdi:cellphone-check' : 'mdi:cellphone-off', mob ? C.green : '', 'MobileStart', mob ? 'Programm kann aus der Ferne gestartet werden' : 'an der Maschine wählen, um zu planen', mob ? 'Aktiv' : 'Aus');
       if (st && st.state === 'in_use' && ende && !['unknown', 'unavailable'].includes(ende.state)) { const d = new Date(ende.state); if (!isNaN(d)) h += row('mdi:flag-checkered', '', 'Programmende', rem && !isNaN(+rem.state) ? `noch ${Math.round(+rem.state * 60)} min` : '', tag(d) + ' ' + hm(d)); }
@@ -142,17 +176,19 @@
     }
 
     _click(e) {
-      const H = this._hass, c = this._c, b = e.target.closest('[data-a],[data-p],[data-q]'); if (!b) return;
-      if (b.dataset.q) { const q = b.dataset.q, sh = (t, h) => { const [a, m] = t.split(':').map(Number), d = new Date(2000, 0, 1, a, m); d.setTime(d.getTime() + h * 36e5); return hm(d); };
-        const dur = ((+this._f.end.slice(0, 2) * 60 + +this._f.end.slice(3)) - (+this._f.start.slice(0, 2) * 60 + +this._f.start.slice(3)) + 1440) % 1440 || 180;
-        this._f.start = q === 'now' ? hm(new Date(Date.now() + 6e4)) : q; this._f.end = sh(this._f.start, dur / 60); this._render(); return; }
-      if (b.dataset.p !== undefined) { this._f.id = b.dataset.p === '' ? null : +b.dataset.p; this._f.name = b.dataset.n; this._render(); return; }
+      const H = this._hass, c = this._c, b = e.target.closest('[data-a],[data-p],[data-q],[data-m],[data-d]'); if (!b) return;
+      if (b.dataset.q) { this._f.time = b.dataset.q === 'now' ? hm(new Date(Date.now() + 6e4)) : b.dataset.q; this._render(); return; }
+      if (b.dataset.m) { const k = this._calc; this._f.mode = b.dataset.m; if (k) this._f.time = hm(b.dataset.m === 'start' ? k.ds : k.fe); this._render(); return; }
+      if (b.dataset.d) { this._f.dur = Math.max(10, (this._f.dur || this._dur(this._f.name).m) + +b.dataset.d); this._render(); return; }
+      if (b.dataset.p !== undefined) { this._f.id = b.dataset.p === '' ? null : +b.dataset.p; this._f.name = b.dataset.n; this._f.dur = this._dur(b.dataset.n).m; this._render(); return; }
       const a = b.dataset.a;
       if (a === 'notify') { H.callService('automation', this._v('notify_automation') === 'on' ? 'turn_off' : 'turn_on', { entity_id: c.notify_automation }); return; }
       if (a === 'open') { this._open = !this._open; this._f = null; if (this._open && !this._live) this._programs(); this._render(); return; }
       if (a === 'del') { H.callService('input_boolean', 'turn_off', { entity_id: c.aktiv }); this._open = false; this._render(); return; }
       if (a === 'save' && !b.disabled) {
-        const now = new Date(), ds = next(this._f.start, new Date(now.getTime() - 6e4)), de = next(this._f.end, ds);
+        const { ds } = this._calc, de = new Date(ds.getTime() + 2 * 36e5); // Plan verfaellt 2 h nach der Startzeit
+        try { localStorage.setItem('wpc-last', JSON.stringify({ mode: this._f.mode, time: this._f.time })); } catch (e) {}
+        if (this._f.dur !== this._dur(this._f.name).m) this._learn(keyOf(this._f.name), this._f.dur, 'angepasst');
         Promise.all([
           H.callService('input_number', 'set_value', { entity_id: c.p_id, value: this._f.id }),
           H.callService('input_text', 'set_value', { entity_id: c.p_name, value: this._f.name.slice(0, 100) }),
