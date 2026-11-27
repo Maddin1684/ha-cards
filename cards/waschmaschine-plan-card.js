@@ -1,4 +1,5 @@
-// waschmaschine-plan-card v0.2 (27.11.2026): Vorgabe = zuletzt genutzte Zeiten (sonst 06:00–09:00, typisch abends beladen, morgens starten), Schnellwahl 05–08 Uhr / Sofort.
+// waschmaschine-plan-card v0.3 (27.11.2026): Vorgabe 06:00–09:00, solange noch nie geplant wurde (neue Helfer stehen auf 00:00).
+// v0.2 (27.11.2026): Vorgabe = zuletzt genutzte Zeiten (sonst 06:00–09:00, typisch abends beladen, morgens starten), Schnellwahl 05–08 Uhr / Sofort.
 // v0.1 (27.11.2026, Testkarte): Miele MobileStart mit Programm-Vorwahl.
 // Pille oben rechts 'Programm planen' (Programm, Startzeit, Endzeit) – gespeichert in Helfern, gestartet von der Automation
 // 'Waschmaschine geplanter Start (MobileStart)': ab Startzeit, sobald MobileStart aktiv ist, bis spaetestens Endzeit (danach verfaellt der Plan).
@@ -114,7 +115,7 @@
       if (this._open) {
         const now = new Date();
         // Vorgabe: zuletzt genutzte Uhrzeiten (meist morgens), sonst 06:00 – 09:00; Programm ebenfalls vom letzten Plan
-        if (!this._f) { const lt = (k, d) => { const m = /(\d{2}):(\d{2})/.exec(this._v(k) || ''); return m && this._v(k).indexOf('1970') < 0 ? m[1] + ':' + m[2] : d; };
+        if (!this._f) { const lt = (k, d) => { const m = /(\d{2}):(\d{2})/.exec(this._v(k) || ''); return m && +this._v('p_id') > 0 ? m[1] + ':' + m[2] : d; }; // erst nach dem ersten Plan gemerkt
           this._f = { start: lt('p_start', '06:00'), end: lt('p_end', '09:00'), id: +this._v('p_id') || null, name: this._v('p_name') || '' }; }
         const ds = next(this._f.start, new Date(now.getTime() - 6e4)), de = next(this._f.end, ds), L = this._list || [];
         const can = this._live && this._f.id != null && this._f.name;
