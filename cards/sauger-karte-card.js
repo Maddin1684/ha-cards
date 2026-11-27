@@ -1,4 +1,5 @@
-// sauger-karte-card v3.4 (27.11.2026): Kartenbild ohne Farbraum-Umrechnung lesen (iPhone/iPad lieferte leicht andere Farben); Teppichmuster toleranter erkannt.
+// sauger-karte-card v3.5 (27.11.2026): gereinigte Flaeche zusaetzlich als Band um die Saugbahnen (halbe Saugerbreite) – unabhaengig von Farben, damit iPhone/iPad und Teppiche wie in der Dreame-App aussehen.
+// v3.4 (27.11.2026): Kartenbild ohne Farbraum-Umrechnung lesen (iPhone/iPad lieferte leicht andere Farben); Teppichmuster toleranter erkannt.
 // v3.3 (27.11.2026): Luecken unter Raumnamen (Nummer + Name) vollstaendig aus der Umgebung gefuellt.
 // v3.2 (27.11.2026): Teppichflaechen (Schachbrettmuster ohne helles Band) gelten als gereinigt, wo Saugbahnen liegen – z. B. Teppich in Wohnen unter den Kreisen.
 // v3.1 (27.11.2026): Ausblenden per Raumname und Etage (map_id der Integration wechselt); Loecher unter Raumnamen/Nadeln werden aus der Umgebung gefuellt; leicht abgedunkelte Flaechen (Fugen, Teppich) zaehlen als gereinigt.
@@ -389,6 +390,10 @@
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b);
           if (mn >= 246) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; n++; }
           else if (d[i + 3] > 250 && clean(r, g, b)) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } }
+        // Hauptregel (geraeteunabhaengig): das gereinigte Band ist die Flaeche, die der Sauger mit seiner Breite ueberfahren hat –
+        // also alles Boden im Umkreis von ~13 px (≈ halbe Saugerbreite) um die weissen Bahnen. Unabhaengig von Farbtoenen (Teppich, iPhone-Farben).
+        { const wp = new Uint8Array(NP); for (let q = 0; q < NP; q++) { const i = q * 4; if (!skip[q] && d[i + 3] > 200 && Math.min(d[i], d[i + 1], d[i + 2]) >= 240) wp[q] = 1; }
+          const band = dil(wp, 13); for (let q = 0; q < NP; q++) { const i = q * 4; if (band[q] && d[i + 3] > 200 && !mo[i + 3]) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } } }
         // Teppiche: im Kartenbild ein Schachbrett aus Grundfarbe und abgedunkelter Grundfarbe, ohne helles Reinigungsband.
         // Teppichflaeche gilt als gereinigt, wo Saugbahnen in der Naehe liegen.
         { const cd = new Uint8Array(NP), pm = new Uint8Array(NP);
