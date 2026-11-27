@@ -1,4 +1,4 @@
-// wind-kompass-card v1.0 (27.11.2026: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.1 (27.11.2026: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -35,12 +35,22 @@
     .ctr .d { font-size:30px; font-weight:500; line-height:32px; color:rgba(255,255,255,.85); }
     .ctr .v { font-size:36px; font-weight:400; line-height:38px; color:#fff; white-space:nowrap; }
     .ctr .v small { font-size:18px; color:rgba(255,255,255,.8); margin-left:4px; }
-    .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
+    .sky { position:absolute; width:10%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
     .sky img { width:100%; height:100%; object-fit:contain; display:block; }
     .sky.sun img { filter:drop-shadow(0 0 8px rgba(255,200,80,.7)); }
-    .pills { display:flex; justify-content:center; gap:6px; margin:10px 16px 0; flex-wrap:wrap; }
-    .pills span { font-size:12px; line-height:16px; padding:4px 11px; border-radius:14px; background:rgba(118,118,128,.24); color:var(--secondary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .pills span.on { background:${C.orange}; color:#fff; }
+    .pills { display:flex; margin:10px 16px 0; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; }
+    .pills:empty { display:none; }
+    .pills span { flex:1; text-align:center; font-size:12px; line-height:16px; padding:4px 0; border-radius:6px; color:var(--secondary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background .2s, color .2s; }
+    .pills span.on { background:rgba(255,255,255,.18); color:var(--primary-text-color); }
+    .bars { margin:12px 16px 0; display:flex; flex-direction:column; gap:8px; }
+    .br { display:grid; grid-template-columns:44px 1fr 62px; align-items:center; gap:8px; font-size:12px; color:var(--secondary-text-color); }
+    .br .vv { text-align:right; color:var(--primary-text-color); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .br .vv small { color:var(--secondary-text-color); font-size:10px; }
+    .tk { position:relative; height:8px; border-radius:4px; background:rgba(118,118,128,.22); overflow:visible; }
+    .tk .z { position:absolute; top:0; bottom:0; opacity:.28; }
+    .tk .f { position:absolute; left:0; top:0; bottom:0; border-radius:4px; transition:width .8s ease; }
+    .tk .mx { position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; border-radius:1px; background:rgba(255,255,255,.55); }
+    .br.sc { margin-top:-6px; font-size:9px; line-height:10px; }
     .lg { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 12px; margin:10px 16px 0; font-size:11px; color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
     .lg span { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
     .lg i { width:10px; height:10px; border-radius:3px; display:inline-block; }
@@ -62,7 +72,7 @@
       const r = this.shadowRoot || this.attachShadow({ mode: 'open' });
       this._root = r;
       r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"></div><div class="wrap" id="wrap"><svg class="k" id="k" viewBox="0 0 300 300"></svg><div id="sky"></div><div class="ctr" id="ctr"></div></div>
-        <div class="pills" id="pills"></div><div class="lg" id="lg"></div><div class="info" id="info"></div></ha-card>`;
+        <div class="bars" id="bars"></div><div class="pills" id="pills"></div><div class="lg" id="lg"></div><div class="info" id="info"></div></ha-card>`;
       r.querySelector('ha-card').addEventListener('click', (ev) => {
         const p = ev.target.closest('[data-p]'); if (p) { this._per = p.dataset.p; this._histAt = 0; this._hist = null; this._last = {}; this._load(); this._render(true); return; }
         if (ev.target.closest('#wrap')) { const e = new Event('hass-more-info', { bubbles: true, composed: true }); e.detail = { entityId: this._c.speed_entity }; this.dispatchEvent(e); }
@@ -106,11 +116,11 @@
       const c = this._c, ds = H.states[c.direction_entity], ss = H.states[c.speed_entity];
       const dir = ds ? num(ds.state, 0) : 0, sp = ss ? num(ss.state, 0) : 0;
       const sun = H.states[c.sun], mo = c.moon_entity && H.states[c.moon_entity];
-      const sunUp = sun && sun.state === 'above_horizon', moonUp = mo && (mo.state === 'up' || num(mo.attributes.moon_altitude, -1) > 0);
+      const sunUp = sun && sun.state === 'above_horizon', moonUp = !sunUp && mo && (mo.state === 'up' || num(mo.attributes.moon_altitude, -1) > 0);
       const sig = [dir, sp, sunUp, sun && Math.round(num(sun.attributes.azimuth, 0)), moonUp, mo && Math.round(num(mo.attributes.moon_azimuth, 0)), this._per, !!this._hist].join('|');
       if (!force && sig === this._sig) return; this._sig = sig;
       this._root.querySelector('.hd').textContent = c.title || ''; this._root.querySelector('.hd').style.display = c.title ? '' : 'none';
-      const R = 112, cx = 150, cy = 150, col = wcol(sp);
+      const R = 102, cx = 150, cy = 150, col = wcol(sp);
       // Windrose
       let rose = '';
       const h = this._hist;
@@ -145,13 +155,18 @@
       this._set('ctr', `<div class="d">${dirTxt}</div><div class="v">${Math.round(sp)}<small>km/h</small></div>`);
       // Sonne / Mond am Rand
       let sky = '';
-      const pos = (az) => { const an = (az - 90) * Math.PI / 180, rr = R; return `left:${((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
+      const pos = (az) => { const an = (az - 90) * Math.PI / 180, rr = R + 36; return `left:${((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
       if (sunUp) sky += `<div class="sky sun" style="${pos(num(sun.attributes.azimuth, 0))}"><img src="${esc(c.sun_image)}" alt=""></div>`;
       if (moonUp) {
         const ph = c.moon_phase_entity && H.states[c.moon_phase_entity] ? Math.max(0, Math.min(7, Math.round(num(H.states[c.moon_phase_entity].state, 4)))) : 4;
         sky += `<div class="sky" style="${pos(num(mo.attributes.moon_azimuth, 0))}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
       }
       this._set('sky', sky);
+      // Wind und Boeen als Balken (Skala 0–75 km/h, Zonen in Windfarben, Strich = Maximum im Zeitraum)
+      const MAXS = 75, gs = c.gust_entity && H.states[c.gust_entity], gu = gs ? num(gs.state, NaN) : NaN;
+      const zones = [[0, 29, C.green], [29, 62, C.yellow], [62, MAXS, C.red]].map(([a, b, cc]) => `<i class="z" style="left:${a / MAXS * 100}%;width:${(b - a) / MAXS * 100}%;background:${cc};${a === 0 ? 'border-radius:4px 0 0 4px;' : ''}${b === MAXS ? 'border-radius:0 4px 4px 0;' : ''}"></i>`).join('');
+      const bar = (lb, v, mx) => isNaN(v) ? '' : `<div class="br"><span>${lb}</span><div class="tk">${zones}<i class="f" style="width:${Math.min(100, v / MAXS * 100).toFixed(1)}%;background:${wcol(v)}"></i>${mx > 0 ? `<i class="mx" style="left:${Math.min(100, mx / MAXS * 100).toFixed(1)}%"></i>` : ''}</div><span class="vv">${dc(v)} <small>km/h</small></span></div>`;
+      this._set('bars', bar('Wind', sp, h ? h.smax : 0) + bar('Böen', gu, h ? h.gmax : 0) + `<div class="br sc"><span></span><div style="position:relative;height:10px">${[[0, '0'], [29, '29'], [62, '62'], [75, '75+']].map(([v, t]) => `<span style="position:absolute;left:${(v / MAXS * 100).toFixed(1)}%;transform:translateX(${v === 0 ? '0' : v === 75 ? '-100%' : '-50%'})">${t}</span>`).join('')}</div><span></span></div>`);
       // Zeitraum und Legende
       this._set('pills', c.rose ? PER.map(([k, l]) => `<span data-p="${k}" class="${k === this._per ? 'on' : ''}">${l}</span>`).join('') : '');
       if (c.rose && h && h.n) {
