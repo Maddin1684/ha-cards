@@ -1,4 +1,4 @@
-// wind-kompass-card v1.7 (27.11.2026: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.8 (27.11.2026: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -54,8 +54,8 @@
     .ctr .v small { font-size:15px; color:rgba(255,255,255,.8); margin-left:4px; }
     .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
     .sky img { width:100%; height:100%; object-fit:contain; display:block; }
-    .sky.sun { width:31%; }
-    .sky.sun img { filter:none; }
+    .sky.sun { width:26%; }
+    .sky.sun img { filter:none; mix-blend-mode:screen; }
     .sky .sd { display:block; width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 40% 38%, #fffbe8 0%, #ffe38a 38%, #ffc23d 72%, #ff9f0a 100%);
       box-shadow:0 0 6px 2px rgba(255,214,10,.55), 0 0 16px 6px rgba(255,159,10,.28); animation:wkk-sun 3s ease-in-out infinite; }
     @keyframes wkk-sun { 0%, 100% { box-shadow:0 0 6px 2px rgba(255,214,10,.55), 0 0 16px 6px rgba(255,159,10,.28); } 50% { box-shadow:0 0 8px 3px rgba(255,214,10,.7), 0 0 22px 9px rgba(255,159,10,.35); } }
@@ -148,7 +148,7 @@
       const sig = [sk, dir, sp, sunUp, sun && Math.round(num(sun.attributes.azimuth, 0)), moonUp, mo && Math.round(num(mo.attributes.moon_azimuth, 0)), this._per, !!this._hist].join('|');
       if (!force && sig === this._sig) return; this._sig = sig;
       this._root.querySelector('.hd').textContent = c.title || ''; this._root.querySelector('.hd').style.display = c.title ? '' : 'none';
-      const R = 96, cx = 150, cy = 150, col = wcol(sp);
+      const R = 86, cx = 150, cy = 150, col = wcol(sp);
       // Windrose
       let rose = '';
       const h = this._hist;
@@ -172,7 +172,7 @@
       // Himmelsrichtung ausblenden, wenn Sonne/Mond direkt davor steht (Abstand < 25°)
       const bodyAz = sunUp ? sunAz : moonUp ? moonAz : null;
       const near = (a) => bodyAz != null && Math.abs(((bodyAz - a + 540) % 360) - 180) < 25;
-      const lbl = [['N', 0], ['O', 90], ['S', 180], ['W', 270]].map(([t, a]) => { const an = (a - 90) * Math.PI / 180, rr = R + 18; return `<text x="${(cx + rr * Math.cos(an)).toFixed(1)}" y="${(cy + rr * Math.sin(an)).toFixed(1)}" fill="${C.orange}" font-size="20" text-anchor="middle" dominant-baseline="central" opacity="${near(a) ? 0.15 : 1}" style="transition:opacity .6s">${t}</text>`; }).join('');
+      const lbl = [['N', 0], ['O', 90], ['S', 180], ['W', 270]].map(([t, a]) => { const an = (a - 90) * Math.PI / 180, rr = R + 17; return `<text x="${(cx + rr * Math.cos(an)).toFixed(1)}" y="${(cy + rr * Math.sin(an)).toFixed(1)}" fill="${C.orange}" font-size="20" text-anchor="middle" dominant-baseline="central" opacity="${near(a) ? 0.15 : 1}" style="transition:opacity .6s">${t}</text>`; }).join('');
       const svg = `<defs><clipPath id="wkc"><circle cx="150" cy="150" r="${R}"/></clipPath>
         <radialGradient id="wkd"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
         <linearGradient id="wka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity=".25"/></linearGradient></defs>
@@ -186,11 +186,12 @@
       this._set('ctr', `<div class="d">${dirTxt}</div><div class="v">${Math.round(sp)}<small>km/h</small></div>`);
       // Sonne / Mond am Rand
       let sky = '';
-      const pos = (az) => { const an = (az - 90) * Math.PI / 180, rr = R + 44; return `left:${((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
-      if (sunUp) sky += `<div class="sky sun" style="${pos(sunAz)}">${c.sun_image && c.sun_image !== 'css' ? `<img src="${esc(c.sun_image)}" alt="">` : '<b class="sd"></b>'}</div>`;
+      // Position am Aussenkreis; so begrenzt, dass die Grafik nie aus der Karte laeuft (half = halbe Breite in %)
+      const pos = (az, half) => { const an = (az - 90) * Math.PI / 180, rr = R + 40, cl = (v) => Math.max(half, Math.min(100 - half, v)); return `left:${cl((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${cl((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
+      if (sunUp) sky += `<div class="sky sun" style="${pos(sunAz, 13)}">${c.sun_image && c.sun_image !== 'css' ? `<img src="${esc(c.sun_image)}" alt="">` : '<b class="sd"></b>'}</div>`;
       if (moonUp) {
         const ph = c.moon_phase_entity && H.states[c.moon_phase_entity] ? Math.max(0, Math.min(7, Math.round(num(H.states[c.moon_phase_entity].state, 4)))) : 4;
-        sky += `<div class="sky" style="${pos(moonAz)}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
+        sky += `<div class="sky" style="${pos(moonAz, 5.5)}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
       }
       this._set('sky', sky);
       // Wind und Boeen: Anteile der Geschwindigkeitsklassen als senkrechte Balken (unten still, nach oben staerker)
