@@ -67,9 +67,9 @@
     .cloud::before { width:55%; height:170%; top:-55%; left:12%; }
     .cloud::after { width:42%; height:130%; top:-35%; right:10%; }
     .cloud.flash { animation-name:wk-cloud-drift, wk-cloud-flash; animation-timing-function:linear, ease-out; }
-    /* Gewitter mit mehreren Wolken: gleicher Blitz wie vorher (0,27 s Flackern), aber nur alle ~12 s je Wolke, versetzt */
+    /* Gewitter mit mehreren Wolken: gleicher Blitz wie vorher (0,27 s Flackern), je Wolke alle 24 s, versetzt -> insgesamt wie vorher etwa alle 3 s ein Blitz */
     .cloud.flash.l { animation-name:wk-cloud-drift, wk-cloud-flash-l; }
-    @keyframes wk-cloud-flash-l { 0% { filter:blur(1.8px) brightness(1); } .5% { filter:blur(1.8px) brightness(5); } 1% { filter:blur(1.8px) brightness(1.5); } 1.5% { filter:blur(1.8px) brightness(4.2); } 2.25%, 100% { filter:blur(1.8px) brightness(1); } }
+    @keyframes wk-cloud-flash-l { 0% { filter:blur(1.8px) brightness(1); } .25% { filter:blur(1.8px) brightness(5); } .5% { filter:blur(1.8px) brightness(1.5); } .75% { filter:blur(1.8px) brightness(4.2); } 1.125%, 100% { filter:blur(1.8px) brightness(1); } }
     @keyframes wk-cloud-drift { 0% { transform:translate3d(0,0,0); opacity:0; } 16% { opacity:var(--cloud-opacity,.35); } 93% { opacity:var(--cloud-opacity,.35); } 100% { transform:translate3d(var(--dx,200%),0,0); opacity:0; } }
     @keyframes wk-cloud-flash { 0% { filter:blur(1.8px) brightness(1); } 2% { filter:blur(1.8px) brightness(5); } 4% { filter:blur(1.8px) brightness(1.5); } 6% { filter:blur(1.8px) brightness(4.2); } 9%, 100% { filter:blur(1.8px) brightness(1); } }
     .rain-drop { z-index:2; top:-6%; background:linear-gradient(to bottom, rgba(150,205,255,.95), rgba(190,230,255,var(--drop-alpha,1))); box-shadow:0 0 1px rgba(200,235,255,calc(var(--glow-alpha,1) * .6)), 0 0 3px rgba(90,180,255,calc(var(--glow-alpha,1) * .35));
@@ -681,7 +681,7 @@
       if (showClouds) {
         const stormy = rain || snow, n = partly && !stormy ? 4 : stormy ? 8 : 6, dark = Math.floor(R() * n), stag = 31.5 / n;
         // Gewitter: alle Wolken blitzen, versetzt nacheinander (je Wolke eigener Takt)
-        const fP = 12, fOff = R() * fP;
+        const fP = 24, fOff = R() * fP;
         const rainSh = ['150,148,145', '120,118,116', '95,93,91', '165,162,158'], nightSh = ['95,99,120', '78,82,102', '110,114,132', '68,72,90'], nightRainSh = ['118,116,124', '100,98,108', '130,128,136', '108,106,118'];
         for (let i = 0; i < n; i++) {
           const big = i % 3 === 0, w = big ? 30 + R() * 10 : 18 + R() * 12, top = (6 + R() * 56).toFixed(0);
