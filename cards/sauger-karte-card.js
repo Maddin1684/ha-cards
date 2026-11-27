@@ -1,4 +1,5 @@
-// sauger-karte-card v3.0 (27.11.2026, Wunsch Martin): Reinigungsspur genauer – gereinigte Flaeche je Raum ueber dessen Grundfarbe erkannt (auch gelbe Raeume wie Esszimmer/Spielzimmer), Beschriftungen und Nadeln exakt ausmaskiert statt grosser Kaesten; Bereiche per Konfig 'ausblenden' entfernbar (Terrasse); Hindernis-Pille oeffnet scrollbare Galerie (Foto, was erkannt wurde, Raum, Trefferquote); grosse Partikel mit Staub-Symbol in Apple-Gelb.
+// sauger-karte-card v3.1 (27.11.2026): Ausblenden per Raumname und Etage (map_id der Integration wechselt); Loecher unter Raumnamen/Nadeln werden aus der Umgebung gefuellt; leicht abgedunkelte Flaechen (Fugen, Teppich) zaehlen als gereinigt.
+// v3.0 (27.11.2026, Wunsch Martin): Reinigungsspur genauer – gereinigte Flaeche je Raum ueber dessen Grundfarbe erkannt (auch gelbe Raeume wie Esszimmer/Spielzimmer), Beschriftungen und Nadeln exakt ausmaskiert statt grosser Kaesten; Bereiche per Konfig 'ausblenden' entfernbar (Terrasse); Hindernis-Pille oeffnet scrollbare Galerie (Foto, was erkannt wurde, Raum, Trefferquote); grosse Partikel mit Staub-Symbol in Apple-Gelb.
 // v2.9 (27.11.2026, Wunsch Martin): am Tag einer erfolgreichen Reinigung gruener Kasten mit Zusammenfassung (Uhrzeit von–bis, Flaeche, Dauer, CleanGenius, nicht erreichte Raeume mit Grund).
 // v2.8 (26.11.2026, Wunsch Martin): Pillen Modus/Akku/Hindernisse gleich gross wie die Kopf-Pillen (13 px, 30 px hoch, Symbol 16 px).
 // v2.7 (26.11.2026, Wunsch Martin): Steuerung als Pille oben rechts wie Beleuchtung/Rollos – Alle reinigen (gruenes Sauger-Symbol), waehrend der Reinigung Pausieren (gelb) und Zur Station (rot), pausiert Fortsetzen (gruen); Akku als Pille neben dem Reinigungsmodus.
@@ -144,7 +145,7 @@
       }
       if (!v || !m) { this.shadowRoot.querySelector('.mw').innerHTML = '<div class="msg">Sauger oder Karte nicht gefunden</div>'; return; }
       const A = m.attributes || {}, V = v.attributes || {};
-      const mapKey = JSON.stringify(this._c.ausblenden || []) + '|' + (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : (this._calKey(A) || ''));
+      const mapKey = JSON.stringify(this._c.ausblenden || []) + '|' + ((H.states[this._c.floor || 'input_select.karte'] || {}).state || '') + '|' + (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : (this._calKey(A) || ''));
       if (mapKey !== this._mapKey && !this._busy) this._loadMap(A, mapKey);
       this._head(v, V, A);
       if (this._geo) { this._overlay(v, V, A); if (m.state + A.entity_picture !== this._trKey && !this._trBusy && !this._busy) this._loadTrail(A, m.state + A.entity_picture); }
@@ -314,9 +315,10 @@
           for (let y = Math.max(0, Math.floor(Y0)); y <= Math.min(gh - 1, Math.ceil(Y1)); y++) for (let x = Math.max(0, Math.floor(X0)); x <= Math.min(gw - 1, Math.ceil(X1)); x++) { const q = y * gw + x; if (fl[q] && ar < best[q]) { best[q] = ar; lab[q] = i + 1; } } });
         for (let it = 0; it < 10; it++) { const L2 = lab.slice(); for (let q = 0; q < N; q++) if (!lab[q] && fl[q]) { const x = q % gw; const n = (x > 0 && lab[q - 1]) || (x < gw - 1 && lab[q + 1]) || (q >= gw && lab[q - gw]) || (q + gw < N && lab[q + gw]); if (n) L2[q] = n; } lab.set(L2); }
         // Bereiche ausblenden (z. B. Terrasse, die durch grosse Fenster als Raum erkannt wurde): Konfig 'ausblenden' = [{karte, raum, x0, x1, y0, y1}] in mm
-        { const itf = this._itf(A), AUS = (this._c.ausblenden || []).filter((z) => z.karte == null || String(z.karte) === String(A.map_id));
+        { const itf = this._itf(A), ks = this._hass.states[this._c.floor || 'input_select.karte'], AUS = (this._c.ausblenden || []).filter((z) => z.etage == null || (ks && ks.state === z.etage));
           if (itf && AUS.length) for (let q = 0; q < N; q++) { if (!lab[q]) continue; const rid = ids[lab[q] - 1], x = q % gw, y = (q - x) / gw, [vx, vy] = itf((x + 0.5) * S, (y + 0.5) * S);
-            if (AUS.some((z) => (z.raum == null || String(z.raum) === rid) && vx >= (z.x0 ?? -1e9) && vx <= (z.x1 ?? 1e9) && vy >= (z.y0 ?? -1e9) && vy <= (z.y1 ?? 1e9))) lab[q] = 0; } }
+            const rn = (rooms[rid] || {}).custom_name || (rooms[rid] || {}).name;
+            if (AUS.some((z) => (z.raum == null || String(z.raum) === rid || z.raum === rn) && vx >= (z.x0 ?? -1e9) && vx <= (z.x1 ?? 1e9) && vy >= (z.y0 ?? -1e9) && vy <= (z.y1 ?? 1e9))) lab[q] = 0; } }
         // je Raum: glaetten, 1 px Abstand zum Nachbarraum, Umriss verfolgen, vereinfachen
         const trace = (mk) => { const seen = new Uint8Array(N), out = [], D = [[-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1]];
           const on = (x, y) => x >= 0 && y >= 0 && x < gw && y < gh && mk[y * gw + x];
@@ -369,7 +371,9 @@
           const b = cand.filter(([k]) => sat(k) >= ms - 0.04).sort((a, c) => c[1] - a[1])[0][0]; if (!bases.includes(b)) bases.push(b); });
         const BS = bases.map((k) => [k >> 16 & 255, k >> 8 & 255, k & 255]);
         // gereinigt = Grundfarbe mit Weiss aufgehellt (in allen Farbkanaelen gleich stark, 18-85 %)
-        const clean = (rr, gg, bb) => { for (const b of BS) { let lo = 9, hi = -9; const c = [rr, gg, bb]; for (let k = 0; k < 3; k++) { const den = 255 - b[k]; if (den <= 25) continue; const f = (c[k] - b[k]) / den; if (f < lo) lo = f; if (f > hi) hi = f; } if (lo >= 0.18 && hi <= 0.85 && hi - lo < 0.2) return true; } return false; };
+        const clean0 = (rr, gg, bb) => { for (const b of BS) { let lo = 9, hi = -9; const c = [rr, gg, bb]; for (let k = 0; k < 3; k++) { const den = 255 - b[k]; if (den <= 25) { if (c[k] < b[k] - 8) { lo = -9; break; } continue; } const f = (c[k] - b[k]) / den; if (f < lo) lo = f; if (f > hi) hi = f; } if (lo >= 0.18 && hi <= 0.85 && hi - lo < 0.2) return true; } return false; };
+        // auch leicht abgedunkelt (Fliesenfugen, Teppichmuster) als gereinigt werten
+        const clean = (rr, gg, bb) => clean0(rr, gg, bb) || [0.955, 0.915].some((f) => clean0(Math.min(255, rr / f), Math.min(255, gg / f), Math.min(255, bb / f)));
         const near = (rr, gg, bb) => BS.some((b) => (rr - b[0]) ** 2 + (gg - b[1]) ** 2 + (bb - b[2]) ** 2 < 900);
         // Beschriftungen (Nummer + Name) und kraeftig farbige Symbole/Nadeln genau ausmaskieren statt grosser Kaesten
         const seedL = new Uint8Array(NP), seedP = new Uint8Array(NP), inL = new Uint8Array(NP); lbx.forEach(([a, b, c, e]) => box(a, b, c, e, inL));
@@ -382,6 +386,9 @@
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b);
           if (mn >= 246) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; n++; }
           else if (d[i + 3] > 250 && clean(r, g, b)) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } }
+        // ausmaskierte Stellen (Beschriftung, Nadeln) mit der umliegenden gereinigten Flaeche fuellen, damit keine Loecher bleiben
+        { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1; const fill = dil(mm, 14);
+          for (let q = 0; q < NP; q++) if (skip[q] && fill[q] && d[q * 4 + 3] > 200 && !mm[q]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
