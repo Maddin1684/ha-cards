@@ -1,4 +1,4 @@
-// wetter-karte-card v1.1 (27.11.2026: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.2 (27.11.2026: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -10,7 +10,7 @@
     entity: 'weather.weather_fusion_ai_elm', icons_path: '/local/wettericons', sun: 'sun.sun',
     temperature_entity: 'sensor.wohnen_wohnen_wohnen_aussen_temperature',
     dwd_entity: 'sensor.stadt_schluchtern_aktuelle_warnstufe', dwd_advance_entity: 'sensor.stadt_schluchtern_vorwarnstufe',
-    nina_match: 'warning_schluchtern_stadt_main_kinzig_kreis_hessen_', title: 'Wetter Elm', forecast_style: 'zeilen', hours: 6, days: 7, test: false,
+    nina_match: 'warning_schluchtern_stadt_main_kinzig_kreis_hessen_', title: 'Wetter Elm', forecast_style: 'linie', hours: 5, days: 7, test: false,
   };
   // Farbschwellen wie Aussentemperatur-Grafik (statistics-graph-chart-card)
   const TH = [[-10, [140, 52, 253]], [-5, [140, 52, 253]], [2, [10, 132, 255]], [5, [66, 245, 227]], [10, [121, 210, 179]], [14, [48, 209, 88]], [19, [255, 214, 10]], [30, [255, 99, 0]], [35, [255, 69, 58]]];
@@ -58,7 +58,7 @@
     .cloud.flash { animation-name:wk-cloud-drift, wk-cloud-flash; animation-timing-function:linear, ease-out; }
     @keyframes wk-cloud-drift { 0% { left:var(--start-left,-45%); opacity:0; } 16% { opacity:var(--cloud-opacity,.35); } 93% { opacity:var(--cloud-opacity,.35); } 100% { left:var(--end-left,96%); opacity:0; } }
     @keyframes wk-cloud-flash { 0% { filter:blur(1.8px) brightness(1); } 2% { filter:blur(1.8px) brightness(5); } 4% { filter:blur(1.8px) brightness(1.5); } 6% { filter:blur(1.8px) brightness(4.2); } 9%, 100% { filter:blur(1.8px) brightness(1); } }
-    .rain-drop { z-index:2; top:-6%; background:linear-gradient(to bottom, rgba(150,205,255,.95), rgba(190,230,255,var(--drop-alpha,1))); box-shadow:0 0 1.5px rgba(200,235,255,var(--glow-alpha,1)), 0 0 5px rgba(90,180,255,var(--glow-alpha,1));
+    .rain-drop { z-index:2; top:-6%; background:linear-gradient(to bottom, rgba(150,205,255,.95), rgba(190,230,255,var(--drop-alpha,1))); box-shadow:0 0 1px rgba(200,235,255,calc(var(--glow-alpha,1) * .6)), 0 0 3px rgba(90,180,255,calc(var(--glow-alpha,1) * .35));
       animation-name:wk-rain; animation-timing-function:linear; animation-iteration-count:infinite; will-change:transform, opacity; backface-visibility:hidden; }
     @keyframes wk-rain { 0% { transform:translateY(0); opacity:0; } 10% { opacity:1; } 90% { opacity:.9; } 97% { opacity:.5; } 100% { transform:translateY(var(--fall,130px)); opacity:0; } }
     .snow-flake { z-index:2; top:-4%; border-radius:50%; background:rgba(255,255,255,.85); box-shadow:0 0 2px rgba(255,255,255,.55);
@@ -73,6 +73,16 @@
       box-shadow:0 0 5px 1px rgba(255,255,255,.95), 0 0 7px 3px rgba(255,205,100,.6), 0 0 12px 5px rgba(255,170,60,.32), 0 0 19px 7px rgba(255,150,40,.15); animation:wk-sun-pulse 2.2s ease-in-out infinite; }
     .sun-glow::before { content:""; position:absolute; inset:-260%; border-radius:50%; background:repeating-conic-gradient(rgba(255,222,160,.16) 0deg 2deg, rgba(255,222,160,0) 2deg 14deg); filter:blur(2px); animation:wk-sun-rays 55s linear infinite; }
     .sun-glow.gold { background:radial-gradient(circle, #fff5ee 0%, #ffb494 45%, #ff7a5c 100%); box-shadow:0 0 5px 1px rgba(255,238,228,.95), 0 0 7px 3px rgba(255,130,100,.65), 0 0 12px 5px rgba(240,90,70,.38), 0 0 19px 7px rgba(220,70,60,.18); }
+    .sun-light { z-index:0; left:-30%; top:-90%; width:120%; height:220%; background:radial-gradient(closest-side, rgba(255,214,120,.22), rgba(255,214,120,.08) 45%, rgba(255,214,120,0) 100%); }
+    .sun-light.gold { background:radial-gradient(closest-side, rgba(255,140,90,.3), rgba(255,120,80,.1) 45%, rgba(255,120,80,0) 100%); }
+    .sun-rays { z-index:0; left:-260px; top:-260px; width:560px; height:560px; border-radius:50%; background:repeating-conic-gradient(from 0deg, rgba(255,226,160,.13) 0deg 3deg, rgba(255,226,160,0) 3deg 15deg);
+      -webkit-mask-image:radial-gradient(circle, transparent 8%, #000 14%, rgba(0,0,0,.55) 40%, transparent 70%); mask-image:radial-gradient(circle, transparent 8%, #000 14%, rgba(0,0,0,.55) 40%, transparent 70%);
+      filter:blur(1.5px); animation:wk-sun-rays 90s linear infinite, wk-sun-breathe 7s ease-in-out infinite; }
+    .sun-rays.gold { background:repeating-conic-gradient(from 0deg, rgba(255,150,100,.16) 0deg 3deg, rgba(255,150,100,0) 3deg 15deg); }
+    @keyframes wk-sun-breathe { 0%, 100% { opacity:.75; } 50% { opacity:1; } }
+    .sun-sweep { z-index:0; top:-30%; height:160%; left:0; width:30%; background:linear-gradient(90deg, rgba(255,240,200,0), rgba(255,240,200,.12), rgba(255,240,200,0)); animation:wk-sun-sweep 14s linear infinite; will-change:transform; }
+    .sun-sweep.gold { background:linear-gradient(90deg, rgba(255,170,120,0), rgba(255,170,120,.14), rgba(255,170,120,0)); }
+    @keyframes wk-sun-sweep { 0% { transform:translateX(-130%) skewX(-25deg); } 45%, 100% { transform:translateX(420%) skewX(-25deg); } }
     .sun-halo { z-index:0; border-radius:50%; background:radial-gradient(circle, rgba(255,150,170,.4) 0%, rgba(255,150,170,.15) 55%, transparent 75%); }
     @keyframes wk-sun-pulse { 0%, 100% { transform:scale(1); opacity:.92; } 50% { transform:scale(1.1); opacity:1; } }
     @keyframes wk-sun-rays { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
@@ -82,8 +92,8 @@
     @keyframes wk-fog { 0% { transform:translateX(-4%) scaleX(1) scaleY(.96); opacity:calc(var(--fog-opacity,.15) * .62); } 50% { transform:translateX(4%) scaleX(1.06) scaleY(1.04); opacity:var(--fog-opacity,.15); } 100% { transform:translateX(-4%) scaleX(1) scaleY(.96); opacity:calc(var(--fog-opacity,.15) * .62); } }
 
     .now { position:absolute; inset:0; z-index:3; display:flex; align-items:center; padding:0 12px; gap:10px; }
-    .cur { flex:0 0 88px; display:flex; flex-direction:column; align-items:center; }
-    .cur img, .cur ha-icon { width:54px; height:54px; --mdc-icon-size:50px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .cur { flex:0 0 96px; display:flex; flex-direction:column; align-items:center; }
+    .cur img, .cur ha-icon { width:68px; height:68px; --mdc-icon-size:62px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
     .cur .cn { font-size:14px; line-height:1.2; margin-top:2px; color:var(--primary-text-color); text-align:center; }
     .sep { width:.5px; align-self:stretch; margin:18px 0; background:rgba(255,255,255,.15); }
     .hrs { flex:1; min-width:0; display:flex; justify-content:space-between; }
@@ -121,30 +131,30 @@
     .w.op .ds > div { padding-top:6px; padding-bottom:2px; }
     .w .ds b { font-weight:400; color:var(--secondary-text-color); }
     .w.adv { opacity:.7; }
-    .dr { display:grid; grid-template-columns:44px 28px 56px 30px minmax(0,1fr) 32px; align-items:center; height:34px; font-size:14px; border-top:.5px solid var(--divider-color, rgba(84,84,88,.45)); font-variant-numeric:tabular-nums; }
-    .dr:first-child { border-top:0; }
-    .dr .d { color:var(--primary-text-color); }
-    .dr .d.n { color:${C.orange}; }
-    .dr img, .dr ha-icon { width:24px; height:24px; --mdc-icon-size:22px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
-    .pr { font-size:12px; color:var(--secondary-text-color); display:flex; align-items:center; gap:4px; white-space:nowrap; }
-    .pr.wet { color:${C.teal}; }
-    .pr .k { position:relative; width:4px; height:14px; border-radius:2px; background:rgba(10,132,255,.22); overflow:hidden; flex:none; }
-    .pr .k i { position:absolute; left:0; right:0; bottom:0; background:${C.blue}; }
-    .pr .k.s { background:rgba(255,255,255,.2); } .pr .k.s i { background:#fff; }
-    .lo { color:var(--secondary-text-color); text-align:right; padding-right:8px; }
-    .hi { text-align:right; color:var(--primary-text-color); }
-    .tr { position:relative; height:5px; border-radius:3px; background:rgba(118,118,128,.16); }
-    .tr i { position:absolute; top:0; bottom:0; border-radius:3px; }
-    .tr b { position:absolute; top:-2px; width:9px; height:9px; margin-left:-4.5px; border-radius:50%; background:#fff; box-shadow:0 0 0 1.5px var(--ha-card-background, var(--card-background-color, #1c1c1e)); }
-    .lg { font-size:11px; color:var(--secondary-text-color); display:flex; gap:10px; align-items:center; margin:6px 0 8px; }
-    .lg span { display:flex; align-items:center; gap:4px; }
-    .lg i { width:4px; height:10px; border-radius:2px; display:inline-block; }
-    .bc { display:grid; text-align:center; font-size:12px; font-variant-numeric:tabular-nums; }
-    .bc .d { color:var(--secondary-text-color); }
-    .bc .d.n { color:${C.orange}; }
-    .bc img, .bc ha-icon { width:24px; height:24px; --mdc-icon-size:22px; margin:2px auto 0; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
-    .bc .pv { font-size:11px; color:var(--secondary-text-color); }
-    .bc .pv.wet { color:${C.teal}; }
+    .cg { display:grid; text-align:center; font-variant-numeric:tabular-nums; }
+    .cc { display:flex; flex-direction:column; align-items:center; min-width:0; }
+    .cg .d { font-size:15px; color:var(--primary-text-color); }
+    .cg .d.n { color:${C.orange}; }
+    .cg img, .cg .cc > ha-icon:not([icon="mdi:navigation"]) { width:34px; height:34px; --mdc-icon-size:30px; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
+    .ca { position:relative; margin:2px 0 0; }
+    .ca .sp { position:absolute; top:4px; bottom:4px; border-left:1px dashed rgba(255,255,255,.14); }
+    .ca .z0 { position:absolute; left:0; right:0; border-top:1px dashed rgba(100,210,255,.28); }
+    .ca .z0l { position:absolute; left:0; font-size:9px; color:rgba(100,210,255,.6); }
+    .ca .pt { position:absolute; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; }
+    .ca .bar { position:absolute; width:9px; margin-left:-4.5px; border-radius:5px; }
+    .ca .tn { position:absolute; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:#fff; box-shadow:0 0 0 2px var(--ha-card-background, var(--card-background-color, #1c1c1e)); }
+    .ca .vh, .ca .vl { position:absolute; transform:translateX(-50%); font-size:13px; line-height:14px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .ca .vh { color:var(--primary-text-color); }
+    .ca .vl { color:var(--secondary-text-color); }
+    .cg.pr { margin-top:2px; }
+    .cg .pb { height:12px; width:62%; display:flex; align-items:flex-end; }
+    .cg .pb span { display:block; width:100%; border-radius:2px; }
+    .cg .pv { font-size:12px; margin-top:3px; color:var(--secondary-text-color); white-space:nowrap; }
+    .cg .pv.wet { color:${C.teal}; }
+    .cg.wd { margin:6px 0 10px; }
+    .cg.wd .cc { flex-direction:row; justify-content:center; gap:2px; font-size:12px; color:var(--secondary-text-color); white-space:nowrap; }
+    .cg.wd ha-icon { --mdc-icon-size:13px; width:13px; height:13px; display:flex; }
+    .cg.wd small { font-size:10px; }
     .bsvg { display:block; width:100%; }
     .err { padding:10px 16px; font-size:12px; color:${C.red}; }
   `;
@@ -286,15 +296,11 @@
       if (key !== this._fxKey) { this._fxKey = key; const e = this._root.getElementById('fx'); if (e) e.innerHTML = this._fxHtml(c, night, el); }
       this._set('cur', `${this._img(c)}<div class="cn">${esc(NAMES[c] || c)}</div>`);
       // naechste Stunden
-      const hf = (this._fc.hourly || []).filter((x) => Date.parse(x.datetime) > Date.now() - 1800000).slice(0, Math.max(3, num(this._c.hours, 6)));
-      let hrs = '';
-      if (hf.length) {
-        const n = Math.max(3, Math.min(hf.length, num(this._c.hours, 6)));
-        hrs = hf.slice(0, n).map((x, i) => {
-          const d = new Date(x.datetime), hc = this._cond(x.condition, this._isNightAt(d)), p = Math.round(num(x.precipitation_probability));
-          return `<div class="h"><span class="t${i === 0 ? ' n' : ''}">${i === 0 ? 'Jetzt' : String(d.getHours()).padStart(2, '0')}</span>${this._img(i === 0 && this._test !== 'live' ? c : hc)}<span class="p${p >= 30 ? ' wet' : ''}">${p} %</span></div>`;
-        }).join('');
-      }
+      const hf = (this._fc.hourly || []).filter((x) => Date.parse(x.datetime) > Date.now()).slice(0, Math.max(3, num(this._c.hours, 5)));
+      const hrs = hf.map((x) => {
+        const d = new Date(x.datetime), hc = this._cond(x.condition, this._isNightAt(d)), p = Math.round(num(x.precipitation_probability));
+        return `<div class="h"><span class="t">${d.getHours()} Uhr</span>${this._img(hc)}<span class="p${p >= 30 ? ' wet' : ''}">${p} %</span></div>`;
+      }).join('');
       this._set('hrs', hrs);
     }
 
@@ -386,55 +392,52 @@
         const pr = num(x.precipitation);
         const snowDay = /snowy/.test(x.condition || '') || (have ? (tot > 0.05 && sn / tot >= 0.5) : num(x.temperature, 9) <= 0);
         const snowFrac = have && tot > 0 ? sn / tot : (snowDay ? 1 : 0);
-        return { d, i, cond: x.condition, hi: num(x.temperature), lo: num(x.templow, num(x.temperature) - 3), pr, pp: Math.round(num(x.precipitation_probability)), snow: snowDay && pr >= 0.05, cm: pr * snowFrac };
+        return { ws: num(x.wind_speed, NaN), wb: num(x.wind_bearing, NaN), d, i, cond: x.condition, hi: num(x.temperature), lo: num(x.templow, num(x.temperature) - 3), pr, pp: Math.round(num(x.precipitation_probability)), snow: snowDay && pr >= 0.05, cm: pr * snowFrac };
       });
     }
     _fcast(we) {
       const D = this._days(we);
       if (!D.length) { this._set('fl', `<div class="lg">Vorhersage wird geladen …</div>`); this._set('ffx', ''); return; }
-      const style = /balken|linie/.test(this._c.forecast_style || '') ? 'linie' : 'zeilen';
+      const style = /balken|zeilen/.test(this._c.forecast_style || '') ? 'balken' : 'linie';
       this._set('ffx', this._open.fc === 'zu' ? 'Anzeigen' : 'Einklappen');
       const tNow = this._c.temperature_entity && this._hass.states[this._c.temperature_entity] ? num(this._hass.states[this._c.temperature_entity].state, num(we.attributes.temperature)) : num(we.attributes.temperature);
-      this._set('fl', style === 'linie' ? this._line(D, tNow) : this._rows(D, tNow));
+      this._set('fl', this._chart(D, tNow, style));
     }
     _dayName(x) { return x.i === 0 && sameDay(x.d, new Date()) ? 'Heute' : WD[x.d.getDay()]; }
-    _rows(D, tNow) {
-      const lo = Math.min(...D.map((x) => x.lo), tNow), hi = Math.max(...D.map((x) => x.hi), tNow), sp = Math.max(1, hi - lo);
+    _chart(D, tNow, mode) {
+      const n = D.length, CH = 118, PT = 24, PB = 24, lo = Math.min(...D.map((x) => x.lo)), hi = Math.max(...D.map((x) => x.hi));
+      const y = (v) => PT + (hi - v) / Math.max(1, hi - lo) * (CH - PT - PB), X = (i) => (i + 0.5) / n * 100;
+      const col = `grid-template-columns:repeat(${n},minmax(0,1fr))`, today0 = this._dayName(D[0]) === 'Heute';
       const pMax = Math.max(2, ...D.map((x) => x.pr));
-      const anySnow = D.some((x) => x.snow);
-      return D.map((x) => {
-        const l = (x.lo - lo) / sp * 100, w = Math.max(4, (x.hi - x.lo) / sp * 100);
-        const g = `linear-gradient(90deg,${tc(x.lo)},${tc((x.lo + x.hi) / 2)},${tc(x.hi)})`;
-        const today = this._dayName(x) === 'Heute';
-        const v = x.snow ? `ca. ${dc(Math.max(0.1, x.cm))}` : dc(x.pr), f = Math.max(12, Math.min(100, x.pr / pMax * 100));
-        return `<div class="dr"><span class="d${today ? ' n' : ''}">${this._dayName(x)}</span>${this._img(x.cond)}
-          <span class="pr${x.pr >= 0.5 ? ' wet' : ''}"><span class="k${x.snow ? ' s' : ''}"><i style="height:${x.pr > 0.04 ? f : 0}%"></i></span>${v}</span>
-          <span class="lo">${r0(x.lo)}°</span><span class="tr"><i style="left:${l}%;width:${Math.min(100 - l, w)}%;background:${g}"></i>${today ? `<b style="left:${Math.max(0, Math.min(100, (tNow - lo) / sp * 100))}%"></b>` : ''}</span><span class="hi">${r0(x.hi)}°</span></div>`;
-      }).join('') + `<div class="lg"><span><i style="background:${C.blue}"></i>Regen in mm</span>${anySnow ? `<span><i style="background:#fff"></i>Schnee in cm</span>` : ''}</div>`;
-    }
-    _line(D, tNow) {
-      const n = D.length, W = 340, Hh = 96, lo = Math.min(...D.map((x) => x.lo)), hi = Math.max(...D.map((x) => x.hi));
-      const y = (v) => 18 + (hi - v) / Math.max(1, hi - lo) * (Hh - 36), cx = (i) => (i + 0.5) * W / n;
-      const pMax = Math.max(2, ...D.map((x) => x.pr)), anySnow = D.some((x) => x.snow);
-      const col = `grid-template-columns:repeat(${n},minmax(0,1fr))`;
-      const path = (k) => { let d = `M${cx(0)},${y(D[0][k])}`; for (let i = 1; i < n; i++) { const x0 = cx(i - 1), x1 = cx(i), y0 = y(D[i - 1][k]), y1 = y(D[i][k]), m = (x1 - x0) / 2; d += ` C${x0 + m},${y0} ${x1 - m},${y1} ${x1},${y1}`; } return d; };
-      let s = `<div class="bc" style="${col}">${D.map((x) => `<div><div class="d${this._dayName(x) === 'Heute' ? ' n' : ''}">${this._dayName(x)}</div>${this._img(x.cond)}</div>`).join('')}</div>`;
-      s += `<svg class="bsvg" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" style="height:${Hh}px;overflow:visible"><defs><linearGradient id="wkg" x1="0" y1="${y(hi)}" x2="0" y2="${y(lo)}" gradientUnits="userSpaceOnUse">${[0, 0.25, 0.5, 0.75, 1].map((k) => `<stop offset="${k}" stop-color="${tc(hi - (hi - lo) * k)}"/>`).join('')}</linearGradient></defs>`;
-      s += `<path d="${path('hi')}" fill="none" stroke="url(#wkg)" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`;
-      s += `<path d="${path('lo')}" fill="none" stroke="url(#wkg)" stroke-width="2.5" stroke-linecap="round" stroke-opacity=".6" vector-effect="non-scaling-stroke"/>`;
-      s += `</svg>`;
-      // Punkte und Werte als HTML (nicht verzerrt)
-      s += `<div style="position:relative;height:0">${D.map((x, i) => {
-        const l = (cx(i) / W * 100).toFixed(2);
-        return `<span style="position:absolute;left:${l}%;top:${(y(x.hi) - Hh).toFixed(1)}px;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:${tc(x.hi)}"></span>`
-          + `<span style="position:absolute;left:${l}%;top:${(y(x.lo) - Hh).toFixed(1)}px;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:${tc(x.lo)};opacity:.8"></span>`
-          + `<span style="position:absolute;left:${l}%;top:${(y(x.hi) - Hh - 20).toFixed(1)}px;transform:translateX(-50%);font-size:12px;color:var(--primary-text-color);font-variant-numeric:tabular-nums">${r0(x.hi)}°</span>`
-          + `<span style="position:absolute;left:${l}%;top:${(y(x.lo) - Hh + 6).toFixed(1)}px;transform:translateX(-50%);font-size:12px;color:var(--secondary-text-color);font-variant-numeric:tabular-nums">${r0(x.lo)}°</span>`;
+      const wc = (v) => (v <= 28 ? C.green : v <= 61 ? C.yellow : v <= 117 ? C.red : C.purple);
+      // Kopf: Tag + Icon
+      let s = `<div class="cg" style="${col}">${D.map((x) => `<div class="cc"><div class="d${this._dayName(x) === 'Heute' ? ' n' : ''}">${this._dayName(x)}</div>${this._img(x.cond)}</div>`).join('')}</div>`;
+      // Diagramm
+      s += `<div class="ca" style="height:${CH}px">`;
+      for (let i = 1; i < n; i++) s += `<i class="sp" style="left:${(i / n * 100).toFixed(2)}%"></i>`;
+      if (lo < 0 && hi > 0) s += `<i class="z0" style="top:${y(0).toFixed(1)}px"></i><span class="z0l" style="top:${(y(0) - 7).toFixed(1)}px">0°</span>`;
+      if (mode === 'linie') {
+        const path = (k) => { let d = `M${X(0)},${y(D[0][k])}`; for (let i = 1; i < n; i++) { const x0 = X(i - 1), x1 = X(i), y0 = y(D[i - 1][k]), y1 = y(D[i][k]), m = (x1 - x0) / 2; d += ` C${x0 + m},${y0} ${x1 - m},${y1} ${x1},${y1}`; } return d; };
+        s += `<svg viewBox="0 0 100 ${CH}" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"><defs><linearGradient id="wkg" x1="0" y1="${y(hi)}" x2="0" y2="${y(lo)}" gradientUnits="userSpaceOnUse">${[0, 0.25, 0.5, 0.75, 1].map((k) => `<stop offset="${k}" stop-color="${tc(hi - (hi - lo) * k)}"/>`).join('')}</linearGradient></defs>
+          <path d="${path('hi')}" fill="none" stroke="url(#wkg)" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+          <path d="${path('lo')}" fill="none" stroke="url(#wkg)" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/></svg>`;
+        D.forEach((x, i) => { s += `<b class="pt" style="left:${X(i)}%;top:${y(x.hi).toFixed(1)}px;background:${tc(x.hi)}"></b><b class="pt" style="left:${X(i)}%;top:${y(x.lo).toFixed(1)}px;background:${tc(x.lo)}"></b>`; });
+      } else {
+        D.forEach((x, i) => {
+          const t = y(x.hi), b = y(x.lo), h = Math.max(8, b - t);
+          s += `<b class="bar" style="left:${X(i)}%;top:${t.toFixed(1)}px;height:${h.toFixed(1)}px;background:linear-gradient(180deg,${tc(x.hi)},${tc((x.hi + x.lo) / 2)},${tc(x.lo)})"></b>`;
+          if (i === 0 && today0) s += `<b class="tn" style="left:${X(i)}%;top:${y(Math.max(lo, Math.min(hi, tNow))).toFixed(1)}px"></b>`;
+        });
+      }
+      D.forEach((x, i) => { s += `<span class="vh" style="left:${X(i)}%;top:${(y(x.hi) - 21).toFixed(1)}px">${r0(x.hi)}°</span><span class="vl" style="left:${X(i)}%;top:${(y(x.lo) + 7).toFixed(1)}px">${r0(x.lo)}°</span>`; });
+      s += `</div>`;
+      // Niederschlag
+      s += `<div class="cg pr" style="${col}">${D.map((x) => {
+        const h = x.pr > 0.04 ? Math.max(3, x.pr / pMax * 12) : 0, c = x.snow ? 'rgba(255,255,255,.85)' : x.pr >= 0.5 ? C.blue : 'rgba(10,132,255,.55)';
+        return `<div class="cc"><div class="pb"><span style="height:${h.toFixed(1)}px;background:${c}"></span></div><div class="pv${x.pr >= 0.5 ? ' wet' : ''}">${x.snow ? dc(Math.max(0.1, x.cm)) + ' cm' : dc(x.pr) + ' mm'}</div></div>`;
       }).join('')}</div>`;
-      s += `<div class="bc" style="${col};border-top:.5px solid var(--divider-color, rgba(84,84,88,.45));padding-top:6px;margin-top:4px">${D.map((x) => {
-        const h = x.pr > 0.04 ? Math.max(2, x.pr / pMax * 16) : 0, c = x.snow ? '#fff' : (x.pr >= 0.5 ? C.blue : 'rgba(10,132,255,.5)');
-        return `<div><div style="height:16px;display:flex;align-items:flex-end;justify-content:center"><span style="width:14px;height:${h}px;border-radius:3px 3px 1px 1px;background:${c}"></span></div><div class="pv${x.pr >= 0.5 ? ' wet' : ''}">${x.snow ? dc(Math.max(0.1, x.cm)) : dc(x.pr)}</div></div>`;
-      }).join('')}</div><div class="lg"><span><i style="background:${C.blue}"></i>Regen in mm</span>${anySnow ? `<span><i style="background:#fff"></i>Schnee in cm</span>` : ''}</div>`;
+      // Wind
+      s += `<div class="cg wd" style="${col}">${D.map((x) => isNaN(x.ws) ? '<div class="cc"></div>' : `<div class="cc"><ha-icon icon="mdi:navigation" style="color:${wc(x.ws)};transform:rotate(${isNaN(x.wb) ? 0 : Math.round(x.wb + 180)}deg)"></ha-icon><span>${Math.round(x.ws)} <small>km/h</small></span></div>`).join('')}</div>`;
       return s;
     }
 
@@ -457,8 +460,7 @@
       }
       if (sun) {
         const gold = el < 10;
-        if (gold) h += `<div class="sun-halo" style="left:-2px;top:-10px;width:50px;height:50px"></div>`;
-        h += `<div class="sun-glow${gold ? ' gold' : ''}" style="left:14px;top:${gold ? 14 : 10}px"></div>`;
+        h += `<div class="sun-light${gold ? ' gold' : ''}"></div><div class="sun-rays${gold ? ' gold' : ''}" style="animation-delay:${neg(90)}s, ${neg(7)}s"></div><div class="sun-sweep${gold ? ' gold' : ''}" style="animation-delay:${neg(14)}s"></div>`;
       }
       if (showClouds) {
         const stormy = rain || snow, n = partly && !stormy ? 4 : stormy ? 8 : 6, dark = Math.floor(R() * n), stag = 31.5 / n;
@@ -477,8 +479,8 @@
         const n = c === 'pouring' || storm ? 34 : 24, gap = 108 / n; let cur = -4;
         for (let i = 0; i < n; i++) {
           cur += gap * (0.45 + R() * 1.1);
-          const d = (c === 'pouring' || storm ? 0.42 : 0.6) + R() * 0.12, len = (6 + R() * 3).toFixed(1);
-          h += `<div class="rain-drop" style="left:${cur.toFixed(1)}%;width:1px;height:${len}px;--fall:${fall}px;--drop-alpha:${(0.75 + R() * 0.25).toFixed(2)};--glow-alpha:${(0.55 + R() * 0.4).toFixed(2)};animation-duration:${d.toFixed(2)}s;animation-delay:${neg(d, i * 0.37)}s"></div>`;
+          const d = (c === 'pouring' || storm ? 0.42 : 0.6) + R() * 0.12, len = (4.5 + R() * 2.5).toFixed(1);
+          h += `<div class="rain-drop" style="left:${cur.toFixed(1)}%;width:.6px;height:${len}px;--fall:${fall}px;--drop-alpha:${(0.75 + R() * 0.25).toFixed(2)};--glow-alpha:${(0.55 + R() * 0.4).toFixed(2)};animation-duration:${d.toFixed(2)}s;animation-delay:${neg(d, i * 0.37)}s"></div>`;
         }
       }
       if (snow) {
