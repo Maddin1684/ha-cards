@@ -1,4 +1,5 @@
-// sauger-karte-card v2.9 (27.11.2026, Wunsch Martin): am Tag einer erfolgreichen Reinigung gruener Kasten mit Zusammenfassung (Uhrzeit von–bis, Flaeche, Dauer, CleanGenius, nicht erreichte Raeume mit Grund).
+// sauger-karte-card v3.0 (27.11.2026, Wunsch Martin): Reinigungsspur genauer – gereinigte Flaeche je Raum ueber dessen Grundfarbe erkannt (auch gelbe Raeume wie Esszimmer/Spielzimmer), Beschriftungen und Nadeln exakt ausmaskiert statt grosser Kaesten; Bereiche per Konfig 'ausblenden' entfernbar (Terrasse); Hindernis-Pille oeffnet scrollbare Galerie (Foto, was erkannt wurde, Raum, Trefferquote); grosse Partikel mit Staub-Symbol in Apple-Gelb.
+// v2.9 (27.11.2026, Wunsch Martin): am Tag einer erfolgreichen Reinigung gruener Kasten mit Zusammenfassung (Uhrzeit von–bis, Flaeche, Dauer, CleanGenius, nicht erreichte Raeume mit Grund).
 // v2.8 (26.11.2026, Wunsch Martin): Pillen Modus/Akku/Hindernisse gleich gross wie die Kopf-Pillen (13 px, 30 px hoch, Symbol 16 px).
 // v2.7 (26.11.2026, Wunsch Martin): Steuerung als Pille oben rechts wie Beleuchtung/Rollos – Alle reinigen (gruenes Sauger-Symbol), waehrend der Reinigung Pausieren (gelb) und Zur Station (rot), pausiert Fortsetzen (gruen); Akku als Pille neben dem Reinigungsmodus.
 // v2.6 (26.11.2026): Karte erscheint auch, wenn die Integration die Kalibrierung verworfen hat (wird je Karte gemerkt; sonst Bild abrufen, damit sie neu gemeldet wird).
@@ -28,7 +29,7 @@
   const C = { green: '#30d158', yellow: '#ffd60a', orange: '#ff9f0a', red: '#ff453a', purple: '#bf5af2', blue: '#0a84ff', teal: '#64d2ff', pink: '#ff375f' };
   const SELC = '#f56300'; // ausgewaehlte Raeume (Martins Orange)
   const ROOMC = [C.green, C.blue, C.yellow, C.teal, C.orange, C.purple, C.pink, C.red]; // nach Reinigungsreihenfolge (order)
-  const OBST = [[/stecker|kabel|cable|wire/i, 'mdi:power-socket-eu'], [/textil|socke|sock|kleid|cloth/i, 'mdi:tshirt-crew-outline'], [/schuh|shoe/i, 'mdi:shoe-sneaker'],
+  const OBST = [[/partikel|particle|dust|krümel/i, 'mdi:grain'], [/stecker|kabel|cable|wire/i, 'mdi:power-socket-eu'], [/textil|socke|sock|kleid|cloth/i, 'mdi:tshirt-crew-outline'], [/schuh|shoe/i, 'mdi:shoe-sneaker'],
     [/basis|möbel|fuß|base|furniture/i, 'mdi:table-furniture'], [/kot|poop|exkrement/i, 'mdi:emoticon-poop-outline'], [/haustier|pet|hund|katze/i, 'mdi:paw'], [/waage|scale/i, 'mdi:scale-bathroom'], [/.*/, 'mdi:alert-outline']];
   const STATE = { docked: 'Angedockt', cleaning: 'Reinigt', returning: 'Fährt zur Basis', paused: 'Pausiert', idle: 'Bereit', error: 'Fehler' };
   const MODE = { 'Sweeping': 'Saugen', 'Mopping': 'Wischen', 'Sweeping and mopping': 'Saugen + Wischen', 'Mopping after sweeping': 'Erst saugen, dann wischen' };
@@ -88,6 +89,19 @@
     .pin { position:absolute; transform:translate(-50%,-50%); height:16px; padding:0 5px; border-radius:999px; background:rgba(255,69,58,.2); color:${C.red}; border:0; display:flex; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .pin::before { content:''; position:absolute; inset:-8px -6px; }
     .pin ha-icon { --mdc-icon-size:11px; display:flex; }
+    .pin.gy { background:rgba(255,214,10,.22); color:${C.yellow}; }
+    .og { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; margin:-4px 0 0; }
+    .og.on { grid-template-rows:1fr; margin-bottom:10px; }
+    .og > div { overflow:hidden; min-height:0; }
+    .ogs { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding:2px 0; }
+    .ogs::-webkit-scrollbar { display:none; }
+    .ogt { flex:0 0 132px; border:0; padding:0; background:rgba(118,118,128,.12); border-radius:12px; overflow:hidden; text-align:left; font:inherit; color:var(--primary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .ogt .im { height:88px; background:rgba(118,118,128,.3) center/cover no-repeat; display:flex; align-items:center; justify-content:center; color:#8e8e93; }
+    .ogt .im ha-icon { --mdc-icon-size:30px; }
+    .ogt .tx { padding:6px 8px 8px; }
+    .ogt b { display:flex; align-items:center; gap:4px; font-size:12px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ogt b ha-icon { --mdc-icon-size:13px; flex:0 0 13px; display:flex; }
+    .ogt span { display:block; font-size:11px; color:var(--secondary-text-color); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .msg { font-size:12px; color:var(--secondary-text-color); padding:24px 0; text-align:center; }
     .lb { position:absolute; inset:0; background:rgba(0,0,0,.62); border-radius:12px; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; z-index:5; }
     .lb.on { opacity:1; pointer-events:auto; }
@@ -125,12 +139,12 @@
       if (!this.shadowRoot) {
         const r = this.attachShadow({ mode: 'open' });
         r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"><div class="ttl"></div><span class="hb"></span></div>
-          <div class="fl"></div><div class="tiles"></div><div class="chips"></div><div class="mw"><div class="msg">Karte wird geladen …</div></div><div class="ft"><span class="sel"></span><span class="acts"></span></div></ha-card>`;
+          <div class="fl"></div><div class="tiles"></div><div class="chips"></div><div class="og"><div><div class="ogs"></div></div></div><div class="mw"><div class="msg">Karte wird geladen …</div></div><div class="ft"><span class="sel"></span><span class="acts"></span></div></ha-card>`;
         r.querySelector('ha-card').addEventListener('click', (e) => this._click(e));
       }
       if (!v || !m) { this.shadowRoot.querySelector('.mw').innerHTML = '<div class="msg">Sauger oder Karte nicht gefunden</div>'; return; }
       const A = m.attributes || {}, V = v.attributes || {};
-      const mapKey = (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : (this._calKey(A) || ''));
+      const mapKey = JSON.stringify(this._c.ausblenden || []) + '|' + (A.map_id || '') + '|' + JSON.stringify(A.rooms || {}) + '|' + (A.calibration_points ? JSON.stringify(A.calibration_points) : (this._calKey(A) || ''));
       if (mapKey !== this._mapKey && !this._busy) this._loadMap(A, mapKey);
       this._head(v, V, A);
       if (this._geo) { this._overlay(v, V, A); if (m.state + A.entity_picture !== this._trKey && !this._trBusy && !this._busy) this._loadTrail(A, m.state + A.entity_picture); }
@@ -147,8 +161,13 @@
       const batChip = b != null ? `<span class="chip"><ha-icon icon="${V.charging ? 'mdi:battery-charging' : 'mdi:battery'}" style="color:${bc}"></ha-icon>${b} %</span>` : '';
       this._tiles(v, V);
       const obs = this._obstacles(A).length;
-      set('.chips', (obs ? `<span class="chip"><ha-icon icon="mdi:alert-outline" style="color:${C.red}"></ha-icon>${obs} Hindernis${obs === 1 ? '' : 'se'}</span>` : '') +
+      const OL = this._obstacles(A);
+      set('.chips', (obs ? `<button class="chip btnc" data-og="1"><ha-icon icon="mdi:alert-outline" style="color:${C.red}"></ha-icon>${obs} Hindernis${obs === 1 ? '' : 'se'}<ha-icon icon="mdi:chevron-${this._og ? 'up' : 'down'}" style="--mdc-icon-size:14px;opacity:.6"></ha-icon></button>` : '') +
         this._modeChip(V) + batChip);
+      // Galerie aller Hindernisse (nach Raum sortiert): Foto, was erkannt wurde, wo, Trefferquote
+      const ogEl = r.querySelector('.og'); if (ogEl) { ogEl.classList.toggle('on', !!this._og && obs > 0);
+        set('.ogs', obs && this._og ? OL.slice().sort((a, b) => String(a.room).localeCompare(String(b.room)) || (+a.id - +b.id)).map((o) => `<button class="ogt" data-obs="${o.id}"><div class="im"${o.pic ? ` style="background-image:url('${esc(o.pic)}')"` : ''}>${o.pic ? '' : `<ha-icon icon="${o.icon}"></ha-icon>`}</div>
+          <div class="tx"><b><ha-icon icon="${o.icon}" style="color:${o.gelb ? C.yellow : C.red}"></ha-icon>${esc(o.type)}</b><span>${esc([o.room, o.p != null ? o.p + ' %' : ''].filter(Boolean).join(' · '))}</span></div></button>`).join('') : ''); }
       const n = this._sel.size;
       set('.sel', n ? esc([...this._sel].map((id) => this._roomName(id, A)).join(', ')) : (run ? '' : 'Räume antippen zum Auswählen'));
       // v2.7: Steuerung als Pillen oben rechts wie Beleuchtung/Rollos (Sauger-Symbol gruen = reinigen, gelb = pausieren, rot = zur Station)
@@ -222,7 +241,7 @@
       const O = A.obstacles || {}, P = A.obstacle_picture || {};
       const live = Object.keys(O).filter((k) => O[k].possibility != null && O[k].ignore_status !== 'Ignored').map((k) => {
         const o = O[k], pk = Object.keys(P).find((p) => p.split(':')[0].trim() === k);
-        return { id: k, x: o.x, y: o.y, type: o.type || 'Hindernis', p: o.possibility, room: o.room || '', pic: pk ? P[pk] : '', icon: OBST.find(([re]) => re.test(o.type || ''))[1] };
+        return { id: k, x: o.x, y: o.y, type: o.type || 'Hindernis', p: o.possibility, room: o.room || '', pic: pk ? P[pk] : '', icon: OBST.find(([re]) => re.test(o.type || ''))[1], gelb: /partikel|particle|dust|krümel/i.test(o.type || '') };
       });
       const ck = 'skc-obs-' + (A.map_id || '');
       if (live.length) { this._cacheObs(ck, live); return live; }
@@ -243,6 +262,13 @@
     }
     // Saugerkoordinaten (mm) -> Kartenbild-Pixel ueber die drei Kalibrierpunkte
     _calKey(A) { try { return localStorage.getItem('skc-cal-' + (A.map_id || '')) || ''; } catch (e) { return ''; } }
+    // Umkehrung: Kartenbild-Pixel -> Saugerkoordinaten (mm)
+    _itf(A) {
+      const cp = (A.calibration_points && A.calibration_points.length ? A.calibration_points : (() => { try { return JSON.parse(this._calKey(A) || 'null'); } catch (e) { return null; } })()) || [];
+      const g = (vx, vy) => cp.find((p) => p.vacuum.x === vx && p.vacuum.y === vy), a = g(0, 0), b = g(1000, 0), c = g(0, 1000); if (!a || !b || !c) return null;
+      const m11 = (b.map.x - a.map.x) / 1000, m12 = (c.map.x - a.map.x) / 1000, m21 = (b.map.y - a.map.y) / 1000, m22 = (c.map.y - a.map.y) / 1000, det = m11 * m22 - m12 * m21;
+      return (px, py) => { const dx = px - a.map.x, dy = py - a.map.y; return [(m22 * dx - m12 * dy) / det, (-m21 * dx + m11 * dy) / det]; };
+    }
     _tf(A) {
       // Kalibrierung je Karte merken: die Integration liefert sie erst, nachdem das Kartenbild einmal gezeichnet wurde
       const ck = 'skc-cal-' + (A.map_id || '');
@@ -287,6 +313,10 @@
           const X0 = Math.min(...pts.map((p) => p[0])) / S - 3, X1 = Math.max(...pts.map((p) => p[0])) / S + 3, Y0 = Math.min(...pts.map((p) => p[1])) / S - 3, Y1 = Math.max(...pts.map((p) => p[1])) / S + 3, ar = (X1 - X0) * (Y1 - Y0);
           for (let y = Math.max(0, Math.floor(Y0)); y <= Math.min(gh - 1, Math.ceil(Y1)); y++) for (let x = Math.max(0, Math.floor(X0)); x <= Math.min(gw - 1, Math.ceil(X1)); x++) { const q = y * gw + x; if (fl[q] && ar < best[q]) { best[q] = ar; lab[q] = i + 1; } } });
         for (let it = 0; it < 10; it++) { const L2 = lab.slice(); for (let q = 0; q < N; q++) if (!lab[q] && fl[q]) { const x = q % gw; const n = (x > 0 && lab[q - 1]) || (x < gw - 1 && lab[q + 1]) || (q >= gw && lab[q - gw]) || (q + gw < N && lab[q + gw]); if (n) L2[q] = n; } lab.set(L2); }
+        // Bereiche ausblenden (z. B. Terrasse, die durch grosse Fenster als Raum erkannt wurde): Konfig 'ausblenden' = [{karte, raum, x0, x1, y0, y1}] in mm
+        { const itf = this._itf(A), AUS = (this._c.ausblenden || []).filter((z) => z.karte == null || String(z.karte) === String(A.map_id));
+          if (itf && AUS.length) for (let q = 0; q < N; q++) { if (!lab[q]) continue; const rid = ids[lab[q] - 1], x = q % gw, y = (q - x) / gw, [vx, vy] = itf((x + 0.5) * S, (y + 0.5) * S);
+            if (AUS.some((z) => (z.raum == null || String(z.raum) === rid) && vx >= (z.x0 ?? -1e9) && vx <= (z.x1 ?? 1e9) && vy >= (z.y0 ?? -1e9) && vy <= (z.y1 ?? 1e9))) lab[q] = 0; } }
         // je Raum: glaetten, 1 px Abstand zum Nachbarraum, Umriss verfolgen, vereinfachen
         const trace = (mk) => { const seen = new Uint8Array(N), out = [], D = [[-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1]];
           const on = (x, y) => x >= 0 && y >= 0 && x < gw && y < gh && mk[y * gw + x];
@@ -323,14 +353,35 @@
         const bmp = await createImageBitmap(await (await fetch(A.entity_picture)).blob());
         const W = bmp.width, Hh = bmp.height, cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
         const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0); const id = cx.getImageData(0, 0, W, Hh), d = id.data;
-        const skip = new Uint8Array(W * Hh), box = (x0, y0, x1, y1) => { for (let y = Math.max(0, y0 | 0); y < Math.min(Hh, y1); y++) for (let x = Math.max(0, x0 | 0); x < Math.min(W, x1); x++) skip[y * W + x] = 1; };
-        Object.values(A.rooms || {}).forEach((r) => { if (r.x == null) return; const [x, y] = tf(r.x, r.y); box(x - 80, y - 80, x + 80, y + 28); });
-        Object.values(A.obstacles || {}).forEach((o) => { const [x, y] = tf(o.x, o.y); box(x - 26, y - 52, x + 26, y + 8); });
-        [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 22, y - 22, x + 22, y + 22); } });
+        const NP = W * Hh, skip = new Uint8Array(NP), box = (x0, y0, x1, y1, m = skip) => { for (let y = Math.max(0, y0 | 0); y < Math.min(Hh, y1); y++) for (let x = Math.max(0, x0 | 0); x < Math.min(W, x1); x++) m[y * W + x] = 1; };
+        const dil = (m, r) => { const t = new Uint8Array(NP), o = new Uint8Array(NP);
+          for (let y = 0; y < Hh; y++) { let c = 0; for (let x = -r; x < W + r; x++) { if (x + r < W && m[y * W + x + r]) c++; if (x - r - 1 >= 0 && m[y * W + x - r - 1]) c--; if (x >= 0 && x < W && c) t[y * W + x] = 1; } }
+          for (let x = 0; x < W; x++) { let c = 0; for (let y = -r; y < Hh + r; y++) { if (y + r < Hh && t[(y + r) * W + x]) c++; if (y - r - 1 >= 0 && t[(y - r - 1) * W + x]) c--; if (y >= 0 && y < Hh && c) o[y * W + x] = 1; } } return o; };
+        // Grundfarbe je Raum (ungereinigt): kraeftigste haeufige Farbe im Raumrechteck, ohne Beschriftung
+        const rooms = Object.values(A.rooms || {}).filter((r) => r.visibility !== 'Hidden'), bases = [], lbx = [];
+        rooms.forEach((r) => { const pts = [tf(r.x0, r.y0), tf(r.x1, r.y1)], X0 = Math.max(0, Math.min(pts[0][0], pts[1][0]) | 0), X1 = Math.min(W, Math.max(pts[0][0], pts[1][0]) | 0), Y0 = Math.max(0, Math.min(pts[0][1], pts[1][1]) | 0), Y1 = Math.min(Hh, Math.max(pts[0][1], pts[1][1]) | 0);
+          const L = r.x != null ? tf(r.x, r.y) : null; if (L) lbx.push([L[0] - 95, L[1] - 70, L[0] + 95, L[1] + 42]);
+          const cnt = new Map(); let tot = 0;
+          for (let y = Y0; y < Y1; y += 1) for (let x = X0; x < X1; x += 1) { if (L && x > L[0] - 95 && x < L[0] + 95 && y > L[1] - 70 && y < L[1] + 42) continue; const i = (y * W + x) * 4; if (d[i + 3] < 250) continue;
+            const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb); if (mn >= 240 || mx - mn < 12 || (mx - mn) / mx >= 0.7) continue; const k = (rr << 16) | (gg << 8) | bb; cnt.set(k, (cnt.get(k) || 0) + 1); tot++; }
+          const sat = (k) => { const c = [k >> 16 & 255, k >> 8 & 255, k & 255]; return (Math.max(...c) - Math.min(...c)) / Math.max(...c); };
+          const cand = [...cnt].filter(([, n]) => n >= tot * 0.015); if (!cand.length) return; const ms = Math.max(...cand.map(([k]) => sat(k)));
+          const b = cand.filter(([k]) => sat(k) >= ms - 0.04).sort((a, c) => c[1] - a[1])[0][0]; if (!bases.includes(b)) bases.push(b); });
+        const BS = bases.map((k) => [k >> 16 & 255, k >> 8 & 255, k & 255]);
+        // gereinigt = Grundfarbe mit Weiss aufgehellt (in allen Farbkanaelen gleich stark, 18-85 %)
+        const clean = (rr, gg, bb) => { for (const b of BS) { let lo = 9, hi = -9; const c = [rr, gg, bb]; for (let k = 0; k < 3; k++) { const den = 255 - b[k]; if (den <= 25) continue; const f = (c[k] - b[k]) / den; if (f < lo) lo = f; if (f > hi) hi = f; } if (lo >= 0.18 && hi <= 0.85 && hi - lo < 0.2) return true; } return false; };
+        const near = (rr, gg, bb) => BS.some((b) => (rr - b[0]) ** 2 + (gg - b[1]) ** 2 + (bb - b[2]) ** 2 < 900);
+        // Beschriftungen (Nummer + Name) und kraeftig farbige Symbole/Nadeln genau ausmaskieren statt grosser Kaesten
+        const seedL = new Uint8Array(NP), seedP = new Uint8Array(NP), inL = new Uint8Array(NP); lbx.forEach(([a, b, c, e]) => box(a, b, c, e, inL));
+        for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 250) continue; const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb);
+          if (mx > 0 && (mx - mn) / mx > 0.62) seedP[q] = 1; else if (inL[q] && mn < 240 && mx - mn >= 12 && !near(rr, gg, bb) && !clean(rr, gg, bb)) seedL[q] = 1; }
+        const mL = dil(seedL, 4), mP = dil(seedP, 3); for (let q = 0; q < NP; q++) if (mL[q] || mP[q]) skip[q] = 1;
+        Object.values(A.obstacles || {}).forEach((o) => { const [x, y] = tf(o.x, o.y); box(x - 17, y - 46, x + 17, y + 3); });
+        [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 24, y - 24, x + 24, y + 24); } });
         const pth = cx.createImageData(W, Hh), mop = cx.createImageData(W, Hh), o = pth.data, mo = mop.data; let n = 0;
-        for (let q = 0; q < W * Hh; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b), mx = Math.max(r, g, b);
+        for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b);
           if (mn >= 246) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; n++; }
-          if (mn >= 180 && mn / mx >= 0.79) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } }
+          else if (d[i + 3] > 250 && clean(r, g, b)) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
@@ -373,13 +424,14 @@
       r.querySelector('.ov').innerHTML = s;
       const rooms = A.rooms || {}, col = {}; G.rooms.forEach((q) => { col[q.id] = q.c; });
       r.querySelector('.hl').innerHTML = Object.keys(rooms).filter((k) => col[k] && rooms[k].x != null).map((k) => `<span class="lbl" style="${pct(P(rooms[k].x, rooms[k].y))}">${esc(rooms[k].custom_name || rooms[k].name)}</span>`).join('') +
-        obs.map((o) => `<button class="pin" data-obs="${o.id}" style="${pct(P(o.x, o.y))}" aria-label="${esc(o.type)}"><ha-icon icon="${o.icon}"></ha-icon></button>`).join('');
+        obs.map((o) => `<button class="pin${o.gelb ? ' gy' : ''}" data-obs="${o.id}" style="${pct(P(o.x, o.y))}" aria-label="${esc(o.type)}"><ha-icon icon="${o.icon}"></ha-icon></button>`).join('');
     }
 
     _call(d, s, data) { this._hass.callService(d, s, Object.assign({ entity_id: this._c.entity }, data || {})); }
     _click(e) {
       const A = (this._hass.states[this._c.map] || {}).attributes || {}, r = this.shadowRoot, lb = r.querySelector('.lb');
-      const pin = e.target.closest('.pin');
+      if (e.target.closest('[data-og]')) { this._og = !this._og; this._render(); return; }
+      const pin = e.target.closest('.pin, .ogt');
       if (pin) { const o = this._obstacles(A).find((q) => q.id === pin.dataset.obs); if (!o) return;
         lb.innerHTML = `<div class="lbx"><div class="lbp">${o.pic ? `<img src="${esc(o.pic)}" alt="">` : `<ha-icon icon="${o.icon}" style="--mdc-icon-size:44px"></ha-icon>`}<button class="x" data-close="1" aria-label="Schließen"><ha-icon icon="mdi:close"></ha-icon></button></div>
           <div class="lbi"><div><b>${esc(o.type)}</b><span>${esc([o.room, o.p != null ? o.p + ' %' : ''].filter(Boolean).join(' · '))}</span></div></div></div>`;
