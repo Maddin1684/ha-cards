@@ -1,4 +1,4 @@
-// wetter-karte-card v1.14 (27.11.2026: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.15 (27.11.2026: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -59,12 +59,12 @@
     .efx > div { position:absolute; pointer-events:none; }
     /* Effekte wie ELMO-Hauskarte (Regen, Schnee, Wolken, Sterne, Sternschnuppe, Sonne, Blitz, Nebel) */
     .cloud { z-index:1; left:-45%; height:22%; background:radial-gradient(ellipse at center, rgba(var(--cloud-rgb,255,255,255),.95) 0%, rgba(var(--cloud-rgb,255,255,255),.55) 55%, rgba(var(--cloud-rgb,255,255,255),0) 80%); border-radius:50%; filter:blur(1.8px);
-      animation-name:wk-cloud-drift; animation-timing-function:linear; animation-iteration-count:infinite; will-change:left, opacity; }
+      animation-name:wk-cloud-drift; animation-timing-function:linear; animation-iteration-count:infinite; will-change:transform, opacity; backface-visibility:hidden; }
     .cloud::before, .cloud::after { content:""; position:absolute; background:inherit; border-radius:50%; }
     .cloud::before { width:55%; height:170%; top:-55%; left:12%; }
     .cloud::after { width:42%; height:130%; top:-35%; right:10%; }
     .cloud.flash { animation-name:wk-cloud-drift, wk-cloud-flash; animation-timing-function:linear, ease-out; }
-    @keyframes wk-cloud-drift { 0% { left:var(--start-left,-45%); opacity:0; } 16% { opacity:var(--cloud-opacity,.35); } 93% { opacity:var(--cloud-opacity,.35); } 100% { left:var(--end-left,96%); opacity:0; } }
+    @keyframes wk-cloud-drift { 0% { transform:translate3d(0,0,0); opacity:0; } 16% { opacity:var(--cloud-opacity,.35); } 93% { opacity:var(--cloud-opacity,.35); } 100% { transform:translate3d(var(--dx,200%),0,0); opacity:0; } }
     @keyframes wk-cloud-flash { 0% { filter:blur(1.8px) brightness(1); } 2% { filter:blur(1.8px) brightness(5); } 4% { filter:blur(1.8px) brightness(1.5); } 6% { filter:blur(1.8px) brightness(4.2); } 9%, 100% { filter:blur(1.8px) brightness(1); } }
     .rain-drop { z-index:2; top:-6%; background:linear-gradient(to bottom, rgba(150,205,255,.95), rgba(190,230,255,var(--drop-alpha,1))); box-shadow:0 0 1px rgba(200,235,255,calc(var(--glow-alpha,1) * .6)), 0 0 3px rgba(90,180,255,calc(var(--glow-alpha,1) * .35));
       animation-name:wk-rain; animation-timing-function:linear; animation-iteration-count:infinite; will-change:transform, opacity; backface-visibility:hidden; }
@@ -100,11 +100,12 @@
     @keyframes wk-fog { 0% { transform:translateX(-4%) scaleX(1) scaleY(.96); opacity:calc(var(--fog-opacity,.15) * .62); } 50% { transform:translateX(4%) scaleX(1.06) scaleY(1.04); opacity:var(--fog-opacity,.15); } 100% { transform:translateX(-4%) scaleX(1) scaleY(.96); opacity:calc(var(--fog-opacity,.15) * .62); } }
 
     .now { position:absolute; inset:0; z-index:3; display:flex; align-items:center; padding:0 12px; gap:10px; }
-    .cur { flex:0 0 96px; display:flex; flex-direction:column; align-items:center; }
+    .cur { transform:translateZ(0); will-change:transform; flex:0 0 96px; display:flex; flex-direction:column; align-items:center; }
     .cur img, .cur ha-icon { width:45px; height:45px; --mdc-icon-size:45px; display:flex; align-items:center; justify-content:center; color:#c7c7cc; }
     .cur .cn { font-size:17px; font-weight:500; line-height:1.2; margin-top:2px; color:var(--primary-text-color); text-align:center; }
     .sep { width:.5px; align-self:stretch; margin:18px 0; background:rgba(255,255,255,.15); }
-    .hrs { flex:1; min-width:0; display:flex; }
+    .rgt { position:relative; flex:1; min-width:0; align-self:stretch; display:flex; align-items:center; margin-right:-12px; padding-right:12px; }
+    .hrs { position:relative; z-index:1; flex:1; min-width:0; display:flex; }
     .h { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; color:var(--secondary-text-color); min-width:0; }
     .h .tv { font-size:13px; color:var(--primary-text-color); font-variant-numeric:tabular-nums; }
     .h .tb { position:relative; display:block; align-self:stretch; height:2px; margin:3px 0 4px; }
@@ -154,7 +155,8 @@
       .hero, .tst { margin-left:12px; margin-right:12px; } .tst { padding:0 0 10px; }
       .fold { padding:0 12px; }
       .cur { flex:0 0 74px; } .cur img, .cur ha-icon { width:45px; height:45px; --mdc-icon-size:45px; }
-      .now { padding:0 8px; gap:6px; }
+      .fh .fx .vb, .fh .fx .vb + .dt { display:none; }
+      .now { padding:0 8px; gap:6px; } .rgt { margin-right:-8px; padding-right:8px; }
       .h:nth-child(n+5) { display:none; } .h:nth-child(4) .tb { border-radius:0 2px 2px 0; margin-right:6px; }
       .h img, .h ha-icon { width:22px; height:22px; --mdc-icon-size:20px; }
     }
@@ -252,7 +254,7 @@
       root.innerHTML = `<style>${CSS}</style><ha-card>
         <div class="hd"></div>
         <div class="tst" id="tst"></div>
-        <div class="hero" id="hero"><div class="efx" id="fx"></div><div class="now"><div class="cur" id="cur"></div><div class="sep"></div><div class="hrs" id="hrs"></div></div></div>
+        <div class="hero" id="hero"><div class="now"><div class="cur" id="cur"></div><div class="sep"></div><div class="rgt"><div class="efx" id="fx"></div><div class="hrs" id="hrs"></div></div></div></div>
         <div id="ex"></div>
         <div class="fold" data-id="warn"><div class="fh"><span class="ft">${ico('mdi:alert-outline')}</span><span class="lbl">Warnungen</span><span class="fx" id="wfx"></span></div><div class="fb"><div class="fi" id="wl"></div></div></div>
         <div class="fold" data-id="fc"><div class="fh"><span class="ft">${ico('mdi:calendar-month-outline')}</span><span class="lbl">Vorhersage</span><span class="fx" id="ffx"></span></div><div class="fb"><div class="fi" id="fl"></div></div></div>
@@ -397,9 +399,9 @@
       else {
         const p = [];
         p.push(`<span class="cnt" style="color:${nd.length ? LV[mx(nd)] : 'var(--secondary-text-color)'}">DWD ${nd.length}</span>`);
-        if (nv.length) p.push(`<span class="cnt" style="color:var(--secondary-text-color)">Vorab ${nv.length}</span>`);
+        if (nv.length) p.push(`<span class="cnt vb" style="color:var(--secondary-text-color)">Vorab ${nv.length}</span>`);
         p.push(`<span class="cnt" style="color:${nn.length ? LV[mx(nn)] : 'var(--secondary-text-color)'}">NINA ${nn.length}</span>`);
-        fx = p.join('<span>·</span>');
+        fx = p.join('<span class="dt">·</span>');
       }
       this._set('wfx', fx);
       const rows = L.map((w) => {
@@ -526,7 +528,7 @@
           const d = 25 + R() * 13, del = (Number(neg(d)) - i * stag).toFixed(2);
           const rgb = stormy ? (night ? nightRainSh : rainSh)[Math.floor(R() * 4)] : night ? nightSh[Math.floor(R() * 4)] : (i === dark ? '175,172,168' : '255,255,255');
           const fl = i === flash;
-          h += `<div class="cloud${fl ? ' flash' : ''}" style="top:${top}%;width:${w.toFixed(0)}%;--cloud-opacity:${op.toFixed(2)};--cloud-rgb:${rgb};--start-left:-${(w * 0.6).toFixed(0)}%;--end-left:${(104 - w * 0.4).toFixed(0)}%;animation-duration:${d.toFixed(1)}s${fl ? ', 3s' : ''};animation-delay:${del}s${fl ? ', ' + neg(3) + 's' : ''}"></div>`;
+          h += `<div class="cloud${fl ? ' flash' : ''}" style="top:${top}%;width:${w.toFixed(0)}%;--cloud-opacity:${op.toFixed(2)};--cloud-rgb:${rgb};left:-${(w * 0.6).toFixed(0)}%;--dx:${((104 - w * 0.4 + w * 0.6) / w * 100).toFixed(0)}%;animation-duration:${d.toFixed(1)}s${fl ? ', 3s' : ''};animation-delay:${del}s${fl ? ', ' + neg(3) + 's' : ''}"></div>`;
         }
       }
       if (rain) {
