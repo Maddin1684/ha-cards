@@ -1,4 +1,5 @@
-// sauger-karte-card v3.9 (27.11.2026): Fahrspuren wieder wie vorher (zart); Raumbeschriftung nur noch eng um Nummernkreis und Namenspille ausgespart – vorher fiel ein grosser Kasten weg, auf dem Wohnen-Teppich fehlten dadurch Bahnen und die unteren Kreise.
+// sauger-karte-card v3.10 (27.11.2026): Raumnummer als Kreis und Namenspille als Kapsel ausgespart statt als Rechteck – kein Viereck mehr in der Spur.
+// v3.9 (27.11.2026): Fahrspuren wieder wie vorher (zart); Raumbeschriftung nur noch eng um Nummernkreis und Namenspille ausgespart – vorher fiel ein grosser Kasten weg, auf dem Wohnen-Teppich fehlten dadurch Bahnen und die unteren Kreise.
 // v3.8: Fahrspuren kraeftiger (rueckgaengig).
 // v3.7 (27.11.2026): Luecken in gereinigten Flaechen (z. B. Wohnen) werden geschlossen (Konfig 'luecken' in px, Standard 30).
 // v3.6 (27.11.2026): Trocknungsbalken mit Verlauf rot -> gruen wie Fortschritt.
@@ -371,7 +372,7 @@
         const rooms = Object.values(A.rooms || {}).filter((r) => r.visibility !== 'Hidden'), bases = [], lbx = [];
         rooms.forEach((r) => { const pts = [tf(r.x0, r.y0), tf(r.x1, r.y1)], X0 = Math.max(0, Math.min(pts[0][0], pts[1][0]) | 0), X1 = Math.min(W, Math.max(pts[0][0], pts[1][0]) | 0), Y0 = Math.max(0, Math.min(pts[0][1], pts[1][1]) | 0), Y1 = Math.min(Hh, Math.max(pts[0][1], pts[1][1]) | 0);
           const L = r.x != null ? tf(r.x, r.y) : null, hw = String(r.custom_name || r.name || '').length * 6.5 + 18;
-          if (L) { lbx.push([L[0] - hw, L[1] - 20, L[0] + hw, L[1] + 20]); lbx.push([L[0] - 24, L[1] - 80, L[0] + 24, L[1] - 32]); }
+          if (L) { lbx.push([L[0] - hw, L[1] - 20, L[0] + hw, L[1] + 20, 20]); lbx.push([L[0] - 19, L[1] - 75, L[0] + 19, L[1] - 37, 19]); }
           const cnt = new Map(); let tot = 0;
           for (let y = Y0; y < Y1; y += 1) for (let x = X0; x < X1; x += 1) { if (L && x > L[0] - 95 && x < L[0] + 95 && y > L[1] - 80 && y < L[1] + 22) continue; const i = (y * W + x) * 4; if (d[i + 3] < 250) continue;
             const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb); if (mn >= 240 || mx - mn < 12 || (mx - mn) / mx >= 0.7) continue; const k = (rr << 16) | (gg << 8) | bb; cnt.set(k, (cnt.get(k) || 0) + 1); tot++; }
@@ -385,7 +386,10 @@
         const clean = (rr, gg, bb) => clean0(rr, gg, bb) || [0.955, 0.915].some((f) => clean0(Math.min(255, rr / f), Math.min(255, gg / f), Math.min(255, bb / f)));
         const near = (rr, gg, bb) => BS.some((b) => (rr - b[0]) ** 2 + (gg - b[1]) ** 2 + (bb - b[2]) ** 2 < 900);
         // Beschriftungen (Nummer + Name) und kraeftig farbige Symbole/Nadeln genau ausmaskieren statt grosser Kaesten
-        const seedL = new Uint8Array(NP), seedP = new Uint8Array(NP), inL = new Uint8Array(NP); lbx.forEach(([a, b, c, e]) => box(a, b, c, e, inL));
+        const seedL = new Uint8Array(NP), seedP = new Uint8Array(NP), inL = new Uint8Array(NP); lbx.forEach(([a, b, c, e, rad]) => { const cy = (b + e) / 2;
+          for (let y = Math.max(0, b | 0); y < Math.min(Hh, e); y++) for (let x = Math.max(0, a | 0); x < Math.min(W, c); x++) {
+            const ex = x < a + rad ? a + rad - x : x > c - rad ? x - (c - rad) : 0, ey = Math.abs(y - cy) - ((e - b) / 2 - rad);
+            if (ex * ex + Math.max(0, ey) * Math.max(0, ey) <= rad * rad) inL[y * W + x] = 1; } });
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 250) continue; const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb);
           if (mx > 0 && (mx - mn) / mx > 0.62) seedP[q] = 1; else if (inL[q] && mn < 240 && mx - mn >= 12 && !near(rr, gg, bb) && !clean(rr, gg, bb)) seedL[q] = 1; }
         const mP = dil(seedP, 3); for (let q = 0; q < NP; q++) if (inL[q] || mP[q]) skip[q] = 1; void seedL;
