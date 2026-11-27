@@ -1,4 +1,4 @@
-// wetter-karte-card v1.3 (27.11.2026: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.4 (27.11.2026: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -384,18 +384,35 @@
     }
 
     /* ---------- Vorhersage ---------- */
+    /* Neuschnee in cm direkt von Open-Meteo (snowfall_sum), alle 30 min, zwischengespeichert */
+    async _loadSnow(we) {
+      if (this._snowBusy || Date.now() - (this._snowAt || 0) < 1800000) return;
+      const lat = num(we.attributes.latitude, num(this._hass.config && this._hass.config.latitude, NaN)), lon = num(we.attributes.longitude, num(this._hass.config && this._hass.config.longitude, NaN));
+      if (isNaN(lat) || isNaN(lon)) return;
+      if (!this._snow) { try { const c = JSON.parse(localStorage.getItem('wkc-snow') || 'null'); if (c && Date.now() - c.t < 3 * 3600000) { this._snow = c.d; this._snowAt = c.t; if (Date.now() - c.t < 1800000) return; } } catch (e) {} }
+      this._snowBusy = true; this._snowAt = Date.now();
+      try {
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&daily=snowfall_sum,precipitation_sum&timezone=Europe%2FBerlin&forecast_days=9`);
+        const j = await r.json(), dd = j && j.daily;
+        if (dd && Array.isArray(dd.time)) {
+          const m = {}; dd.time.forEach((t, k) => { m[t] = { cm: num(dd.snowfall_sum[k]), mm: num(dd.precipitation_sum[k]) }; });
+          this._snow = m; try { localStorage.setItem('wkc-snow', JSON.stringify({ t: Date.now(), d: m })); } catch (e) {}
+          this._render(true);
+        }
+      } catch (e) { console.warn(TAG, 'Open-Meteo Schnee', e); }
+      this._snowBusy = false;
+    }
     _days(we) {
       const D = (this._fc.daily || []).slice(0, Math.max(3, num(this._c.days, 7)));
-      const hf = this._fc.hourly || [];
+      this._loadSnow(we);
+      const key = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       return D.map((x, i) => {
-        const d = new Date(x.datetime);
-        // Schnee: Niederschlag in Stunden mit <= 0,5 Grad (aus Stundenvorhersage) oder Tageszustand Schnee
-        let tot = 0, sn = 0, have = false;
-        hf.forEach((h) => { const hd = new Date(h.datetime); if (!sameDay(hd, d)) return; have = true; const p = num(h.precipitation); tot += p; if (num(h.temperature, 9) <= 0.5 || /snow/.test(h.condition || '')) sn += p; });
-        const pr = num(x.precipitation);
-        const snowDay = /snowy/.test(x.condition || '') || (have ? (tot > 0.05 && sn / tot >= 0.5) : num(x.temperature, 9) <= 0);
-        const snowFrac = have && tot > 0 ? sn / tot : (snowDay ? 1 : 0);
-        return { ws: num(x.wind_speed, NaN), wb: num(x.wind_bearing, NaN), d, i, cond: x.condition, hi: num(x.temperature), lo: num(x.templow, num(x.temperature) - 3), pr, pp: Math.round(num(x.precipitation_probability)), snow: snowDay && pr >= 0.05, cm: pr * snowFrac };
+        const d = new Date(x.datetime), pr = num(x.precipitation), om = this._snow && this._snow[key(d)];
+        // Schnee, wenn Open-Meteo Neuschnee meldet und dieser mind. die Haelfte des Niederschlags ausmacht (1 cm Neuschnee ~ 0,7 mm Wasser)
+        let snow = false, cm = 0;
+        if (om) { cm = om.cm; snow = cm >= 0.1 && cm * 0.7 >= 0.5 * Math.max(om.mm, 0.01); }
+        else snow = /snowy/.test(x.condition || '') && pr >= 0.05;
+        return { ws: num(x.wind_speed, NaN), wb: num(x.wind_bearing, NaN), d, i, cond: x.condition, hi: num(x.temperature), lo: num(x.templow, num(x.temperature) - 3), pr, pp: Math.round(num(x.precipitation_probability)), snow, cm: om ? cm : NaN };
       });
     }
     _fcast(we) {
@@ -437,7 +454,7 @@
       // Niederschlag
       s += `<div class="cg pr" style="${col}">${D.map((x) => {
         const h = x.pr > 0.04 ? Math.max(3, x.pr / pMax * 12) : 0, c = x.snow ? '#fff' : C.blue;
-        return `<div class="cc"><div class="pb"><span style="height:${h.toFixed(1)}px;background:${c}"></span></div><div class="pv"><ha-icon icon="${x.snow ? 'mdi:snowflake' : 'mdi:water'}" style="color:${c}"></ha-icon>${x.snow ? dc(Math.max(0.1, x.cm)) + '<small> cm</small>' : dc(x.pr) + '<small> mm</small>'}</div></div>`;
+        return `<div class="cc"><div class="pb"><span style="height:${h.toFixed(1)}px;background:${c}"></span></div><div class="pv"><ha-icon icon="${x.snow ? 'mdi:snowflake' : 'mdi:water'}" style="color:${c}"></ha-icon>${x.snow && !isNaN(x.cm) ? dc(x.cm) + '<small> cm</small>' : dc(x.pr) + '<small> mm</small>'}</div></div>`;
       }).join('')}</div>`;
       // Wind
       s += `<div class="cg wd" style="${col}">${D.map((x) => isNaN(x.ws) ? '<div class="cc"></div>' : `<div class="cc"><span class="wa"><ha-icon icon="mdi:navigation" style="color:${wc(x.ws)};transform:rotate(${isNaN(x.wb) ? 0 : Math.round(x.wb + 180)}deg)"></ha-icon></span><span class="wv">${Math.round(x.ws)}<small> km/h</small></span></div>`).join('')}</div>`;
