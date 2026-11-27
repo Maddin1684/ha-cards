@@ -1,4 +1,5 @@
-// sauger-karte-card v3.7 (27.11.2026): Luecken in gereinigten Flaechen (z. B. Wohnen) werden geschlossen (Konfig 'luecken' in px, Standard 30).
+// sauger-karte-card v3.8 (27.11.2026): Fahrspuren deutlich sichtbar (kraeftiger, etwas breiter) – in der verkleinerten Karte fehlten einzelne Bahnen, z. B. Wohnen oben (Konfig 'spur_deckkraft' 0–255, Standard 180).
+// v3.7 (27.11.2026): Luecken in gereinigten Flaechen (z. B. Wohnen) werden geschlossen (Konfig 'luecken' in px, Standard 30).
 // v3.6 (27.11.2026): Trocknungsbalken mit Verlauf rot -> gruen wie Fortschritt.
 // v3.5 (27.11.2026): gereinigte Flaeche zusaetzlich als Band um die Saugbahnen (halbe Saugerbreite) – unabhaengig von Farben, damit iPhone/iPad und Teppiche wie in der Dreame-App aussehen.
 // v3.4 (27.11.2026): Kartenbild ohne Farbraum-Umrechnung lesen (iPhone/iPad lieferte leicht andere Farben); Teppichmuster toleranter erkannt.
@@ -411,6 +412,10 @@
         { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1;
           const R = this._c.luecken != null ? +this._c.luecken : 30, dd = dil(mm, R), inv = new Uint8Array(NP); for (let q = 0; q < NP; q++) inv[q] = dd[q] ? 0 : 1;
           const ero = dil(inv, R); for (let q = 0; q < NP; q++) if (!ero[q] && !mm[q] && d[q * 4 + 3] > 200) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
+        // Fahrspuren kraeftiger und 1 px breiter: die Karte wird stark verkleinert angezeigt (ca. 1:4), duenne Linien verschwanden sonst –
+        // vor allem einzelne geschwungene Bahnen (z. B. Wohnen oben)
+        { const pm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (o[q * 4 + 3]) pm[q] = 1; const th = dil(pm, 1), al = this._c.spur_deckkraft != null ? +this._c.spur_deckkraft : 180;
+          for (let q = 0; q < NP; q++) if (th[q] && d[q * 4 + 3] > 200) { const i = q * 4; o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = al; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
