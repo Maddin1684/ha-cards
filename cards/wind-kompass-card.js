@@ -1,4 +1,4 @@
-// wind-kompass-card v1.2 (27.11.2026: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.3 (27.11.2026: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -28,17 +28,34 @@
     :host { display:block; }
     ha-card { padding:4px 0 12px; overflow:hidden; }
     .hd { font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; padding:12px 16px 0; color:var(--ha-card-header-color, var(--primary-text-color)); }
-    .wrap { position:relative; width:min(100%, 330px); margin:0 auto; aspect-ratio:1; }
+    :host { container-type:inline-size; }
+    .main { display:grid; grid-template-columns:minmax(0,1fr) auto auto; grid-template-areas:'w b l'; align-items:center; gap:6px 10px; padding:4px 14px 0 6px; }
+    .wrap { grid-area:w; position:relative; width:100%; max-width:250px; aspect-ratio:1; margin:0 auto; }
+    .vb { grid-area:b; display:flex; gap:6px; }
+    .lg { grid-area:l; }
+    @container (max-width: 380px) {
+      .main { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:'w b' 'l l'; padding:4px 12px 0 4px; }
+      .lg { flex-direction:row !important; flex-wrap:wrap; justify-content:center; gap:4px 10px !important; }
+      .vt { height:150px !important; width:22px !important; }
+    }
+    .vc { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; color:var(--secondary-text-color); }
+    .vt { width:26px; height:190px; border-radius:7px; overflow:hidden; display:flex; flex-direction:column-reverse; background:rgba(118,118,128,.22); }
+    .vt i { display:flex; align-items:center; justify-content:center; font-style:normal; font-size:9px; font-weight:500; color:rgba(0,0,0,.75); overflow:hidden; white-space:nowrap; }
+    .vt i + i { border-bottom:1px solid rgba(28,28,30,.6); }
+    .vt i.cm { color:#fff; }
+    .tst { display:flex; gap:6px; padding:0 16px 6px; } .tst:empty { display:none; }
+    .tst span { font-size:12px; padding:3px 10px; border-radius:6px; background:rgba(118,118,128,.24); color:var(--secondary-text-color); cursor:pointer; }
+    .tst span.on { background:${C.orange}; color:#fff; }
     .wrap svg.k { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
     .arr { transition:transform 1s ease; transform-origin:150px 150px; }
     .ctr { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none; text-shadow:0 1px 6px rgba(0,0,0,.6); }
-    .ctr .d { font-size:30px; font-weight:500; line-height:32px; color:rgba(255,255,255,.85); }
-    .ctr .v { font-size:36px; font-weight:400; line-height:38px; color:#fff; white-space:nowrap; }
-    .ctr .v small { font-size:18px; color:rgba(255,255,255,.8); margin-left:4px; }
-    .sky { position:absolute; width:10%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
+    .ctr .d { font-size:24px; font-weight:500; line-height:26px; color:rgba(255,255,255,.85); }
+    .ctr .v { font-size:30px; font-weight:400; line-height:32px; color:#fff; white-space:nowrap; }
+    .ctr .v small { font-size:15px; color:rgba(255,255,255,.8); margin-left:4px; }
+    .sky { position:absolute; width:11%; aspect-ratio:1; transform:translate(-50%,-50%); transition:left 1s, top 1s; pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
     .sky img { width:100%; height:100%; object-fit:contain; display:block; }
     .sky.sun img { filter:drop-shadow(0 0 8px rgba(255,200,80,.7)); }
-    .pills { display:flex; margin:10px 16px 0; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; }
+    .pills { display:flex; margin:12px 16px 0; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; }
     .pills:empty { display:none; }
     .pills span { flex:1; text-align:center; font-size:12px; line-height:16px; padding:4px 0; border-radius:6px; color:var(--secondary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background .2s, color .2s; }
     .pills span.on { background:rgba(255,255,255,.18); color:var(--primary-text-color); }
@@ -53,12 +70,10 @@
     .tk .f { position:absolute; left:0; top:0; bottom:0; border-radius:4px; transition:width .8s ease; }
     .tk .mx { position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; border-radius:1px; background:rgba(255,255,255,.55); }
     .br.sc { margin-top:-6px; font-size:9px; line-height:10px; }
-    .lg { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 12px; margin:10px 16px 0; font-size:11px; color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
+    .lg { display:flex; flex-direction:column-reverse; gap:5px; font-size:10px; color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
     .lg span { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
     .lg i { width:10px; height:10px; border-radius:3px; display:inline-block; }
     .lg b { font-weight:500; color:var(--primary-text-color); }
-    .info { text-align:center; font-size:12px; color:var(--secondary-text-color); margin:6px 16px 0; }
-    .info b { font-weight:500; color:var(--primary-text-color); }
   `;
 
   class WindKompassCard extends HTMLElement {
@@ -73,9 +88,11 @@
     _build() {
       const r = this.shadowRoot || this.attachShadow({ mode: 'open' });
       this._root = r;
-      r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"></div><div class="wrap" id="wrap"><svg class="k" id="k" viewBox="0 0 300 300"></svg><div id="sky"></div><div class="ctr" id="ctr"></div></div>
-        <div class="bars" id="bars"></div><div class="pills" id="pills"></div><div class="lg" id="lg"></div><div class="info" id="info"></div></ha-card>`;
+      r.innerHTML = `<style>${CSS}</style><ha-card><div class="hd"></div><div class="tst" id="tst"></div>
+        <div class="main"><div class="wrap" id="wrap"><svg class="k" id="k" viewBox="0 0 300 300"></svg><div id="sky"></div><div class="ctr" id="ctr"></div></div>
+        <div class="vb" id="bars"></div><div class="lg" id="lg"></div></div><div class="pills" id="pills"></div></ha-card>`;
       r.querySelector('ha-card').addEventListener('click', (ev) => {
+        const tt = ev.target.closest('[data-sk]'); if (tt) { this._sk = tt.dataset.sk; this._render(true); return; }
         const p = ev.target.closest('[data-p]'); if (p) { this._per = p.dataset.p; this._histAt = 0; this._hist = null; this._last = {}; this._load(); this._render(true); return; }
         if (ev.target.closest('#wrap')) { const e = new Event('hass-more-info', { bubbles: true, composed: true }); e.detail = { entityId: this._c.speed_entity }; this.dispatchEvent(e); }
       });
@@ -120,11 +137,14 @@
       const c = this._c, ds = H.states[c.direction_entity], ss = H.states[c.speed_entity];
       const dir = ds ? num(ds.state, 0) : 0, sp = ss ? num(ss.state, 0) : 0;
       const sun = H.states[c.sun], mo = c.moon_entity && H.states[c.moon_entity];
-      const sunUp = sun && sun.state === 'above_horizon', moonUp = !sunUp && mo && (mo.state === 'up' || num(mo.attributes.moon_altitude, -1) > 0);
-      const sig = [dir, sp, sunUp, sun && Math.round(num(sun.attributes.azimuth, 0)), moonUp, mo && Math.round(num(mo.attributes.moon_azimuth, 0)), this._per, !!this._hist].join('|');
+      const sk = c.test ? (this._sk || 'live') : 'live';
+      const sunUp = sk === 'sun' || (sk === 'live' && sun && sun.state === 'above_horizon'), moonUp = sk === 'moon' || (sk === 'live' && !sunUp && mo && (mo.state === 'up' || num(mo.attributes.moon_altitude, -1) > 0));
+      const sunAz = sun ? num(sun.attributes.azimuth, 180) : 180, moonAz = mo ? num(mo.attributes.moon_azimuth, 120) : 120;
+      this._set('tst', c.test ? [['live', 'Live'], ['sun', 'Sonne'], ['moon', 'Mond']].map(([k, l]) => `<span data-sk="${k}" class="${k === sk ? 'on' : ''}">${l}</span>`).join('') : '');
+      const sig = [sk, dir, sp, sunUp, sun && Math.round(num(sun.attributes.azimuth, 0)), moonUp, mo && Math.round(num(mo.attributes.moon_azimuth, 0)), this._per, !!this._hist].join('|');
       if (!force && sig === this._sig) return; this._sig = sig;
       this._root.querySelector('.hd').textContent = c.title || ''; this._root.querySelector('.hd').style.display = c.title ? '' : 'none';
-      const R = 102, cx = 150, cy = 150, col = wcol(sp);
+      const R = 96, cx = 150, cy = 150, col = wcol(sp);
       // Windrose
       let rose = '';
       const h = this._hist;
@@ -159,26 +179,26 @@
       this._set('ctr', `<div class="d">${dirTxt}</div><div class="v">${Math.round(sp)}<small>km/h</small></div>`);
       // Sonne / Mond am Rand
       let sky = '';
-      const pos = (az) => { const an = (az - 90) * Math.PI / 180, rr = R + 36; return `left:${((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
-      if (sunUp) sky += `<div class="sky sun" style="${pos(num(sun.attributes.azimuth, 0))}"><img src="${esc(c.sun_image)}" alt=""></div>`;
+      const pos = (az) => { const an = (az - 90) * Math.PI / 180, rr = R + 44; return `left:${((cx + rr * Math.cos(an)) / 3).toFixed(2)}%;top:${((cy + rr * Math.sin(an)) / 3).toFixed(2)}%`; };
+      if (sunUp) sky += `<div class="sky sun" style="${pos(sunAz)}"><img src="${esc(c.sun_image)}" alt=""></div>`;
       if (moonUp) {
         const ph = c.moon_phase_entity && H.states[c.moon_phase_entity] ? Math.max(0, Math.min(7, Math.round(num(H.states[c.moon_phase_entity].state, 4)))) : 4;
-        sky += `<div class="sky" style="${pos(num(mo.attributes.moon_azimuth, 0))}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
+        sky += `<div class="sky" style="${pos(moonAz)}"><img src="${esc(c.moon_images_path.replace(/\/$/, ''))}/${MOON[ph]}.png" alt=""></div>`;
       }
       this._set('sky', sky);
-      // Wind und Boeen: Anteile der Geschwindigkeitsklassen im Zeitraum als gestapelter Balken
-      const dist = (arr, calm, tot) => { if (!tot) return ''; const seg = [['rgba(255,255,255,.22)', calm]].concat(BINS.map((b, k) => [b.c, arr[k]]));
-        return seg.filter((x) => x[1] > 0).map(([cc, v]) => { const pc = v / tot * 100; return `<i style="width:${pc.toFixed(2)}%;background:${cc}">${pc >= 9 ? Math.round(pc) + '%' : ''}</i>`; }).join(''); };
-      const bars = h && h.n ? `<div class="br"><span>Wind</span><div class="tk">${dist(h.cnt.reduce((m, a) => m.map((x, k) => x + a[k]), BINS.map(() => 0)), h.calm, h.n)}</div></div>`
-        + (h.gn ? `<div class="br"><span>Böen</span><div class="tk">${dist(h.gb, h.gcalm, h.gn)}</div></div>` : '') : '';
+      // Wind und Boeen: Anteile der Geschwindigkeitsklassen als senkrechte Balken (unten still, nach oben staerker)
+      const CALM = '#8e8e93';
+      const dist = (arr, calm, tot) => { if (!tot) return ''; const seg = [[CALM, calm, 1]].concat(BINS.map((b, k) => [b.c, arr[k], 0]));
+        return seg.filter((x) => x[1] > 0).map(([cc, v, cm]) => { const pc = v / tot * 100; return `<i class="${cm ? 'cm' : ''}" style="height:${pc.toFixed(2)}%;background:${cc}">${pc >= 8 ? Math.round(pc) + '%' : ''}</i>`; }).join(''); };
+      const bars = h && h.n ? `<div class="vc"><div class="vt">${dist(h.cnt.reduce((m, a) => m.map((x, k) => x + a[k]), BINS.map(() => 0)), h.calm, h.n)}</div>Wind</div>`
+        + (h.gn ? `<div class="vc"><div class="vt">${dist(h.gb, h.gcalm, h.gn)}</div>Böen</div>` : '') : '';
       this._set('bars', bars);
       // Zeitraum und Legende
       this._set('pills', c.rose ? PER.map(([k, l]) => `<span data-p="${k}" class="${k === this._per ? 'on' : ''}">${l}</span>`).join('') : '');
       if (c.rose && h && h.n) {
         const tot = h.n, sums = BINS.map((_, b) => h.cnt.reduce((m, a) => m + a[b], 0));
-        const gsum = h.gb || []; this._set('lg', `<span><i style="background:rgba(255,255,255,.25)"></i>still</span>` + BINS.map((b, i) => (sums[i] || gsum[i] ? `<span><i style="background:${b.c}"></i>${b.l}</span>` : '')).join('') + '<span>km/h</span>');
-        this._set('info', `Ø <b>${dc(h.avg)} km/h</b> · max. <b>${dc(h.smax)} km/h</b>${h.gmax ? ` · Böen bis <b style="color:${wcol(h.gmax)}">${dc(h.gmax)} km/h</b>` : ''}`);
-      } else { this._set('lg', c.rose ? '<span>Verlauf wird geladen …</span>' : ''); this._set('info', ''); }
+        const gsum = h.gb || []; this._set('lg', `<span><i style="background:${CALM}"></i>still</span>` + BINS.map((b, i) => (sums[i] || gsum[i] ? `<span><i style="background:${b.c}"></i>${b.l} km/h</span>` : '')).join(''));
+      } else { this._set('lg', c.rose ? '<span>lädt …</span>' : ''); }
     }
   }
   customElements.define(TAG, WindKompassCard);
