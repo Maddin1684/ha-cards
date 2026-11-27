@@ -1,4 +1,4 @@
-// wetter-karte-card v1.25 (27.11.2026: Zustand zweizeilig; Aussentemperatur gleiche Groesse/Hoehe wie Zustand; Mini-Verlauf groesser mit Gitter und Max/Min mit Uhrzeit; v1.24: statt grosser Grafik Mini-Verlauf (24 h, Flaeche + Linie in Temperaturfarben, Vortag gestrichelt) rechts unter Temperatur und Tendenz-Icon; v1.23: Kopfbereich neu (Variante B): Zustand mit Symbol links, Aussentemperatur mit Tendenz-Icon rechts, darunter Aussentemperatur-Grafik (statistics-graph-chart-card wie bisher) und Stundenleiste; v1.22: Kopfbereich-Hintergrund etwas kraeftiger (.09); v1.21: Niederschlagsbalken halbtransparent; Kopfbereich transparenter; v1.20: grafischer Editor (Wetter-Entitaet, Titel, Darstellung, Quellen, Warnungen, Anzeige); v1.19: Warnungszaehler mit Doppelpunkt (DWD: 2 · NINA: 1); v1.18: alle Wettersymbole als eingebettetes SVG (fluessig, je Einfuegung eigene IDs); Sonnenauf-/-untergang in der Stundenleiste (eigene Symbole sunrise/sunset.svg, Uhrzeit, interpolierte Temperatur); v1.17: Effekte wieder ueber den ganzen Kopfbereich; Hauptsymbol 70 px (schmal 62 px); v1.16: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
+// wetter-karte-card v1.26 (27.11.2026: Temperatur mit °C rechtsbuendig; Untertitel unter Zustand entfernt; Max/Min als Pillen (Wert und Uhrzeit untereinander); v1.25: Zustand zweizeilig; Aussentemperatur gleiche Groesse/Hoehe wie Zustand; Mini-Verlauf groesser mit Gitter und Max/Min mit Uhrzeit; v1.24: statt grosser Grafik Mini-Verlauf (24 h, Flaeche + Linie in Temperaturfarben, Vortag gestrichelt) rechts unter Temperatur und Tendenz-Icon; v1.23: Kopfbereich neu (Variante B): Zustand mit Symbol links, Aussentemperatur mit Tendenz-Icon rechts, darunter Aussentemperatur-Grafik (statistics-graph-chart-card wie bisher) und Stundenleiste; v1.22: Kopfbereich-Hintergrund etwas kraeftiger (.09); v1.21: Niederschlagsbalken halbtransparent; Kopfbereich transparenter; v1.20: grafischer Editor (Wetter-Entitaet, Titel, Darstellung, Quellen, Warnungen, Anzeige); v1.19: Warnungszaehler mit Doppelpunkt (DWD: 2 · NINA: 1); v1.18: alle Wettersymbole als eingebettetes SVG (fluessig, je Einfuegung eigene IDs); Sonnenauf-/-untergang in der Stundenleiste (eigene Symbole sunrise/sunset.svg, Uhrzeit, interpolierte Temperatur); v1.17: Effekte wieder ueber den ganzen Kopfbereich; Hauptsymbol 70 px (schmal 62 px); v1.16: Hauptsymbol als eingebettetes SVG statt <img> (fluessige Animation), 60 px, Text kleiner; v1.15: Effekte nur noch im Stundenbereich (rechts der Trennlinie); Wolken per transform statt left (ruckelfrei), Zustandssymbol auf eigener Ebene; v1.14: Zustandssymbol 45 px; v1.13: Vorhersage-Icons wieder kleiner (40 px); v1.12: Stunden: Wahrscheinlichkeit ueber, Temperatur unter der Linie, kleinere Punkte; Zustandssymbol 50 px, Zustandstext groesser; v1.11: Vorhersage-Icons 50 px; Stunden-Verlaufslinie duenner mit Punkt je Stunde; v1.10: Stunden mit Temperatur und durchgehendem Verlaufsbalken in Temperaturfarben; v1.9: Vorhersage zeigt nur ganze Tage (Spaltenbreite passend zur Kartenbreite), Wischen rastet tageweise ein; v1.8: Vorhersage-Icons groesser (42 px); v1.7: schmale Karte (iPad 3 Spalten) – kompakter Kopf, weniger Stunden, Vorhersage seitlich scrollbar (mind. 54 px je Tag); v1.6: Regen-/Schneesymbol kleiner; Punkt aktuelle Temperatur in den Balken entfernt; v1.5: Warn-Symbole wie Warn-Laufband (DWD-Warncode, Glaette mdi:car-traction-control, NINA-Bild); v1.4: Neuschnee in cm direkt von Open-Meteo (snowfall_sum) statt Schaetzung; Schnee nur, wenn er mind. die Haelfte des Niederschlags ist; ohne Open-Meteo Schnee nur bei Tageszustand Schnee (in mm); v1.3: Standard Balken; Niederschlag nur zwei Farben (Regen blau, Schnee weiss) mit Tropfen-/Schneesymbol; Wind Pfeil ueber dem Wert (keine Ueberschneidung); Test 'Teils bewoelkt Nacht'; v1.2: Regen feiner; Sonne nur als Licht und Strahlen ohne Scheibe; groesseres Zustandssymbol; Stunden mit 'Uhr' ohne 'Jetzt'; Vorhersage im Spaltenraster wie weather-forecast-card (gestrichelte Trenner, Min gepunktet, 0-Grad-Linie), Niederschlag in mm/cm, Wind mit Richtungspfeil in Windfarben; Varianten Linie und Balken (Zeilen entfallen); v1.1: Effekte wie ELMO-Hauskarte per CSS (Wolken, Regen, Schnee, Sterne, Sternschnuppe, Sonne mit Strahlenkranz, Blitz in der Wolke, Nebelbaender) statt Canvas; Balken-Variante durch Linien-Variante ersetzt; v1.0: erste Version – Kopf mit aktuellem Zustand und Wettereffekt (Sonne, Regen, Schnee, klare Nacht, Gewitter, Nebel, Wolken) plus naechste Stunden;
 // Warnungen DWD (aktuell + Vorabinfo) und NINA mit Farben der NINA-DWD-Karte, antippen zeigt Beschreibung; Vorhersage als Zeilen (Apple-Stil) oder Balken,
 // Temperaturfarben nach den Schwellen der Aussentemperatur-Grafik, Niederschlag in mm bzw. Schnee ca. cm; Testauswahl fuer Wetter und Warnungen)
 (() => {
@@ -111,11 +111,13 @@
     .cur .cn .w1 { display:block; }
     .cur .cs { font-size:12px; line-height:1.3; color:var(--secondary-text-color); margin-top:2px; }
     .tmp { display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex:none; cursor:pointer; }
-    .tmp .tr0 { display:flex; align-items:center; gap:4px; height:22px; }
+    .tmp .tr0 { display:flex; align-items:center; justify-content:flex-end; gap:4px; height:22px; align-self:flex-end; }
     .tmp .tv0 { font-size:17px; font-weight:500; line-height:22px; color:var(--primary-text-color); font-variant-numeric:tabular-nums; white-space:nowrap; }
     .tmp .si, .tmp .si svg, .tmp img { width:24px; height:24px; }
-    .tmp .spk { position:relative; width:172px; height:60px; } .tmp .spk svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
-    .spk .ml { position:absolute; font-size:9px; line-height:10px; white-space:nowrap; color:var(--primary-text-color); font-variant-numeric:tabular-nums; }
+    .tmp .spk { position:relative; width:172px; height:84px; } .tmp .spk svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
+    .spk .ml { position:absolute; display:flex; flex-direction:column; align-items:center; padding:1px 5px; border-radius:6px; background:rgba(28,28,30,.72); border:.5px solid rgba(255,255,255,.12);
+      font-size:9px; line-height:10px; white-space:nowrap; color:var(--primary-text-color); font-variant-numeric:tabular-nums; }
+    .spk .ml b { font-weight:500; font-size:8px; text-transform:uppercase; letter-spacing:.04em; }
     .spk .ml i { font-style:normal; color:var(--secondary-text-color); }
     .hl { height:.5px; background:rgba(255,255,255,.12); margin:6px 0 8px; }
     .hrs { display:flex; }
@@ -169,7 +171,7 @@
       .hd { font-size:22px; line-height:40px; padding:10px 12px 2px; }
       .hero, .tst { margin-left:12px; margin-right:12px; } .tst { padding:0 0 10px; }
       .fold { padding:0 12px; }
-      .cur img, .cur ha-icon, .cur .mi, .cur .mi svg { width:50px; height:50px; --mdc-icon-size:50px; } .cur { gap:8px; } .cur .cn { font-size:15px; } .tmp .tv0 { font-size:15px; } .cur .cs .cl { display:none; } .tmp .si, .tmp .si svg { width:22px; height:22px; } .tmp .spk { width:124px; height:54px; } .hero { padding:8px 8px 10px; }
+      .cur img, .cur ha-icon, .cur .mi, .cur .mi svg { width:50px; height:50px; --mdc-icon-size:50px; } .cur { gap:8px; } .cur .cn { font-size:15px; } .tmp .tv0 { font-size:15px; } .cur .cs .cl { display:none; } .tmp .si, .tmp .si svg { width:22px; height:22px; } .tmp .spk { width:124px; height:80px; } .hero { padding:8px 8px 10px; }
       .fh .fx .vb, .fh .fx .vb + .dt { display:none; }
 
       .h img, .h ha-icon, .h .si, .h .si svg { width:22px; height:22px; --mdc-icon-size:20px; }
@@ -279,24 +281,24 @@
       const H = this._hist; if (!H || H.today.length < 2) return '';
       // Koordinaten in Prozent (Breite) bzw. 0..100 (Hoehe); oben/unten Platz fuer Max-/Min-Beschriftung
       const t = H.today, all = t.concat(H.yest).map((x) => x.v), lo = Math.min(...all), hi = Math.max(...all), sp = Math.max(1, hi - lo);
-      const X = (tm) => (tm - H.from) / (H.to - H.from) * 100, Y = (v) => 18 + (hi - v) / sp * 64;
+      const X = (tm) => (tm - H.from) / (H.to - H.from) * 100, Y = (v) => 30 + (hi - v) / sp * 40;
       const line = (a) => a.map((p, i) => `${i ? 'L' : 'M'}${X(p.t).toFixed(2)},${Y(p.v).toFixed(2)}`).join('');
       const g = 'wks' + (this._gid || (this._gid = Math.random().toString(36).slice(2, 7)));
       const stops = [0, 0.25, 0.5, 0.75, 1].map((k) => `<stop offset="${k}" stop-color="${tc(hi - sp * k)}"/>`).join('');
       const lst = t[t.length - 1];
       // Gitter: 3 waagerecht, senkrecht alle 6 h (volle Stunden)
-      let grid = [18, 50, 82].map((y) => `<line x1="0" x2="100" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.12)" stroke-width=".8" vector-effect="non-scaling-stroke"/>`).join('');
-      const d0 = new Date(H.from); d0.setMinutes(0, 0, 0); for (let tm = d0.getTime(); tm <= H.to; tm += 3600000) { if (new Date(tm).getHours() % 6) continue; const x = X(tm); if (x > 1 && x < 99) grid += `<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="12" y2="88" stroke="rgba(255,255,255,.08)" stroke-width=".8" vector-effect="non-scaling-stroke"/>`; }
+      let grid = [30, 50, 70].map((y) => `<line x1="0" x2="100" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.12)" stroke-width=".8" vector-effect="non-scaling-stroke"/>`).join('');
+      const d0 = new Date(H.from); d0.setMinutes(0, 0, 0); for (let tm = d0.getTime(); tm <= H.to; tm += 3600000) { if (new Date(tm).getHours() % 6) continue; const x = X(tm); if (x > 1 && x < 99) grid += `<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="24" y2="76" stroke="rgba(255,255,255,.08)" stroke-width=".8" vector-effect="non-scaling-stroke"/>`; }
       const svg = `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="${g}l" x1="0" y1="${Y(hi)}" x2="0" y2="${Y(lo)}" gradientUnits="userSpaceOnUse">${stops}</linearGradient>
         <linearGradient id="${g}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity=".05"/></linearGradient>
         <mask id="${g}m"><rect width="100" height="100" fill="url(#${g}a)"/></mask></defs>${grid}
         ${H.yest.length > 1 ? `<path d="${line(H.yest)}" fill="none" stroke="#C7C7CC" stroke-opacity=".8" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>` : ''}
-        <path d="${line(t)}L${X(lst.t).toFixed(2)},88L${X(t[0].t).toFixed(2)},88Z" fill="url(#${g}l)" mask="url(#${g}m)"/>
+        <path d="${line(t)}L${X(lst.t).toFixed(2)},76L${X(t[0].t).toFixed(2)},76Z" fill="url(#${g}l)" mask="url(#${g}m)"/>
         <path d="${line(t)}" fill="none" stroke="url(#${g}l)" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
       // Max/Min (letzte 24 h) mit Uhrzeit
       let mx = t[0], mn = t[0]; t.forEach((p) => { if (p.v > mx.v) mx = p; if (p.v < mn.v) mn = p; });
       const lab = (p, top) => { const x = X(p.t), tr = x < 18 ? '0' : x > 82 ? '-100%' : '-50%';
-        return `<span class="ml" style="left:${x.toFixed(1)}%;${top ? 'top:0' : 'bottom:0'};transform:translateX(${tr})">${String(Math.round(p.v * 10) / 10).replace('.', ',').replace('-', '−')}° <i>${hhmm(new Date(p.t))}</i></span>`; };
+        return `<span class="ml" style="left:${x.toFixed(1)}%;${top ? 'top:0' : 'bottom:0'};transform:translateX(${tr})"><b style="color:${tc(p.v)}">${top ? 'max' : 'min'}</b> ${String(Math.round(p.v * 10) / 10).replace('.', ',').replace('-', '−')}°<i>${hhmm(new Date(p.t))} Uhr</i></span>`; };
       return svg + lab(mx, true) + lab(mn, false);
     }
 
@@ -408,7 +410,7 @@
       if (this._last.cur !== c) {
         this._last.cur = c;
         const el = this._root.getElementById('cur');
-        el.innerHTML = `<div class="mi"></div><div class="ct"><div class="cn">${esc(NAMES[c] || c).split(' ').map((w) => `<span class="w1">${w}</span>`).join('')}</div><div class="cs"></div></div>`;
+        el.innerHTML = `<div class="mi"></div><div class="ct"><div class="cn">${esc(NAMES[c] || c).split(' ').map((w) => `<span class="w1">${w}</span>`).join('')}</div></div>`;
         const mi = el.firstChild, path = this._c.icons_path;
         if (!path) mi.innerHTML = ico(MDI[c] || 'mdi:weather-cloudy');
         else svgText(`${path.replace(/\/$/, '')}/${c}.svg`).then((t) => { if (this._last.cur === c && mi.isConnected) mi.innerHTML = svgUse(t); })
@@ -418,8 +420,8 @@
       const ts = this._hass.states[this._c.temperature_entity], tr = this._hass.states[this._c.trend_entity];
       const tval = ts ? num(ts.state, NaN) : NaN, trs = tr ? tr.state : '';
       const tpath = (this._c.trend_icons_path || '').replace(/\/$/, '');
-      this._set('tmp', isNaN(tval) ? '' : `<div class="tr0"><span class="tv0">${String(Math.round(tval * 10) / 10).replace('.', ',').replace('-', '−')}°</span>${tpath ? `<span class="si" data-src="${esc(tpath)}/${TRI[trs] || 'thermometer-glass.svg'}" data-f="mdi:thermometer"></span>` : ''}</div>${this._c.temp_chart === false ? '' : `<div class="spk">${this._spark()}</div>`}`);
-      const cs = this._root.querySelector('#cur .cs'); if (cs) { const tx = trs && TRI[trs] ? `<span class="cl">Außentemperatur · </span>${esc(trs)}` : 'Außentemperatur'; if (cs.innerHTML !== tx) cs.innerHTML = tx; }
+      this._set('tmp', isNaN(tval) ? '' : `<div class="tr0"><span class="tv0">${String(Math.round(tval * 10) / 10).replace('.', ',').replace('-', '−')} °C</span>${tpath ? `<span class="si" data-src="${esc(tpath)}/${TRI[trs] || 'thermometer-glass.svg'}" data-f="mdi:thermometer"></span>` : ''}</div>${this._c.temp_chart === false ? '' : `<div class="spk">${this._spark()}</div>`}`);
+      
       // naechste Stunden
       const hf = (this._fc.hourly || []).filter((x) => Date.parse(x.datetime) > Date.now()).slice(0, Math.max(3, num(this._c.hours, 5)));
       const it = hf.map((x) => { const d = new Date(x.datetime); return { d, t: num(x.temperature), c: this._cond(x.condition, this._isNightAt(d)), p: Math.round(num(x.precipitation_probability)) }; });
