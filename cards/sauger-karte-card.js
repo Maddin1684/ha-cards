@@ -1,4 +1,5 @@
-// sauger-karte-card v3.6 (27.11.2026): Trocknungsbalken mit Verlauf rot -> gruen wie Fortschritt.
+// sauger-karte-card v3.7 (27.11.2026): Luecken in gereinigten Flaechen (z. B. Wohnen) werden geschlossen (Konfig 'luecken' in px, Standard 30).
+// v3.6 (27.11.2026): Trocknungsbalken mit Verlauf rot -> gruen wie Fortschritt.
 // v3.5 (27.11.2026): gereinigte Flaeche zusaetzlich als Band um die Saugbahnen (halbe Saugerbreite) – unabhaengig von Farben, damit iPhone/iPad und Teppiche wie in der Dreame-App aussehen.
 // v3.4 (27.11.2026): Kartenbild ohne Farbraum-Umrechnung lesen (iPhone/iPad lieferte leicht andere Farben); Teppichmuster toleranter erkannt.
 // v3.3 (27.11.2026): Luecken unter Raumnamen (Nummer + Name) vollstaendig aus der Umgebung gefuellt.
@@ -405,6 +406,11 @@
         // ausmaskierte Stellen (Beschriftung, Nadeln) mit der umliegenden gereinigten Flaeche fuellen, damit keine Loecher bleiben
         { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1; const fill = dil(mm, 34);
           for (let q = 0; q < NP; q++) if (skip[q] && fill[q] && d[q * 4 + 3] > 200 && !mm[q]) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
+        // Luecken innerhalb gereinigter Flaechen schliessen (dunklere Bodenstellen, Moebelkanten, Teppichraender): Schliessen mit ~30 px –
+        // kleinere Loecher werden gefuellt, grosse nicht befahrene Bereiche bleiben frei
+        { const mm = new Uint8Array(NP); for (let q = 0; q < NP; q++) if (mo[q * 4 + 3]) mm[q] = 1;
+          const R = this._c.luecken != null ? +this._c.luecken : 30, dd = dil(mm, R), inv = new Uint8Array(NP); for (let q = 0; q < NP; q++) inv[q] = dd[q] ? 0 : 1;
+          const ero = dil(inv, R); for (let q = 0; q < NP; q++) if (!ero[q] && !mm[q] && d[q * 4 + 3] > 200) { const i = q * 4; mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; } }
         // Wischband weich (Kachelfugen verschwinden), Saugspur scharf darueber
         const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; c2.getContext('2d').putImageData(mop, 0, 0);
         const c3 = document.createElement('canvas'); c3.width = W; c3.height = Hh; c3.getContext('2d').putImageData(pth, 0, 0);
