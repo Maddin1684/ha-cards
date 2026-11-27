@@ -1,4 +1,6 @@
-// sauger-karte-card v3.10 (27.11.2026): Raumnummer als Kreis und Namenspille als Kapsel ausgespart statt als Rechteck – kein Viereck mehr in der Spur.
+// sauger-karte-card v3.12 (27.11.2026): Konfig 'bild_ohne_symbole: true' – wenn in der Dreame-Integration Raumnamen/Nummern/Hindernisse/Roboter/Basis im Kartenbild ausgeblendet sind, wird nichts mehr ausgespart (vollstaendige Spuren).
+// v3.11 (27.11.2026): Fahrspuren unter Raumnummer/Namenspille/Nadeln werden ergaenzt (Bahnen, die beidseits weiterlaufen, werden durchgezogen).
+// v3.10 (27.11.2026): Raumnummer als Kreis und Namenspille als Kapsel ausgespart statt als Rechteck – kein Viereck mehr in der Spur.
 // v3.9 (27.11.2026): Fahrspuren wieder wie vorher (zart); Raumbeschriftung nur noch eng um Nummernkreis und Namenspille ausgespart – vorher fiel ein grosser Kasten weg, auf dem Wohnen-Teppich fehlten dadurch Bahnen und die unteren Kreise.
 // v3.8: Fahrspuren kraeftiger (rueckgaengig).
 // v3.7 (27.11.2026): Luecken in gereinigten Flaechen (z. B. Wohnen) werden geschlossen (Konfig 'luecken' in px, Standard 30).
@@ -372,7 +374,7 @@
         const rooms = Object.values(A.rooms || {}).filter((r) => r.visibility !== 'Hidden'), bases = [], lbx = [];
         rooms.forEach((r) => { const pts = [tf(r.x0, r.y0), tf(r.x1, r.y1)], X0 = Math.max(0, Math.min(pts[0][0], pts[1][0]) | 0), X1 = Math.min(W, Math.max(pts[0][0], pts[1][0]) | 0), Y0 = Math.max(0, Math.min(pts[0][1], pts[1][1]) | 0), Y1 = Math.min(Hh, Math.max(pts[0][1], pts[1][1]) | 0);
           const L = r.x != null ? tf(r.x, r.y) : null, hw = String(r.custom_name || r.name || '').length * 6.5 + 18;
-          if (L) { lbx.push([L[0] - hw, L[1] - 20, L[0] + hw, L[1] + 20, 20]); lbx.push([L[0] - 19, L[1] - 75, L[0] + 19, L[1] - 37, 19]); }
+          if (L && !this._c.bild_ohne_symbole) { lbx.push([L[0] - hw, L[1] - 20, L[0] + hw, L[1] + 20, 20]); lbx.push([L[0] - 19, L[1] - 75, L[0] + 19, L[1] - 37, 19]); }
           const cnt = new Map(); let tot = 0;
           for (let y = Y0; y < Y1; y += 1) for (let x = X0; x < X1; x += 1) { if (L && x > L[0] - 95 && x < L[0] + 95 && y > L[1] - 80 && y < L[1] + 22) continue; const i = (y * W + x) * 4; if (d[i + 3] < 250) continue;
             const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb); if (mn >= 240 || mx - mn < 12 || (mx - mn) / mx >= 0.7) continue; const k = (rr << 16) | (gg << 8) | bb; cnt.set(k, (cnt.get(k) || 0) + 1); tot++; }
@@ -393,12 +395,25 @@
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 250) continue; const rr = d[i], gg = d[i + 1], bb = d[i + 2], mn = Math.min(rr, gg, bb), mx = Math.max(rr, gg, bb);
           if (mx > 0 && (mx - mn) / mx > 0.62) seedP[q] = 1; else if (inL[q] && mn < 240 && mx - mn >= 12 && !near(rr, gg, bb) && !clean(rr, gg, bb)) seedL[q] = 1; }
         const mP = dil(seedP, 3); for (let q = 0; q < NP; q++) if (inL[q] || mP[q]) skip[q] = 1; void seedL;
-        Object.values(A.obstacles || {}).forEach((o) => { const [x, y] = tf(o.x, o.y); box(x - 17, y - 46, x + 17, y + 3); });
-        [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 24, y - 24, x + 24, y + 24); } });
+        if (!this._c.bild_ohne_symbole) Object.values(A.obstacles || {}).forEach((o) => { const [x, y] = tf(o.x, o.y); box(x - 17, y - 46, x + 17, y + 3); });
+        if (!this._c.bild_ohne_symbole) [A.vacuum_position, A.charger_position].forEach((q) => { if (q) { const [x, y] = tf(q.x, q.y); box(x - 24, y - 24, x + 24, y + 24); } });
         const pth = cx.createImageData(W, Hh), mop = cx.createImageData(W, Hh), o = pth.data, mo = mop.data; let n = 0;
         for (let q = 0; q < NP; q++) { const i = q * 4; if (d[i + 3] < 200 || skip[q]) continue; const r = d[i], g = d[i + 1], b = d[i + 2], mn = Math.min(r, g, b);
           if (mn >= 246) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; n++; }
           else if (d[i + 3] > 250 && clean(r, g, b)) { mo[i] = 0; mo[i + 1] = 88; mo[i + 2] = 230; mo[i + 3] = 255; n++; } }
+        // Fahrspuren unter ausgesparten Stellen (Raumnummer, Namenspille, Hindernis-Nadeln, Basis) ergaenzen:
+        // eine Bahn, die links und rechts (bzw. oben und unten) einer verdeckten Stelle weiterlaeuft, wird hindurch verbunden.
+        { const P = (q) => o[q * 4 + 3] > 0, MAX = 90, put = (q) => { const i = q * 4; if (d[i + 3] > 200 && !o[i + 3]) { o[i] = 235; o[i + 1] = 235; o[i + 2] = 245; o[i + 3] = 95; } };
+          const near = (q, step, lim) => { for (let k = 1; k <= 2; k++) { const r = q + step * k; if (r >= 0 && r < lim && P(r)) return true; } return false; };
+          for (let pass = 0; pass < 2; pass++) {
+            const out = [], along = pass === 0 ? 1 : W, L1 = pass === 0 ? Hh : W, L2 = pass === 0 ? W : Hh;
+            for (let a = 0; a < L1; a++) { let b = 0;
+              while (b < L2) { const q0 = pass === 0 ? a * W + b : b * W + a; if (!skip[q0]) { b++; continue; }
+                let e = b; while (e < L2 && skip[pass === 0 ? a * W + e : e * W + a]) e++;
+                const qs = pass === 0 ? a * W + b : b * W + a, qe = pass === 0 ? a * W + (e - 1) : (e - 1) * W + a;
+                if (e - b <= MAX && near(qs, -along, NP) && near(qe, along, NP)) for (let k = b; k < e; k++) out.push(pass === 0 ? a * W + k : k * W + a);
+                b = e; } }
+            out.forEach(put); } }
         // Hauptregel (geraeteunabhaengig): das gereinigte Band ist die Flaeche, die der Sauger mit seiner Breite ueberfahren hat –
         // also alles Boden im Umkreis von ~13 px (≈ halbe Saugerbreite) um die weissen Bahnen. Unabhaengig von Farbtoenen (Teppich, iPhone-Farben).
         { const wp = new Uint8Array(NP); for (let q = 0; q < NP; q++) { const i = q * 4; if (!skip[q] && d[i + 3] > 200 && Math.min(d[i], d[i + 1], d[i + 2]) >= 240) wp[q] = 1; }
