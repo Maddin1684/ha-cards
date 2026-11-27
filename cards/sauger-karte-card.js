@@ -1,4 +1,5 @@
-// sauger-karte-card v3.5 (27.11.2026): gereinigte Flaeche zusaetzlich als Band um die Saugbahnen (halbe Saugerbreite) – unabhaengig von Farben, damit iPhone/iPad und Teppiche wie in der Dreame-App aussehen.
+// sauger-karte-card v3.6 (27.11.2026): Trocknungsbalken mit Verlauf rot -> gruen wie Fortschritt.
+// v3.5 (27.11.2026): gereinigte Flaeche zusaetzlich als Band um die Saugbahnen (halbe Saugerbreite) – unabhaengig von Farben, damit iPhone/iPad und Teppiche wie in der Dreame-App aussehen.
 // v3.4 (27.11.2026): Kartenbild ohne Farbraum-Umrechnung lesen (iPhone/iPad lieferte leicht andere Farben); Teppichmuster toleranter erkannt.
 // v3.3 (27.11.2026): Luecken unter Raumnamen (Nummer + Name) vollstaendig aus der Umgebung gefuellt.
 // v3.2 (27.11.2026): Teppichflaechen (Schachbrettmuster ohne helles Band) gelten als gereinigt, wo Saugbahnen liegen – z. B. Teppich in Wohnen unter den Kreisen.
@@ -198,7 +199,7 @@
       const extra = [ok(ar) ? ar.state + ' m²' : '', ok(ct) ? ct.state + ' min' : ''].filter(Boolean).join(' · ');
       h += tile('mdi:history', 'Letzte Reinigung', last, extra ? `<span class="sx">${esc(extra)}</span>` : '');
       if (ok(pr) && (v.state === 'cleaning' || v.state === 'paused' || v.state === 'returning')) { const p = +pr.state; h += tile('mdi:timelapse', 'Reinigungsfortschritt', p + ' %' + (extra ? ' · ' + extra : ''), bar(p, 'grad'), 'w'); }
-      if (ok(dp) && +dp.state < 100) { const p = +dp.state; h += tile('mdi:hair-dryer', 'Trocknung', (ok(dl) ? 'noch ' + dl.state + ' min' : p + ' %'), bar(p, C.blue), 'w'); }
+      if (ok(dp) && +dp.state < 100) { const p = +dp.state; h += tile('mdi:hair-dryer', 'Trocknung', (ok(dl) ? 'noch ' + dl.state + ' min' : p + ' %'), bar(p, 'grad'), 'w'); }
       if (ok(lw) && lw.state !== 'no_warning') h += tile('mdi:water-alert', 'Wassertank', fmt(lw), '', 'al w');
       if (ok(er) && er.state !== 'no_error') h += tile('mdi:alert-circle-outline', 'Fehler', fmt(er), '', 'al w');
       // v2.9: am Tag einer erfolgreichen Reinigung gruener Kasten mit kurzer Zusammenfassung (aus dem Reinigungsverlauf)
