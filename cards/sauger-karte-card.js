@@ -1,4 +1,5 @@
-// sauger-karte-card v2.8 (26.11.2026, Wunsch Martin): Pillen Modus/Akku/Hindernisse gleich gross wie die Kopf-Pillen (13 px, 30 px hoch, Symbol 16 px).
+// sauger-karte-card v2.9 (27.11.2026, Wunsch Martin): am Tag einer erfolgreichen Reinigung gruener Kasten mit Zusammenfassung (Uhrzeit von–bis, Flaeche, Dauer, CleanGenius, nicht erreichte Raeume mit Grund).
+// v2.8 (26.11.2026, Wunsch Martin): Pillen Modus/Akku/Hindernisse gleich gross wie die Kopf-Pillen (13 px, 30 px hoch, Symbol 16 px).
 // v2.7 (26.11.2026, Wunsch Martin): Steuerung als Pille oben rechts wie Beleuchtung/Rollos – Alle reinigen (gruenes Sauger-Symbol), waehrend der Reinigung Pausieren (gelb) und Zur Station (rot), pausiert Fortsetzen (gruen); Akku als Pille neben dem Reinigungsmodus.
 // v2.6 (26.11.2026): Karte erscheint auch, wenn die Integration die Kalibrierung verworfen hat (wird je Karte gemerkt; sonst Bild abrufen, damit sie neu gemeldet wird).
 // v2.5 (25.11.2026): Kachelwerte in normaler Schrift statt fett (passend zu den anderen Karten).
@@ -59,6 +60,9 @@
     .tile .bar { height:6px; border-radius:3px; background:rgba(118,118,128,.3); margin-top:6px; overflow:hidden; }
     .tile .bar i { display:block; height:100%; border-radius:3px; transition:width .6s; }
     .tile.al { background:rgba(255,69,58,.16); }
+    .tile.ok { background:rgba(48,209,88,.16); }
+    .tile.ok small, .tile.ok small ha-icon { color:${C.green}; }
+    .tile.ok .sx { color:var(--secondary-text-color); }
     .tile.al b, .tile.al small { color:${C.red}; }
     .tile.al ha-icon { animation:skbl 1s steps(1) infinite; }
     @keyframes skbl { 50% { opacity:0; } }
@@ -173,6 +177,21 @@
       if (ok(dp) && +dp.state < 100) { const p = +dp.state; h += tile('mdi:hair-dryer', 'Trocknung', (ok(dl) ? 'noch ' + dl.state + ' min' : p + ' %'), bar(p, C.blue), 'w'); }
       if (ok(lw) && lw.state !== 'no_warning') h += tile('mdi:water-alert', 'Wassertank', fmt(lw), '', 'al w');
       if (ok(er) && er.state !== 'no_error') h += tile('mdi:alert-circle-outline', 'Fehler', fmt(er), '', 'al w');
+      // v2.9: am Tag einer erfolgreichen Reinigung gruener Kasten mit kurzer Zusammenfassung (aus dem Reinigungsverlauf)
+      if (ok(hi) && !['cleaning', 'paused', 'returning'].includes(v.state)) {
+        const L = Object.values(hi.attributes || {}).filter((x) => x && typeof x === 'object' && x.timestamp).sort((a, b) => b.timestamp - a.timestamp)[0];
+        const d0 = L && new Date(L.timestamp * 1000), td = new Date();
+        if (L && L.completed && d0.toDateString() === td.toDateString() && parseFloat(L.cleaned_area) > 0) {
+          const hm = (d) => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+          const d1 = L.multiple_cleaning_time && L.multiple_cleaning_time > L.timestamp ? new Date(L.multiple_cleaning_time * 1000) : null;
+          const MA = (H.states[this._c.map] || {}).attributes || {};
+          const WHY = (t) => /carpet/i.test(t) ? 'Teppich' : /door/i.test(t) ? 'Tür zu' : /threshold/i.test(t) ? 'Schwelle' : /obstacle/i.test(t) ? 'Hindernis' : 'nicht erreichbar';
+          const bl = Object.entries(L.blocked_rooms || {}).map(([id, t]) => (this._roomName(id, MA) || 'Raum ' + id) + ' (' + WHY(t) + ')');
+          const sub = [L.cleaned_area, L.cleaning_time, /clean ?genius/i.test(L.cleanup_method || '') ? 'CleanGenius' : ''].filter(Boolean).join(' · ');
+          h += tile('mdi:check-circle-outline', 'Reinigung erfolgreich', 'heute ' + hm(d0) + (d1 ? '–' + hm(d1) : '') + ' · ' + sub,
+            bl.length ? `<span class="sx">nicht gereinigt: ${esc(bl.join(', '))}</span>` : '', 'ok w');
+        }
+      }
       if (r.querySelector('.tiles').innerHTML !== h) r.querySelector('.tiles').innerHTML = h;
       const ks = H.states[this._c.floor || 'input_select.karte'];
       const fl = ks && (ks.attributes.options || []).length > 1 ? ks.attributes.options.map((o) => `<button class="${o === ks.state ? 'on' : ''}" data-floor="${esc(o)}">${esc(o)}</button>`).join('') : '';
