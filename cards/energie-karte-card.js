@@ -1,4 +1,4 @@
-// energie-karte-card v1.2 (28.11.2026: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.3 (28.11.2026: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -40,6 +40,7 @@
   const dc = (v, d = 1) => Number(v).toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
   const fmtW = (w) => Math.abs(w) >= 1000 ? dc(Math.abs(w) / 1000, 1) + ' kW' : Math.round(Math.abs(w)) + ' W';
   const ic = (k, col) => `<svg viewBox="0 0 24 24" fill="${col}"><path d="${ICON[k]}"/></svg>`;
+  const socCol = (p) => p < 20 ? C.red : p < 40 ? C.yellow : C.green;
   const sum = (a) => a.reduce((m, x) => m + x, 0);
   const niceMax = (v) => { const p = Math.pow(10, Math.floor(Math.log10(v || 1))); for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (v <= m * p) return m * p; return 10 * p; };
   const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
@@ -104,7 +105,7 @@
     .tk .fill .wave { position:absolute; left:0; top:-6px; width:200%; height:7px; fill:color-mix(in srgb, var(--fc) 22%, transparent); animation:wave 3s linear infinite; }
     @keyframes wave { from { transform:translateX(0); } to { transform:translateX(-50%); } }
     .tk .soc2 { position:absolute; left:10px; right:10px; bottom:5px; height:3px; border-radius:2px; background:rgba(118,118,128,.3); overflow:hidden; z-index:1; }
-    .tk .soc2 i { display:block; height:100%; border-radius:2px; transition:width .8s; background:linear-gradient(90deg, ${C.red} 0%, ${C.yellow} 50%, ${C.green} 80%); background-size:100% 100%; }
+    .tk .soc2 i { display:block; height:100%; border-radius:2px; transition:width .8s, background .4s; background:linear-gradient(90deg, color-mix(in srgb, var(--sc) 35%, transparent), var(--sc)); }
     .tk .soc2 i { position:relative; overflow:hidden; }
     .tk .soc2 i.chg::after { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.35) 0 6px, transparent 6px 12px); background-size:24px 100%; animation:stripes .8s linear infinite; }
     @keyframes stripes { from { background-position:0 0; } to { background-position:24px 0; } }
@@ -270,14 +271,14 @@
       const bCol = s.bat > 0 ? C.green : s.bat < 0 ? C.lila : 'rgba(118,118,128,.6)'; tk('bat', bCol, s.bat !== 0, 'bt'); icon('bat', 'bat', s.bat ? bCol : C.t2);
       val('bat', fmtW(s.bat), s.bat ? bCol : C.t2); this._set('d-bat', 'html', `${s.soc} %${s.bat > 0 ? ' · lädt' : s.bat < 0 ? ' · entlädt' : ''}`);
       this._set('bfill', 'height', s.soc + '%'); this._set('bfill', '--fc', bCol);
-      this._set('bsoc', 'width', Math.max(0.5, s.soc) + '%'); this._set('bsoc', 'backgroundSize', (10000 / Math.max(0.5, s.soc)).toFixed(1) + '% 100%');
+      this._set('bsoc', 'width', Math.max(0.5, s.soc) + '%'); this._set('bsoc', '--sc', socCol(s.soc));
       // Wasser
       const wOn = s.water > 0; tk('water', C.blue, wOn, ''); icon('water', 'water', wOn ? C.blue : C.t2);
       val('water', dc(s.water, 0) + ' L/min', wOn ? C.blue : C.t2); this._set('d-water', 'html', `${s.wday} L heute`); this._set('rip', 'cls', 'rip' + (wOn ? '' : ' off'));
       // Enyaq
       const cOn = s.wall > 0; tk('car', C.cyan, cOn, 'cr'); icon('car', cOn ? 'ev' : 'car', cOn ? C.cyan : C.t2);
       val('car', cOn ? fmtW(s.wall) : `${s.car} %`, cOn ? C.cyan : C.t2); this._set('d-car', 'html', cOn || s.wallday > 0 ? `${dc(s.wallday)} kWh · ${s.car} %` : 'Akku');
-      this._set('csoc', 'width', Math.max(0.5, s.car) + '%'); this._set('csoc', 'backgroundSize', (10000 / Math.max(0.5, s.car)).toFixed(1) + '% 100%'); this._set('csoc', 'cls', cOn ? 'chg' : '');
+      this._set('csoc', 'width', Math.max(0.5, s.car) + '%'); this._set('csoc', '--sc', socCol(s.car)); this._set('csoc', 'cls', cOn ? 'chg' : '');
     }
 
     /* ---------- Diagramme aus der Langzeitstatistik ---------- */
