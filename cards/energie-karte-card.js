@@ -1,4 +1,4 @@
-// energie-karte-card v1.7 (28.11.2026: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.8 (28.11.2026: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -7,7 +7,7 @@
 
   const C = { red: '#ff453a', green: '#30d158', solar: '#fbbf24', solar2: '#ffe08a', lila: '#bf5af2', blue: '#0a84ff', cyan: 'rgb(64,200,224)', orange: '#f56300', yellow: '#ffd60a', t2: 'rgba(235,235,245,.6)' };
   const DEF = {
-    title: 'Energie', link: '', link_label: 'Tagesdaten', simulation: false, charts: true, strom_eingeklappt: false, wasser_eingeklappt: false,
+    title: 'Energie', link: '', link_label: 'Tagesdaten', simulation: false, charts: true,
     solar_power: 'sensor.balkonkraftwerk_summe', solar_dachgaube: 'sensor.smart_plug_2212096903668551080548e1e9b26bfc_power', solar_gartenhaus: 'sensor.solarbank_2_e1600_pro_solarleistung', solar_day: 'sensor.solar_kwh_helfer',
     grid_power: 'sensor.stromverbrauch', grid_day: 'sensor.tagesverbrauch_strom', home_day: 'sensor.tagesgesamt',
     battery_power: 'sensor.solarbank_2_e1600_pro_akkuleistung', battery_soc: 'sensor.solarbank_2_e1600_pro_ladestand', battery_invert: false,
@@ -88,12 +88,12 @@
     .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.14), rgba(118,118,128,.12) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
     .tk.gl { animation:tglow 1.6s ease-in-out infinite; }
     @keyframes tglow { 0%,100% { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gc) 50%, transparent), 0 0 0 transparent; } 50% { box-shadow:inset 0 0 0 1px var(--gc), 0 0 22px color-mix(in srgb, var(--gc) 55%, transparent); } }
-    .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:11px; white-space:nowrap; color:rgba(235,235,245,.6); }
+    .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500; white-space:nowrap; color:#fff; }
     .tk .th ha-icon { --mdc-icon-size:18px; width:18px; height:18px; display:inline-flex; transition:color .4s; }
     .tk .tv { position:relative; z-index:1; font-size:18px; font-weight:600; letter-spacing:-.01em; line-height:22px; margin-top:auto; font-variant-numeric:tabular-nums; white-space:nowrap; transition:color .4s; }
     .tk .td { position:relative; z-index:1; font-size:10.5px; line-height:13px; color:rgba(235,235,245,.6); white-space:nowrap; font-variant-numeric:tabular-nums; margin-top:1px; overflow:hidden; text-overflow:ellipsis; }
     .tk.bt .td, .tk.cr .td { margin-bottom:5px; }
-    .tk .gs { position:absolute; left:34px; top:27px; z-index:1; font-size:10px; line-height:12px; font-weight:500; transition:color .4s; }
+    .tk .gs { position:absolute; left:34px; top:28px; z-index:1; font-size:10px; line-height:12px; font-weight:500; transition:color .4s; }
     .tk .jr { position:relative; z-index:1; display:flex; align-items:center; gap:6px; margin:3px 0 2px; font-size:10px; line-height:12px; color:rgba(235,235,245,.6); }
     .tk .mx { flex:1; display:flex; height:4px; gap:2px; border-radius:2px; overflow:hidden; background:rgba(118,118,128,.3); }
     .tk .mx i { display:block; height:100%; border-radius:2px; transition:flex-grow .6s; }
@@ -116,42 +116,24 @@
     .tk .rip { position:absolute; left:0; right:0; bottom:0; height:18px; overflow:hidden; transition:opacity .6s; }
     .tk .rip svg { position:absolute; left:0; bottom:0; width:200%; height:100%; fill:rgba(10,132,255,.25); animation:wave 1.4s linear infinite; }
     .off { opacity:0; }
-    /* Einklappbare Bereiche */
-    .fh { display:flex; align-items:center; gap:14px; height:44px; cursor:pointer; user-select:none; border-bottom:.5px solid rgba(128,128,128,.3); margin:6px 0 6px; }
-    .fh .ft { flex:0 0 28px; width:28px; height:28px; border-radius:7px; background:rgba(118,118,128,.28); display:flex; align-items:center; justify-content:center; }
-    .fh .ft svg { width:18px; height:18px; }
-    .fh .lbl { flex:1; font-weight:500; font-size:14px; text-transform:uppercase; letter-spacing:.04em; }
-    .fh .fx { font-size:12px; color:var(--secondary-text-color); display:flex; align-items:center; gap:4px; font-variant-numeric:tabular-nums; }
-    .fh .fx b { color:var(--primary-text-color); font-weight:400; }
-    .fh .fx svg { width:18px; height:18px; transition:transform .3s; transform:rotate(180deg); }
-    .fold.closed .fh .fx svg { transform:none; }
-    .fb { display:grid; grid-template-rows:1fr; transition:grid-template-rows .3s ease; }
-    .fold.closed .fb { grid-template-rows:0fr; }
-    .fi { overflow:hidden; min-height:0; }
-    .ah { display:flex; align-items:flex-end; justify-content:space-between; margin:2px 0 6px; }
-    .ah small { display:block; font-size:11px; font-weight:500; letter-spacing:.04em; text-transform:uppercase; color:var(--secondary-text-color); }
-    .ah .big { font-size:26px; font-weight:600; letter-spacing:-.01em; line-height:30px; font-variant-numeric:tabular-nums; }
-    .ah .big span { font-size:14px; font-weight:500; color:var(--secondary-text-color); margin-left:3px; }
-    .ah .when { font-size:12px; color:var(--secondary-text-color); text-align:right; }
-    .seg { display:flex; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; margin-bottom:8px; }
-    .seg span { flex:1; text-align:center; font-size:12px; line-height:16px; padding:3px 0; border-radius:6px; color:var(--secondary-text-color); cursor:pointer; user-select:none; }
+    /* Verlauf als Mini-Kacheln */
+    .vh { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 0 10px; }
+    .vh .t { font-weight:500; font-size:14px; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .seg { display:flex; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; flex:none; }
+    .seg span { text-align:center; font-size:11px; line-height:16px; padding:2px 9px; border-radius:6px; color:var(--secondary-text-color); cursor:pointer; user-select:none; }
     .seg span.on { background:rgba(255,255,255,.18); color:var(--primary-text-color); }
-    .chw { position:relative; height:150px; }
-    .chw .grid { position:absolute; left:0; right:28px; border-top:1px solid rgba(255,255,255,.1); }
-    .chw .grid.d { border-top:1px dashed rgba(255,255,255,.35); }
-    .chw .yl { position:absolute; right:0; transform:translateY(-50%); font-size:10px; color:var(--secondary-text-color); width:26px; text-align:right; font-variant-numeric:tabular-nums; }
-    .chw .avg { position:absolute; right:30px; transform:translateY(-110%); font-size:10px; color:var(--secondary-text-color); background:rgba(28,28,30,.85); padding:0 4px; border-radius:4px; }
-    .bars { position:absolute; left:0; right:28px; top:0; bottom:0; display:flex; align-items:stretch; }
-    .bc { flex:1; position:relative; cursor:pointer; }
-    .bc .st { position:absolute; left:20%; right:20%; bottom:0; display:flex; flex-direction:column-reverse; border-radius:4px; overflow:hidden; transition:opacity .2s; }
-    .bc .st i { display:block; flex:none; }
-    .bc .st i + i { box-shadow:0 1px 0 rgba(28,28,30,.9); }
-    .bars.sel .bc .st { opacity:.32; } .bars.sel .bc.on .st { opacity:1; }
-    .xax { position:relative; height:14px; margin-right:28px; font-size:10px; color:var(--secondary-text-color); }
-    .xax span { position:absolute; transform:translateX(-50%); top:2px; white-space:nowrap; } .xax span:first-child { transform:none; left:0 !important; }
-    .alg { display:flex; flex-wrap:wrap; gap:4px 12px; margin:6px 0 4px; font-size:11px; color:var(--secondary-text-color); }
-    .alg span { display:inline-flex; align-items:center; gap:5px; } .alg i { width:8px; height:8px; border-radius:50%; }
-    .alg b { color:var(--primary-text-color); font-weight:400; font-variant-numeric:tabular-nums; }
+    .g4 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .mt { border-radius:14px; padding:9px 11px 10px; background:linear-gradient(155deg, color-mix(in srgb, var(--c) 16%, rgba(118,118,128,.12)), rgba(118,118,128,.12) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); min-width:0; }
+    .mt .n { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500; color:#fff; }
+    .mt .n ha-icon { --mdc-icon-size:18px; width:18px; height:18px; display:inline-flex; color:var(--c); }
+    .mt .v { font-size:18px; font-weight:600; color:var(--c); margin:2px 0 6px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .mt .v span { font-size:11px; color:var(--secondary-text-color); font-weight:500; margin-left:3px; }
+    .mc { position:relative; height:40px; }
+    .bars { position:absolute; inset:0; display:flex; align-items:flex-end; }
+    .bc { flex:1; height:100%; position:relative; cursor:pointer; }
+    .bc .st { position:absolute; left:0; right:0; bottom:0; border-radius:3px; transition:height .5s, opacity .2s; }
+    .bc.e .st { background:rgba(118,118,128,.22) !important; }
+    .bars.sel .bc .st { opacity:.3; } .bars.sel .bc.on .st { opacity:1; }
     .ld { font-size:12px; color:var(--secondary-text-color); padding:20px 0; text-align:center; }
   `;
 
@@ -159,8 +141,7 @@
     setConfig(c) {
       this._c = Object.assign({}, DEF, c || {});
       if (!Array.isArray(this._c.stat_solar)) this._c.stat_solar = this._c.stat_solar ? [this._c.stat_solar] : [];
-      this._fold = { s: !!this._c.strom_eingeklappt, w: !!this._c.wasser_eingeklappt };
-      this._rng = this._rng || { s: 'tag', w: 'tag' }; this._sel = { s: null, w: null };
+      this._rng = this._rng || 'tag'; this._sel = null;
       this._stat = {}; this._statAt = {}; this._sim = this._sim || '';
       if (this._root) this._build();
     }
@@ -191,20 +172,18 @@
         + tile('bat', 'Batterie', 'bt', `<span class="fill" id="bfill"><svg class="wave" viewBox="0 0 120 10" preserveAspectRatio="none"><path d="M0,5 Q15,0 30,5 T60,5 T90,5 T120,5 V10 H0Z"/></svg></span><span class="soc2"><i id="bsoc"></i></span>`)
         + tile('water', 'Wasser', '', `<span class="rip off" id="rip"><svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M0,6 Q10,0 20,6 T40,6 T60,6 T80,6 T100,6 T120,6 V12 H0Z"/></svg></span>`)
         + tile('car', 'Enyaq', 'cr', `<span class="soc2"><i id="csoc"></i></span>`);
-      const fold = (k, nm, icon) => `<div class="fold${this._fold[k] ? ' closed' : ''}" id="fo-${k}"><div class="fh" data-f="${k}"><span class="ft">${ic(icon, '#fff')}</span><span class="lbl">${nm}</span><span class="fx"><span id="fx-${k}"></span>${ic('chev', 'currentColor')}</span></div><div class="fb"><div class="fi" id="ch-${k}"><div class="ld">Lade Verlauf …</div></div></div></div>`;
       r.innerHTML = `<style>${CSS}</style><ha-card>
         <div class="hd"><div class="ttl">${c.title || ''}</div>${c.link ? `<span class="pl" id="lnk">${ic('chart', 'currentColor')}${c.link_label || ''}</span>` : ''}</div>
         ${c.simulation ? `<div class="sim" id="sim"></div>` : ''}
         <div class="fw" id="fw"><div class="tflow" id="tf">${flowSvg}${tiles}</div></div>
-        ${c.charts ? fold('s', 'Strom', 'bolt') + fold('w', 'Wasser', 'water') : ''}
+        ${c.charts ? `<div class="vh"><span class="t" id="vt">Heute</span><span class="seg" id="vseg"></span></div><div class="g4" id="g4"><div class="ld" style="grid-column:1/-1">Lade Verlauf …</div></div>` : ''}
       </ha-card>`;
       const card = r.querySelector('ha-card');
       card.addEventListener('click', (ev) => {
         const sm = ev.target.closest('[data-sim]'); if (sm) { this._sim = sm.dataset.sim; this._render(); return; }
         if (ev.target.closest('#lnk')) { history.pushState(null, '', c.link); window.dispatchEvent(new CustomEvent('location-changed', { detail: { replace: false } })); return; }
-        const f = ev.target.closest('[data-f]'); if (f) { const k = f.dataset.f; this._fold[k] = !this._fold[k]; r.getElementById('fo-' + k).classList.toggle('closed', this._fold[k]); return; }
-        const sg = ev.target.closest('[data-rng]'); if (sg) { const k = sg.dataset.kind; this._rng[k] = sg.dataset.rng; this._sel[k] = null; this._loadStats(); this._chart(k); return; }
-        const bc = ev.target.closest('.bc'); if (bc) { const k = bc.parentElement.dataset.kind, i = +bc.dataset.i; this._sel[k] = this._sel[k] === i ? null : i; this._chart(k); return; }
+        const sg = ev.target.closest('[data-rng]'); if (sg) { this._rng = sg.dataset.rng; this._sel = null; this._loadStats(); this._chart(); return; }
+        const bc = ev.target.closest('.bc'); if (bc) { const i = +bc.dataset.i; this._sel = this._sel === i ? null : i; this._chart(); return; }
         const t = ev.target.closest('.tk'); if (t) { const id = { solar: c.solar_power, grid: c.grid_power, home: c.home_day, bat: c.battery_power, water: c.water_flow, car: c.car_power }[t.dataset.k]; if (id) this.dispatchEvent(new CustomEvent('hass-more-info', { detail: { entityId: id }, bubbles: true, composed: true })); }
       });
       // feste 400er-Flaeche auf Kartenbreite skalieren (Schrift waechst mit)
@@ -212,7 +191,7 @@
       this._ro = new ResizeObserver(() => this._fit()); this._ro.observe(r.getElementById('fw'));
       this._fit();
       if (this._hass) this._render();
-      if (c.charts) { this._chart('s'); this._chart('w'); }
+      if (c.charts) this._chart();
     }
     _fit() {
       const fw = this._root && this._root.getElementById('fw'), tf = this._root && this._root.getElementById('tf'); if (!fw || !tf) return;
@@ -295,55 +274,39 @@
     }
     async _loadStats() {
       const c = this._c; if (!this._hass || !c.charts) return;
-      for (const k of ['s', 'w']) {
-        const rng = this._rng[k], key = k + rng;
-        if (this._statAt[key] && Date.now() - this._statAt[key] < 600000) continue;
-        this._statAt[key] = Date.now();
-        const R = this._range(rng);
-        const ids = k === 's' ? [c.stat_grid, ...c.stat_solar, c.stat_charge, c.stat_discharge].filter(Boolean) : [c.stat_water].filter(Boolean);
-        if (!ids.length) continue;
-        try {
-          const res = await this._hass.callWS({ type: 'recorder/statistics_during_period', start_time: R.start.toISOString(), statistic_ids: ids, period: R.period, types: ['change'] });
-          const arr = (id) => { const out = Array(R.n).fill(0); (res[id] || []).forEach((p) => { const t = typeof p.start === 'number' ? p.start : Date.parse(p.start); for (let i = 0; i < R.n; i++) { const a = +R.step(i), b = +R.step(i + 1); if (t >= a && t < b) { out[i] += Math.max(0, p.change || 0); break; } } }); return out; };
-          if (k === 's') {
-            const grid = arr(c.stat_grid), sol = Array(R.n).fill(0); c.stat_solar.forEach((id) => arr(id).forEach((v, i) => { sol[i] += v; }));
-            const chg = c.stat_charge ? arr(c.stat_charge) : Array(R.n).fill(0), dis = c.stat_discharge ? arr(c.stat_discharge) : Array(R.n).fill(0);
-            this._stat[key] = { R, series: [{ n: 'Netz', v: grid, c: C.red }, { n: 'Solar', v: sol.map((v, i) => Math.max(0, v - chg[i])), c: C.solar }, { n: 'Akku', v: dis, c: C.lila }], neg: chg };
-          } else {
-            const st = this._hass.states[c.stat_water], u = st && st.attributes.unit_of_measurement, fac = u === 'm³' ? 1000 : u === 'L' ? 1 : 1;
-            this._stat[key] = { R, series: [{ n: 'Wasser', v: arr(c.stat_water).map((v) => v * fac), c: C.blue }] };
-          }
-        } catch (e) { this._stat[key] = { err: String(e && e.message || e) }; }
-        this._chart(k);
-      }
+      const rng = this._rng;
+      if (this._statAt[rng] && Date.now() - this._statAt[rng] < 600000) { this._chart(); return; }
+      this._statAt[rng] = Date.now();
+      const R = this._range(rng);
+      const ids = [c.stat_grid, ...c.stat_solar, c.stat_discharge, c.stat_water].filter(Boolean);
+      try {
+        const res = await this._hass.callWS({ type: 'recorder/statistics_during_period', start_time: R.start.toISOString(), statistic_ids: ids, period: R.period, types: ['change'] });
+        const arr = (id) => { const out = Array(R.n).fill(0); (res[id] || []).forEach((p) => { const t = typeof p.start === 'number' ? p.start : Date.parse(p.start); for (let i = 0; i < R.n; i++) { if (t >= +R.step(i) && t < +R.step(i + 1)) { out[i] += Math.max(0, p.change || 0); break; } } }); return out; };
+        const sol = Array(R.n).fill(0); c.stat_solar.forEach((id) => arr(id).forEach((v, i) => { sol[i] += v; }));
+        const st = this._hass.states[c.stat_water], fac = st && st.attributes.unit_of_measurement === 'm³' ? 1000 : 1;
+        this._stat[rng] = { R, tiles: [
+          { k: 'grid', n: 'Netz', icon: 'mdi:transmission-tower-import', c: C.red, unit: 'kWh', dec: 1, v: arr(c.stat_grid), more: c.stat_grid },
+          { k: 'solar', n: 'Solar', icon: 'mdi:solar-power-variant', c: C.solar, unit: 'kWh', dec: 1, v: sol, more: c.solar_day },
+          { k: 'bat', n: 'Akku', icon: 'mdi:battery-arrow-down', c: C.lila, unit: 'kWh', dec: 1, v: arr(c.stat_discharge), more: c.stat_discharge },
+          { k: 'water', n: 'Wasser', icon: 'mdi:water', c: C.blue, unit: 'L', dec: 0, v: arr(c.stat_water).map((v) => v * fac), more: c.water_day }] };
+      } catch (e) { this._stat[rng] = { err: String(e && e.message || e) }; }
+      this._chart();
     }
-    _chart(k) {
+    _chart() {
       if (!this._root || !this._c.charts) return;
-      const rng = this._rng[k], D = this._stat[k + rng], sel = this._sel[k], unit = k === 's' ? 'kWh' : 'L', dec = k === 's' ? 1 : 0;
-      const seg = `<div class="seg">${[['tag', 'Tag'], ['woche', 'Woche'], ['monat', 'Monat']].map(([v, l]) => `<span data-kind="${k}" data-rng="${v}" class="${rng === v ? 'on' : ''}">${l}</span>`).join('')}</div>`;
-      if (!D || D.err) { this._set('ch-' + k, 'html', seg + `<div class="ld">${D ? 'Statistik nicht verfügbar' : 'Lade Verlauf …'}</div>`); return; }
-      const { R, series, neg } = D, n = R.n;
-      const tops = Array.from({ length: n }, (_, i) => series.reduce((m, x) => m + x.v[i], 0)), mx = niceMax(Math.max(...tops, k === 's' ? 0.5 : 5)), total = sum(tops);
-      const avg = total / Math.max(1, Math.min(n, R.done)), y = (v) => (1 - v / mx) * 100;
-      const lab = (i) => { const d = R.step(i); return R.period === 'hour' ? `${i}:00–${i + 1}:00` : `${WD[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`; };
-      const when = rng === 'tag' ? 'Heute' : rng === 'woche' ? 'Letzte 7 Tage' : MON[R.start.getMonth()];
-      const big = sel == null ? ['Gesamt', total] : [lab(sel), tops[sel]];
-      let h = `<div class="ah"><div><small>${big[0]}</small><div class="big">${dc(big[1], dec)}<span>${unit}</span></div></div><div class="when">${when}${sel == null ? `<br>Ø ${dc(avg, k === 's' ? 2 : 0)} ${unit} pro ${R.period === 'hour' ? 'Stunde' : 'Tag'}` : ''}</div></div>` + seg;
-      h += '<div class="chw">';
-      [mx, mx / 2, 0].forEach((t) => { h += `<span class="grid" style="top:${y(t)}%"></span><span class="yl" style="top:${y(t)}%">${dc(t, Number.isInteger(t) ? 0 : 1)}</span>`; });
-      if (avg > 0) h += `<span class="grid d" style="top:${y(avg)}%"></span><span class="avg" style="top:${y(avg)}%">Ø</span>`;
-      h += `<div class="bars${sel != null ? ' sel' : ''}" data-kind="${k}">`;
-      for (let i = 0; i < n; i++) {
-        const th = tops[i] / mx * 100;
-        const segs = series.map((x) => x.v[i] > 0 ? `<i style="height:${(x.v[i] / tops[i] * 100).toFixed(2)}%;background:${x.c}"></i>` : '').join('');
-        h += `<div class="bc${sel === i ? ' on' : ''}" data-i="${i}"><div class="st" style="height:${Math.max(tops[i] > 0 ? 2.5 : 0, th).toFixed(2)}%">${segs}</div></div>`;
-      }
-      h += '</div></div>';
-      const ticks = R.period === 'hour' ? [0, 6, 12, 18].map((t) => [t, `${t} Uhr`]) : n === 7 ? Array.from({ length: 7 }, (_, i) => [i, WD[R.step(i).getDay()]]) : [0, 7, 14, 21, 28].filter((t) => t < n).map((t) => [t, `${t + 1}.`]);
-      h += `<div class="xax">${ticks.map(([t, l]) => `<span style="left:${((t + 0.5) / n * 100).toFixed(2)}%">${l}</span>`).join('')}</div>`;
-      if (series.length > 1) h += `<div class="alg">${series.map((x) => `<span><i style="background:${x.c}"></i>${x.n} <b>${dc(sel == null ? sum(x.v) : x.v[sel], dec)}</b></span>`).join('')}${neg ? `<span><i style="background:${C.green}"></i>Akku geladen <b>${dc(sel == null ? sum(neg) : neg[sel], dec)}</b></span>` : ''}</div>`;
-      this._set('ch-' + k, 'html', h);
-      this._set('fx-' + k, 'html', `<b>${k === 's' ? dc(total, 1) + ' kWh' : (total >= 1000 ? dc(total / 1000, 2) + ' m³' : Math.round(total) + ' L')}</b>`);
+      const rng = this._rng, D = this._stat[rng], sel = this._sel;
+      this._set('vseg', 'html', [['tag', 'Tag'], ['woche', 'Woche'], ['monat', 'Monat']].map(([v, l]) => `<span data-rng="${v}" class="${rng === v ? 'on' : ''}">${l}</span>`).join(''));
+      if (!D || D.err) { this._set('g4', 'html', `<div class="ld" style="grid-column:1/-1">${D ? 'Statistik nicht verfügbar' : 'Lade Verlauf …'}</div>`); return; }
+      const { R, tiles } = D, n = R.n, gap = n > 24 ? 1 : n > 7 ? 2 : 4;
+      const lab = (i) => { const d = R.step(i); return R.period === 'hour' ? `${i}–${i + 1} Uhr` : `${WD[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`; };
+      this._set('vt', 'html', sel != null ? lab(sel) : rng === 'tag' ? 'Heute' : rng === 'woche' ? 'Letzte 7 Tage' : MON[R.start.getMonth()]);
+      const html = tiles.map((t) => {
+        const mx = Math.max(...t.v), val = sel == null ? sum(t.v) : t.v[sel];
+        const bars = t.v.map((v, i) => `<div class="bc${v > 0 ? '' : ' e'}${sel === i ? ' on' : ''}" data-i="${i}" style="margin:0 ${gap / 2}px"><div class="st" style="height:${v > 0 && mx > 0 ? Math.max(3, v / mx * 40) : 3}px;background:${t.c}"></div></div>`).join('');
+        const vt = t.unit === 'L' && val >= 1000 && sel == null ? `${dc(val / 1000, 2)}<span>m³</span>` : `${dc(val, t.dec)}<span>${t.unit}</span>`;
+        return `<div class="mt" style="--c:${t.c}"><div class="n"><ha-icon icon="${t.icon}"></ha-icon>${t.n}</div><div class="v">${vt}</div><div class="mc"><div class="bars${sel != null ? ' sel' : ''}">${bars}</div></div></div>`;
+      }).join('');
+      this._set('g4', 'html', html);
     }
   }
   customElements.define(TAG, EnergieKarteCard);
@@ -366,8 +329,8 @@
     { type: 'expandable', name: '', title: 'Diagramme (Zähler der Langzeitstatistik)', schema: [
       { name: 'charts', selector: { boolean: {} } },
       { name: 'stat_grid', selector: E('sensor') }, { name: 'stat_solar', selector: { entity: { domain: 'sensor', multiple: true } } },
-      { name: 'stat_charge', selector: E('sensor') }, { name: 'stat_discharge', selector: E('sensor') }, { name: 'stat_water', selector: E('sensor') },
-      { name: 'strom_eingeklappt', selector: { boolean: {} } }, { name: 'wasser_eingeklappt', selector: { boolean: {} } } ] },
+      { name: 'stat_discharge', selector: E('sensor') }, { name: 'stat_water', selector: E('sensor') },
+    ] },
     { type: 'expandable', name: '', title: 'Test', schema: [{ name: 'simulation', selector: { boolean: {} } }] },
   ];
   const LBL = {
@@ -377,8 +340,8 @@
     battery_power: 'Batterie (W, + lädt / − entlädt)', battery_soc: 'Batterie Ladestand (%)', battery_invert: 'Vorzeichen Batterie umkehren',
     water_flow: 'Wasser Durchfluss (L/min)', water_day: 'Wasser heute (L)',
     car_power: 'Wallbox Ladeleistung (W)', car_grid_power: 'Enyaq Netzladeleistung (W)', car_day: 'Wallbox heute (kWh)', car_soc: 'Enyaq Ladestand (%)',
-    charts: 'Diagramme Strom und Wasser anzeigen', stat_grid: 'Netzbezug (kWh-Zähler)', stat_solar: 'Solarertrag (kWh-Zähler)', stat_charge: 'Akku geladen (kWh-Zähler)',
-    stat_discharge: 'Akku entladen (kWh-Zähler)', stat_water: 'Wasserzähler (m³ oder L)', strom_eingeklappt: 'Strom anfangs eingeklappt', wasser_eingeklappt: 'Wasser anfangs eingeklappt',
+    charts: 'Verlauf (Mini-Kacheln) anzeigen', stat_grid: 'Netzbezug (kWh-Zähler)', stat_solar: 'Solarertrag (kWh-Zähler)', stat_charge: 'Akku geladen (kWh-Zähler)',
+    stat_discharge: 'Akku entladen (kWh-Zähler)', stat_water: 'Wasserzähler (m³ oder L)',
     simulation: 'Simulations-Schalter anzeigen',
   };
   class EnergieKarteEditor extends HTMLElement {
