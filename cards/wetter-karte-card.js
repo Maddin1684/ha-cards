@@ -448,7 +448,7 @@
       // Test 'xyz-dawn' / 'xyz-dusk': Zustand xyz bei tiefer Sonne (Morgenrot / Abendrot)
       const tm = /^(.*)-(dawn|dusk)$/.exec(this._test), sunS = this._hass.states[this._c.sun];
       const c = this._test === 'live' ? this._cond(we.state, this._night()) : tm ? tm[1] : this._test;
-      const el = this._test === 'live' ? num(sunS && sunS.attributes.elevation, 30) : tm ? 4 : 30;
+      const el = this._test === 'live' ? num(sunS && sunS.attributes.elevation, 30) : tm ? 2 : 30;
       // Morgen oder Abend: live ueber sun.sun 'rising' (steigt = Morgen), sonst Uhrzeit
       const phase = tm ? (tm[2] === 'dawn' ? 'm' : 'a') : (sunS && sunS.attributes.rising != null ? (sunS.attributes.rising ? 'm' : 'a') : (new Date().getHours() < 12 ? 'm' : 'a'));
       const night = this._test === 'live' ? this._night() : c === 'clear-night' || c === 'partlycloudy-night';
