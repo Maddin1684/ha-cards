@@ -1,4 +1,4 @@
-// energie-karte-card v2.6 (28.11.2026: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v2.7 (28.11.2026: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -133,6 +133,17 @@
     .vh { display:flex; align-items:center; gap:12px; min-height:44px; padding:8px 0; box-sizing:border-box; border-bottom:0.5px solid var(--divider-color, rgba(128,128,128,.3)); margin:8px 0 10px; }
     .vh .ft { flex:0 0 28px; width:28px; height:28px; border-radius:7px; background:rgba(118,118,128,.28); display:flex; align-items:center; justify-content:center; }
     .vh .vx { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; margin-left:8px; border-radius:50%; background:rgba(118,118,128,.32); font-size:11px; line-height:1; vertical-align:2px; cursor:pointer; text-transform:none; }
+    .slw { margin:12px 2px 2px; }
+    .slw input { -webkit-appearance:none; appearance:none; width:100%; height:24px; margin:0; background:transparent; cursor:pointer; touch-action:none; }
+    .slw input::-webkit-slider-runnable-track { height:4px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,.75) var(--p, 0%), rgba(118,118,128,.32) var(--p, 0%)); }
+    .slw input::-moz-range-track { height:4px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,.75) var(--p, 0%), rgba(118,118,128,.32) var(--p, 0%)); }
+    .slw input::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-9px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.35); transition:transform .15s, opacity .3s; }
+    .slw input::-moz-range-thumb { width:22px; height:22px; border:0; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.35); }
+    .slw input:active::-webkit-slider-thumb { transform:scale(1.12); }
+    .slw.idle input::-webkit-slider-thumb { opacity:.55; } .slw.idle input::-webkit-slider-runnable-track { background:rgba(118,118,128,.32); }
+    .slw .sll { display:flex; justify-content:space-between; font-size:10.5px; color:var(--secondary-text-color); margin-top:2px; font-variant-numeric:tabular-nums; }
+    .slw .sll #slm { color:var(--primary-text-color); font-weight:500; }
+    .slw.idle .sll #slm { color:var(--secondary-text-color); font-weight:400; }
     .vh .ft ha-icon { --mdc-icon-size:20px; color:#fff; display:flex; }
     .vh .t { flex:1 1 auto; min-width:0; line-height:17px; font-weight:500; font-size:14px; text-transform:uppercase; letter-spacing:.04em; color:var(--primary-text-color); }
     .seg { display:flex; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; flex:none; margin-left:auto; }
@@ -194,7 +205,7 @@
         <div class="hd"><div class="ttl">${c.title || ''}</div>${c.link ? `<span class="pl" id="lnk">${ic('chart', 'currentColor')}${c.link_label || ''}</span>` : ''}</div>
         ${c.simulation ? `<div class="sim" id="sim"></div>` : ''}
         <div class="fw" id="fw"><div class="tflow" id="tf">${flowSvg}${tiles}</div></div>
-        ${c.charts ? `<div class="vh"><span class="ft"><ha-icon icon="mdi:chart-bar"></ha-icon></span><span class="t" id="vt">Heute</span><span class="seg" id="vseg"></span></div><div class="g4" id="g4"><div class="ld" style="grid-column:1/-1">Lade Verlauf …</div></div>` : ''}
+        ${c.charts ? `<div class="vh"><span class="ft"><ha-icon icon="mdi:chart-bar"></ha-icon></span><span class="t" id="vt">Heute</span><span class="seg" id="vseg"></span></div><div class="g4" id="g4"><div class="ld" style="grid-column:1/-1">Lade Verlauf …</div></div><div class="slw idle" id="slw"><input type="range" id="sl" min="0" max="23" step="1" value="0" aria-label="Zeit wählen"><div class="sll"><span id="sl0"></span><span id="slm">Zum Wählen schieben</span><span id="sl1"></span></div></div>` : ''}
       </ha-card>`;
       const card = r.querySelector('ha-card');
       card.addEventListener('click', (ev) => {
@@ -209,6 +220,11 @@
       if (this._ro) this._ro.disconnect();
       this._ro = new ResizeObserver(() => this._fit()); this._ro.observe(r.getElementById('fw'));
       this._fit();
+      const sl = r.getElementById('sl');
+      if (sl) {
+        sl.addEventListener('input', () => { this._sel = +sl.value; this._chart(); });
+        sl.addEventListener('pointerdown', () => { this._drag = true; }); sl.addEventListener('pointerup', () => { this._drag = false; });
+      }
       if (this._hass) this._render();
       if (c.charts) this._chart();
     }
@@ -358,6 +374,19 @@
         return `<div class="mt" style="--c:${t.c}"><div class="n"><ha-icon icon="${t.icon}"></ha-icon>${t.n}</div><div class="v">${vt}</div><div class="mc"><div class="bars${sel != null ? ' sel' : ''}">${bars}</div></div><div class="mxa">${ax}</div></div>`;
       }).join('');
       this._set('g4', 'html', html);
+      // Schieberegler: steht ohne Auswahl blass auf der laufenden Stunde / dem laufenden Tag
+      const sl = this._root.getElementById('sl');
+      if (sl) {
+        let cur = n - 1; const now = Date.now(); for (let i = 0; i < n; i++) if (now >= +R.step(i) && now < +R.step(i + 1)) cur = i;
+        const v = sel != null ? sel : cur;
+        if (sl.max !== String(n - 1)) sl.max = String(n - 1);
+        if (!this._drag && sl.value !== String(v)) sl.value = String(v);
+        sl.style.setProperty('--p', (n > 1 ? +sl.value / (n - 1) * 100 : 0) + '%');
+        this._set('slw', 'cls', 'slw' + (sel == null ? ' idle' : ''));
+        this._set('sl0', 'html', R.period === 'hour' ? '0 Uhr' : `${R.step(0).getDate()}.${R.step(0).getMonth() + 1}.`);
+        this._set('sl1', 'html', R.period === 'hour' ? '24 Uhr' : `${R.step(n - 1).getDate()}.${R.step(n - 1).getMonth() + 1}.`);
+        this._set('slm', 'html', sel == null ? 'Zum Wählen schieben' : lab(sel));
+      }
     }
   }
   customElements.define(TAG, EnergieKarteCard);
