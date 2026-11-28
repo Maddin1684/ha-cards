@@ -453,7 +453,7 @@
       const phase = tm ? (tm[2] === 'dawn' ? 'm' : 'a') : (sunS && sunS.attributes.rising != null ? (sunS.attributes.rising ? 'm' : 'a') : (new Date().getHours() < 12 ? 'm' : 'a'));
       const night = this._test === 'live' ? this._night() : c === 'clear-night' || c === 'partlycloudy-night';
       const hh = Math.round(((this._root.getElementById('hero') || {}).clientHeight || 0) / 40);
-      const key = [c, night ? 'n' : 't', el < 10 && !night ? 'g' + phase : '', Math.floor(Date.now() / 3600000), hh].join('|');
+      const key = [c, night ? 'n' : 't', el < 4 && el > -4 && !night ? 'g' + phase : '', Math.floor(Date.now() / 3600000), hh].join('|');
       if (key !== this._fxKey) { this._fxKey = key; const e = this._root.getElementById('fx'); if (e) e.innerHTML = this._fxHtml(c, night, el, phase); }
       // Hauptsymbol als eingebettetes SVG (nicht als <img>): Animation laeuft dann wie bei der weather-forecast-card fluessig
       if (this._last.cur !== c) {
