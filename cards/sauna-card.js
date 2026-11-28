@@ -1,4 +1,5 @@
-// sauna-card v1.9 (26.11.2026): Duftrichtung Fichtenessenz ergaenzt; Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
+// sauna-card v1.10 (28.11.2026): Temperatur- und Aufheiz-Symbol beim Heizen in Apple-Rot; Heiz-Pfeil naeher am Titel.
+// v1.9 (26.11.2026): Duftrichtung Fichtenessenz ergaenzt; Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
 // v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
 // v1.7 (26.11.2026): bei 'Kein Aufguss' wieder das durchgestrichene Tropfen-Symbol statt Kuebel.
 // v1.6 (26.11.2026): Sauna-Kuebel (phu:sauna-bucket) als Symbol des Bereichs Aufguss.
@@ -37,7 +38,7 @@
   const CSS = `
     :host { display:block; }
     ha-card { padding:4px 0 8px; overflow:hidden; }
-    .hd .hz { height:44px; width:44px; vertical-align:middle; margin:-6px 0 0 8px; }
+    .hd .hz { height:44px; width:44px; vertical-align:middle; margin:-6px 0 0 -4px; }
     .hd { font-size:24px; font-weight:400; letter-spacing:-.012em; line-height:48px; padding:12px 16px 4px; color:var(--ha-card-header-color, var(--primary-text-color)); }
     .fold { padding:0 16px; }
     .fh { display:flex; align-items:center; gap:16px; height:44px; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; border-bottom:0.5px solid var(--divider-color, rgba(128,128,128,.3)); margin-bottom:4px; }
@@ -227,7 +228,7 @@
       const az = this._v('aufheiz'), m = /^(\d+)\s*Minuten?\s*\((\d{1,2}:\d{2})\)/.exec(az);
       const reached = /erreicht/i.test(az) || (heizt && t >= num(this._c.ziel, 80));
       const sub = reached && (heizt || t >= 40) ? 'Temperatur erreicht' : heizt ? 'heizt' : t >= 40 ? 'kühlt ab' : 'aus';
-      const tc = t >= 80 ? C.red : heizt || t >= 40 ? C.orange : '';
+      const tc = t >= 80 || heizt ? C.red : t >= 40 ? C.orange : '';
       const open = this._chartOpen();
       jetzt += this._row(E.temp, ico('mdi:thermometer', tc), `Temperatur<span class="sec"${sub === 'Temperatur erreicht' ? ` style="color:${C.green}"` : ''}>${esc(sub)}</span>`,
         `<div class="st"><span${tc ? ` style="color:${tc}"` : ''}>${fmt(t)}</span><small>°C</small>${PM}</div><div class="ex"><div>${open || this._chartHad ? this._chart() : ''}</div></div>`,
@@ -237,7 +238,7 @@
       if (heizt && !reached) {
         const ziel = num(this._c.ziel, 80), pts = this._pts || [], lo = pts.length ? Math.min(...pts.filter((p) => p[0] > Date.now() - 4 * 3600000).map((p) => p[1]).concat([t])) : Math.min(t, 0);
         const pr = Math.max(0, Math.min(100, (t - lo) / Math.max(1, ziel - lo) * 100)), w = Math.max(1, pr);
-        jetzt += this._row(E.aufheiz, ico('mdi:sort-clock-descending', C.orange, 'a-up'), `Aufheizzeit${m ? `<span class="sec">bereit um ${m[2]}</span>` : ''}`,
+        jetzt += this._row(E.aufheiz, ico('mdi:sort-clock-descending', C.red, 'a-up'), `Aufheizzeit${m ? `<span class="sec">bereit um ${m[2]}</span>` : ''}`,
           `<div class="st">${m ? `${m[1]} <small>min</small>` : esc(az)}</div><div class="pg"><i style="width:${w.toFixed(1)}%;background:linear-gradient(90deg,${C.green} 0%,${C.yellow} 50%,${C.red} 100%);background-size:${(10000 / w).toFixed(1)}% 100%"></i></div>`);
       }
       const gd = this._v('gang_dauer'), gm = /^(\d+)\.\s*Gang\D*(\d+)/.exec(gd), pm = /^Abkühlpause\D*(\d+)/.exec(gd);
