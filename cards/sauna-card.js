@@ -1,4 +1,5 @@
-// sauna-card v1.10 (28.11.2026): Temperatur- und Aufheiz-Symbol beim Heizen in Apple-Rot; Heiz-Pfeil naeher am Titel.
+// sauna-card v1.11 (28.11.2026): Licht-Symbole in der tatsaechlichen Lichtfarbe; Zeilen aufklappbar: Lampe mit Farbe und Helligkeit, LED-Band mit Helligkeit; Tipp aufs Symbol schaltet ein/aus.
+// v1.10 (28.11.2026): Temperatur- und Aufheiz-Symbol beim Heizen in Apple-Rot; Heiz-Pfeil naeher am Titel.
 // v1.9 (26.11.2026): Duftrichtung Fichtenessenz ergaenzt; Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
 // v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
 // v1.7 (26.11.2026): bei 'Kein Aufguss' wieder das durchgestrichene Tropfen-Symbol statt Kuebel.
@@ -99,6 +100,17 @@
     .a-pulse { animation:sacpulse 2s ease-in-out infinite; }
     .pg { flex:0 0 100%; height:6px; border-radius:3px; background:rgba(118,118,128,.3); overflow:hidden; margin:-4px 0 10px; }
     .pg i { display:block; height:100%; border-radius:3px; transition:width .6s; }
+    .lsl { display:flex; align-items:center; gap:10px; padding:2px 0 10px; font-size:12px; color:var(--secondary-text-color); }
+    .lsl ha-icon { --mdc-icon-size:18px; display:flex; }
+    .lsl span { min-width:36px; text-align:right; font-variant-numeric:tabular-nums; }
+    .lsl input { flex:1; -webkit-appearance:none; appearance:none; height:28px; margin:0; background:transparent; cursor:pointer; touch-action:none; }
+    .lsl input::-webkit-slider-runnable-track { height:6px; border-radius:3px; background:linear-gradient(90deg, var(--lc) var(--p), rgba(118,118,128,.3) var(--p)); }
+    .lsl input::-moz-range-track { height:6px; border-radius:3px; background:linear-gradient(90deg, var(--lc) var(--p), rgba(118,118,128,.3) var(--p)); }
+    .lsl input::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; margin-top:-7px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.4); }
+    .lsl input::-moz-range-thumb { width:20px; height:20px; border:0; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.4); }
+    .lsw { display:flex; flex-wrap:wrap; gap:10px; padding:0 0 12px 28px; }
+    .lsw button { width:28px; height:28px; border-radius:50%; border:0; padding:0; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(255,255,255,.15); -webkit-tap-highlight-color:transparent; }
+    .lsw button.on { box-shadow:0 0 0 2px var(--ha-card-background, #1c1c1e), 0 0 0 4px #fff; }
     .wn ha-icon { --mdc-icon-size:16px; flex:0 0 16px; display:flex; }
   `;
 
@@ -110,6 +122,7 @@
       if (x.nodeType !== y.nodeType || x.nodeName !== y.nodeName) { a.replaceChild(y, x); return; }
       if (x.nodeType !== 1) { if (x.nodeValue !== y.nodeValue) x.nodeValue = y.nodeValue; return; }
       if (x.localName === 'ha-icon' && (x.getAttribute('style') !== y.getAttribute('style') || x.getAttribute('class') !== y.getAttribute('class'))) { a.replaceChild(y, x); return; }
+      if (x.localName === 'input' && x !== (x.getRootNode().activeElement) && !x._drag && x.value !== y.getAttribute('value')) x.value = y.getAttribute('value');
       if (!x.localName.includes('-')) Array.from(x.attributes).forEach((at) => { if (!y.hasAttribute(at.name)) x.removeAttribute(at.name); });
       Array.from(y.attributes).forEach((at) => { if (x.getAttribute(at.name) !== at.value) x.setAttribute(at.name, at.value); });
       morph(x, y);
@@ -122,6 +135,13 @@
   const hhmm = (dt) => String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0');
   const ok = (v) => v != null && !['', 'unknown', 'unavailable'].includes(v);
   const ico = (icon, col = '', cls = '') => `<ha-icon icon="${icon}"${cls ? ` class="${cls}"` : ''}${col ? ` style="color:${col}"` : ''}></ha-icon>`;
+  // Lichtfarben: aktuelle Farbe fuer das Symbol, Auswahl fuer die Lampe
+  const k2rgb = (k) => { const t = k / 100; const r = t <= 66 ? 255 : 329.7 * Math.pow(t - 60, -0.1332); const g = t <= 66 ? 99.47 * Math.log(t) - 161.1 : 288.1 * Math.pow(t - 60, -0.0755); const b = t >= 66 ? 255 : t <= 19 ? 0 : 138.5 * Math.log(t - 10) - 305;
+    return [r, g, b].map((x) => Math.max(0, Math.min(255, Math.round(x)))); };
+  const lightCol = (a) => { const c = a.color_mode === 'color_temp' && a.color_temp_kelvin ? k2rgb(a.color_temp_kelvin) : a.rgb_color; return c ? `rgb(${c.join(',')})` : C.yellow; };
+  const LCOL = [['Warmweiß', { k: 2700 }], ['Neutral', { k: 4000 }], ['Orange', { rgb: [255, 116, 0] }], ['Rot', { rgb: [255, 0, 0] }], ['Pink', { rgb: [255, 45, 120] }], ['Lila', { rgb: [175, 82, 222] }], ['Blau', { rgb: [10, 132, 255] }], ['Türkis', { rgb: [100, 210, 255] }], ['Grün', { rgb: [48, 209, 88] }]]
+    .map(([n, v]) => [n, Object.assign(v, { css: v.k ? `rgb(${k2rgb(v.k).join(',')})` : `rgb(${v.rgb.join(',')})` })]);
+  const sameCol = (a, v) => v.k ? a.color_mode === 'color_temp' && Math.abs((a.color_temp_kelvin || 0) - v.k) < 250 : a.color_mode !== 'color_temp' && a.rgb_color && a.rgb_color.every((x, i) => Math.abs(x - v.rgb[i]) < 30);
   const PM = '<span class="pw"><span class="pc"><ha-icon class="p" icon="mdi:plus-circle-outline"></ha-icon><ha-icon class="m" icon="mdi:minus-circle-outline"></ha-icon></span></span>';
 
   class SaunaCard extends HTMLElement {
@@ -144,7 +164,11 @@
       if (sig === this._sig) return; this._sig = sig;
       try {
         const root = this.shadowRoot || this.attachShadow({ mode: 'open' });
-        if (!root.querySelector('ha-card')) { root.innerHTML = `<style>${CSS}</style><ha-card></ha-card>`; root.querySelector('ha-card').addEventListener('click', (ev) => this._click(ev)); }
+        if (!root.querySelector('ha-card')) { root.innerHTML = `<style>${CSS}</style><ha-card></ha-card>`; root.querySelector('ha-card').addEventListener('click', (ev) => this._click(ev));
+          const card = root.querySelector('ha-card');
+          card.addEventListener('pointerdown', (ev) => { const i = ev.target.closest && ev.target.closest('[data-lbr]'); if (i) i._drag = true; });
+          card.addEventListener('input', (ev) => { const i = ev.target; if (!i.dataset || !i.dataset.lbr) return; i.style.setProperty('--p', i.value + '%'); const sp = i.nextElementSibling; if (sp) sp.textContent = i.value + ' %'; });
+          card.addEventListener('change', (ev) => { const i = ev.target; if (!i.dataset || !i.dataset.lbr) return; i._drag = false; this._hass.callService('light', 'turn_on', { entity_id: this._e[i.dataset.lbr], brightness_pct: +i.value }); }); }
         if (this._chartOpen()) this._hist();
         const html = this._html();
         if (html !== this._last) { const t = document.createElement('template'); t.innerHTML = html; morph(root.querySelector('ha-card'), t.content); this._last = html; }
@@ -276,9 +300,13 @@
 
       /* ---------- Licht und Ambiente ---------- */
       let licht = '';
-      [['bank', 'LED Bankbeleuchtung', 'phu:light-strip'], ['lampe', 'Lampe', 'mdi:bulkhead-light']].forEach(([k, n, ic]) => {
-        const s = this._s(k); if (!s) return; const on = s.state === 'on', br = on && s.attributes.brightness != null ? Math.round(s.attributes.brightness / 2.55) + ' %' : on ? 'an' : 'aus';
-        licht += this._row(E[k], ico(ic, on ? C.yellow : ''), n, `<div class="st"${on ? '' : ' style="color:var(--secondary-text-color)"'}>${br}</div>`, '', `data-toggle="${esc(E[k])}"`);
+      this._lopen = this._lopen || {};
+      [['bank', 'LED Bankbeleuchtung', 'phu:light-strip', false], ['lampe', 'Lampe', 'mdi:bulkhead-light', true]].forEach(([k, n, ic, farbe]) => {
+        const s = this._s(k); if (!s) return; const a = s.attributes, on = s.state === 'on', pc = on && a.brightness != null ? Math.round(a.brightness / 2.55) : 0;
+        const br = on && a.brightness != null ? pc + ' %' : on ? 'an' : 'aus', lc = on ? lightCol(a) : '';
+        const sw = farbe ? `<div class="lsw">${LCOL.map(([nm, v]) => `<button data-lcol="${k}|${nm}" title="${nm}" style="background:${v.css}"${on && sameCol(a, v) ? ' class="on"' : ''}></button>`).join('')}</div>` : '';
+        const ex = `<div class="ex"><div><div class="lsl"><ha-icon icon="mdi:brightness-6"></ha-icon><input type="range" min="1" max="100" step="1" value="${pc || 1}" data-lbr="${k}" style="--p:${pc || 0}%;--lc:${lc || '#8e8e93'}"><span>${on ? pc + ' %' : 'aus'}</span></div>${sw}</div></div>`;
+        licht += `<div class="r${this._lopen[k] ? ' open' : ''}" data-lx="${k}"><div class="bd" data-toggle="${esc(E[k])}">${ico(ic, lc)}</div><div class="nm">${n}</div><div class="st"${on ? '' : ' style="color:var(--secondary-text-color)"'}>${br}${PM}</div>${ex}</div>`;
       });
       const am = this._s('ambiente');
       if (am) licht += `<div class="r" data-more="${esc(E.ambiente)}"><div class="bd">${ico('phu:twinkly-spritzer')}</div><div class="nm">Ambiente</div><div class="seg">${(am.attributes.options || []).map((o) => `<button class="${o === am.state ? 'on' : ''}" data-amb="${esc(o)}">${esc(o)}</button>`).join('')}</div></div>`;
@@ -295,6 +323,10 @@
       const H = this._hass, fh = ev.target.closest('.fh');
       if (fh) { const f = fh.parentElement; f.classList.toggle('closed'); this._open[f.dataset.id] = f.classList.contains('closed') ? 'zu' : 'auf'; try { localStorage.setItem('sac-open', JSON.stringify(this._open)); } catch (e) {} return; }
       const au = ev.target.closest('[data-aufguss]'); if (au) { H.callService('input_select', 'select_option', { entity_id: this._e.aufguss, option: au.dataset.aufguss }); return; }
+      const lc = ev.target.closest('[data-lcol]'); if (lc) { const [k, nm] = lc.dataset.lcol.split('|'), v = (LCOL.find((x) => x[0] === nm) || [])[1]; if (v) H.callService('light', 'turn_on', Object.assign({ entity_id: this._e[k] }, v.k ? { color_temp_kelvin: v.k } : { rgb_color: v.rgb })); return; }
+      if (ev.target.closest('[data-lbr]')) return;
+      const tgl = ev.target.closest('.bd[data-toggle]'); if (tgl) { H.callService('light', 'toggle', { entity_id: tgl.dataset.toggle }); return; }
+      const lx = ev.target.closest('[data-lx]'); if (lx && !ev.target.closest('.ex')) { const k = lx.dataset.lx; this._lopen[k] = !this._lopen[k]; this._sig = ''; this._render(); return; }
       const amb = ev.target.closest('[data-amb]'); if (amb) { H.callService('input_select', 'select_option', { entity_id: this._e.ambiente, option: amb.dataset.amb }); return; }
       if (ev.target.closest('.ex')) return;
       const ch = ev.target.closest('[data-chart]'); if (ch) { this._chartMan = !this._chartOpen(); this._hTry = 0; this._sig = ''; this._render(); return; }
