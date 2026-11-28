@@ -1,13 +1,13 @@
-// energie-karte-card v1.0 (28.11.2026: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.1 (28.11.2026: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
   const TAG = 'energie-karte-card';
   if (customElements.get(TAG)) return;
 
-  const C = { red: '#ff453a', green: '#30d158', solar: '#fbbf24', solar2: '#ffe08a', lila: '#bf5af2', blue: '#0a84ff', cyan: 'rgb(64,200,224)', orange: '#f56300', t2: 'rgba(235,235,245,.6)' };
+  const C = { red: '#ff453a', green: '#30d158', solar: '#fbbf24', solar2: '#ffe08a', lila: '#bf5af2', blue: '#0a84ff', cyan: 'rgb(64,200,224)', orange: '#f56300', yellow: '#ffd60a', t2: 'rgba(235,235,245,.6)' };
   const DEF = {
-    title: 'Energie', link: '/energy', link_label: 'Tagesdaten', simulation: false, charts: true, strom_eingeklappt: false, wasser_eingeklappt: false,
+    title: 'Energie', link: '', link_label: 'Tagesdaten', simulation: false, charts: true, strom_eingeklappt: false, wasser_eingeklappt: false,
     solar_power: 'sensor.balkonkraftwerk_summe', solar_dachgaube: 'sensor.smart_plug_2212096903668551080548e1e9b26bfc_power', solar_gartenhaus: 'sensor.solarbank_2_e1600_pro_solarleistung', solar_day: 'sensor.solar_kwh_helfer',
     grid_power: 'sensor.stromverbrauch', grid_day: 'sensor.tagesverbrauch_strom', home_day: 'sensor.tagesgesamt',
     battery_power: 'sensor.solarbank_2_e1600_pro_akkuleistung', battery_soc: 'sensor.solarbank_2_e1600_pro_ladestand', battery_invert: false,
@@ -81,10 +81,10 @@
     .tln { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
     @keyframes comet { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
     @keyframes breath { 0%,100% { stroke-opacity:.4; } 50% { stroke-opacity:.65; } }
-    .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(44,44,46,.88); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+    .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(44,44,46,.62); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
       display:flex; flex-direction:column; transition:background .4s, box-shadow .4s; cursor:pointer; box-sizing:border-box; color:#fff; }
-    .tk.on { background:linear-gradient(155deg, color-mix(in srgb, var(--c) 24%, rgba(44,44,46,.92)) 0%, rgba(44,44,46,.92) 65%); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
-    .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.12), rgba(44,44,46,.92) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
+    .tk.on { background:linear-gradient(155deg, color-mix(in srgb, var(--c) 24%, rgba(44,44,46,.66)) 0%, rgba(44,44,46,.66) 65%); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
+    .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.12), rgba(44,44,46,.66) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
     .tk.gl { animation:tglow 1.6s ease-in-out infinite; }
     @keyframes tglow { 0%,100% { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gc) 50%, transparent), 0 0 0 transparent; } 50% { box-shadow:inset 0 0 0 1px var(--gc), 0 0 22px color-mix(in srgb, var(--gc) 55%, transparent); } }
     .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:11px; color:rgba(235,235,245,.6); }
@@ -104,10 +104,11 @@
     .tk .fill .wave { position:absolute; left:0; top:-6px; width:200%; height:7px; fill:color-mix(in srgb, var(--fc) 22%, transparent); animation:wave 3s linear infinite; }
     @keyframes wave { from { transform:translateX(0); } to { transform:translateX(-50%); } }
     .tk .soc2 { position:absolute; left:10px; right:10px; bottom:5px; height:3px; border-radius:2px; background:rgba(118,118,128,.3); overflow:hidden; z-index:1; }
-    .tk .soc2 i { display:block; height:100%; border-radius:2px; transition:width .8s, background .4s; }
-    .tk .soc2 i.chg { background:repeating-linear-gradient(90deg, ${C.cyan} 0 6px, color-mix(in srgb, ${C.cyan} 45%, transparent) 6px 12px) !important; background-size:24px 100%; animation:stripes .8s linear infinite; }
+    .tk .soc2 i { display:block; height:100%; border-radius:2px; transition:width .8s; background:linear-gradient(90deg, ${C.red} 0%, ${C.yellow} 50%, ${C.green} 80%); background-size:100% 100%; }
+    .tk .soc2 i { position:relative; overflow:hidden; }
+    .tk .soc2 i.chg::after { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.35) 0 6px, transparent 6px 12px); background-size:24px 100%; animation:stripes .8s linear infinite; }
     @keyframes stripes { from { background-position:0 0; } to { background-position:24px 0; } }
-    .tk .rays { position:absolute; left:30px; top:-40px; width:110px; height:110px; border-radius:50%; background:repeating-conic-gradient(rgba(251,191,36,.18) 0deg 6deg, transparent 6deg 20deg);
+    .tk .rays { position:absolute; left:-34px; top:-56px; width:110px; height:110px; border-radius:50%; background:repeating-conic-gradient(rgba(251,191,36,.18) 0deg 6deg, transparent 6deg 20deg);
       -webkit-mask:radial-gradient(circle, transparent 18%, #000 30%, transparent 70%); mask:radial-gradient(circle, transparent 18%, #000 30%, transparent 70%); animation:rot 18s linear infinite; transition:opacity .6s; }
     @keyframes rot { to { transform:rotate(360deg); } }
     .tk .rip { position:absolute; left:0; right:0; bottom:0; height:18px; overflow:hidden; transition:opacity .6s; }
@@ -187,7 +188,7 @@
         + tile('home', 'Haus', 'hs', '')
         + tile('bat', 'Batterie', 'bt', `<span class="fill" id="bfill"><svg class="wave" viewBox="0 0 120 10" preserveAspectRatio="none"><path d="M0,5 Q15,0 30,5 T60,5 T90,5 T120,5 V10 H0Z"/></svg></span><span class="soc2"><i id="bsoc"></i></span>`)
         + tile('water', 'Wasser', '', `<span class="rip off" id="rip"><svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M0,6 Q10,0 20,6 T40,6 T60,6 T80,6 T100,6 T120,6 V12 H0Z"/></svg></span>`)
-        + tile('car', 'Enyaq', 'cr', `<span class="soc2"><i id="csoc" style="background:${C.cyan}"></i></span>`);
+        + tile('car', 'Enyaq', 'cr', `<span class="soc2"><i id="csoc"></i></span>`);
       const fold = (k, nm, icon) => `<div class="fold${this._fold[k] ? ' closed' : ''}" id="fo-${k}"><div class="fh" data-f="${k}"><span class="ft">${ic(icon, '#fff')}</span><span class="lbl">${nm}</span><span class="fx"><span id="fx-${k}"></span>${ic('chev', 'currentColor')}</span></div><div class="fb"><div class="fi" id="ch-${k}"><div class="ld">Lade Verlauf …</div></div></div></div>`;
       r.innerHTML = `<style>${CSS}</style><ha-card>
         <div class="hd"><div class="ttl">${c.title || ''}</div>${c.link ? `<span class="pl" id="lnk">${ic('chart', 'currentColor')}${c.link_label || ''}</span>` : ''}</div>
@@ -269,14 +270,14 @@
       const bCol = s.bat > 0 ? C.green : s.bat < 0 ? C.lila : 'rgba(118,118,128,.6)'; tk('bat', bCol, s.bat !== 0, 'bt'); icon('bat', 'bat', s.bat ? bCol : C.t2);
       val('bat', fmtW(s.bat), s.bat ? bCol : C.t2); this._set('d-bat', 'html', `${s.soc} %${s.bat > 0 ? ' · lädt' : s.bat < 0 ? ' · entlädt' : ''}`);
       this._set('bfill', 'height', s.soc + '%'); this._set('bfill', '--fc', bCol);
-      this._set('bsoc', 'width', s.soc + '%'); this._set('bsoc', 'background', s.soc < 20 ? C.red : s.soc < 40 ? C.orange : C.green);
+      this._set('bsoc', 'width', Math.max(0.5, s.soc) + '%'); this._set('bsoc', 'backgroundSize', (10000 / Math.max(0.5, s.soc)).toFixed(1) + '% 100%');
       // Wasser
       const wOn = s.water > 0; tk('water', C.blue, wOn, ''); icon('water', 'water', wOn ? C.blue : C.t2);
       val('water', dc(s.water, 0) + ' L/min', wOn ? C.blue : C.t2); this._set('d-water', 'html', `${s.wday} L heute`); this._set('rip', 'cls', 'rip' + (wOn ? '' : ' off'));
       // Enyaq
       const cOn = s.wall > 0; tk('car', C.cyan, cOn, 'cr'); icon('car', cOn ? 'ev' : 'car', cOn ? C.cyan : C.t2);
       val('car', cOn ? fmtW(s.wall) : `${s.car} %`, cOn ? C.cyan : C.t2); this._set('d-car', 'html', cOn || s.wallday > 0 ? `${dc(s.wallday)} kWh · ${s.car} %` : 'Akku');
-      this._set('csoc', 'width', s.car + '%'); this._set('csoc', 'cls', cOn ? 'chg' : '');
+      this._set('csoc', 'width', Math.max(0.5, s.car) + '%'); this._set('csoc', 'backgroundSize', (10000 / Math.max(0.5, s.car)).toFixed(1) + '% 100%'); this._set('csoc', 'cls', cOn ? 'chg' : '');
     }
 
     /* ---------- Diagramme aus der Langzeitstatistik ---------- */
