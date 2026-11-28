@@ -1,4 +1,4 @@
-// energie-karte-card v1.8 (28.11.2026: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.9 (28.11.2026: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -134,6 +134,9 @@
     .bc .st { position:absolute; left:0; right:0; bottom:0; border-radius:3px; transition:height .5s, opacity .2s; }
     .bc.e .st { background:rgba(118,118,128,.22) !important; }
     .bars.sel .bc .st { opacity:.3; } .bars.sel .bc.on .st { opacity:1; }
+    .mxa { position:relative; height:12px; margin-top:4px; font-size:9.5px; line-height:12px; color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
+    .mxa span { position:absolute; top:0; transform:translateX(-50%); white-space:nowrap; }
+    .mxa span.l { transform:none; } .mxa span.r { transform:translateX(-100%); }
     .ld { font-size:12px; color:var(--secondary-text-color); padding:20px 0; text-align:center; }
   `;
 
@@ -300,11 +303,16 @@
       const { R, tiles } = D, n = R.n, gap = n > 24 ? 1 : n > 7 ? 2 : 4;
       const lab = (i) => { const d = R.step(i); return R.period === 'hour' ? `${i}–${i + 1} Uhr` : `${WD[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`; };
       this._set('vt', 'html', sel != null ? lab(sel) : rng === 'tag' ? 'Heute' : rng === 'woche' ? 'Letzte 7 Tage' : MON[R.start.getMonth()]);
+      // Zeitachse: Uhrzeit (Tag), Wochentag (Woche), Datum (Monat)
+      const ctr = (i) => ((i + 0.5) / n * 100).toFixed(2);
+      const ax = R.period === 'hour' ? [[0, '0 Uhr', 'l'], [6, '6'], [12, '12'], [18, '18']].map(([i, l, k]) => `<span class="${k || ''}" style="left:${(i / 24 * 100).toFixed(2)}%">${l}</span>`).join('')
+        : n === 7 ? Array.from({ length: 7 }, (_, i) => `<span style="left:${ctr(i)}%">${WD[R.step(i).getDay()]}</span>`).join('')
+        : [0, 7, 14, 21, 28].filter((i) => i < n).map((i) => `<span style="left:${ctr(i)}%">${i + 1}.</span>`).join('');
       const html = tiles.map((t) => {
         const mx = Math.max(...t.v), val = sel == null ? sum(t.v) : t.v[sel];
         const bars = t.v.map((v, i) => `<div class="bc${v > 0 ? '' : ' e'}${sel === i ? ' on' : ''}" data-i="${i}" style="margin:0 ${gap / 2}px"><div class="st" style="height:${v > 0 && mx > 0 ? Math.max(3, v / mx * 40) : 3}px;background:${t.c}"></div></div>`).join('');
         const vt = t.unit === 'L' && val >= 1000 && sel == null ? `${dc(val / 1000, 2)}<span>m³</span>` : `${dc(val, t.dec)}<span>${t.unit}</span>`;
-        return `<div class="mt" style="--c:${t.c}"><div class="n"><ha-icon icon="${t.icon}"></ha-icon>${t.n}</div><div class="v">${vt}</div><div class="mc"><div class="bars${sel != null ? ' sel' : ''}">${bars}</div></div></div>`;
+        return `<div class="mt" style="--c:${t.c}"><div class="n"><ha-icon icon="${t.icon}"></ha-icon>${t.n}</div><div class="v">${vt}</div><div class="mc"><div class="bars${sel != null ? ' sel' : ''}">${bars}</div></div><div class="mxa">${ax}</div></div>`;
       }).join('');
       this._set('g4', 'html', html);
     }
