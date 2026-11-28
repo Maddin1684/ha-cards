@@ -1,4 +1,4 @@
-// energie-karte-card v2.4 (28.11.2026: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v2.5 (28.11.2026: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -173,7 +173,7 @@
       if (this._hass) this._loadStats();
     }
     disconnectedCallback() { clearInterval(this._iv); if (this._ro) this._ro.disconnect(); }
-    set hass(h) { const first = !this._hass; this._hass = h; if (!this._root) this._build(); if (first) this._loadStats(); this._render(); }
+    set hass(h) { const first = !this._hass; this._hass = h; if (!this._root) this._build(); if (first) this._loadStats(); this._render(); if (Date.now() - (this._chAt || 0) > 60000) { this._chAt = Date.now(); const hk = new Date().getHours(); if (this._hk != null && hk !== this._hk) { this._statAt = {}; this._loadStats(); } this._hk = hk; this._chart(); } }
 
     _build() {
       const r = this.shadowRoot || this.attachShadow({ mode: 'open' });
@@ -305,24 +305,43 @@
       const R = this._range(rng);
       const ids = [c.stat_grid, ...c.stat_solar, c.stat_discharge, c.stat_water].filter(Boolean);
       try {
-        const res = await this._hass.callWS({ type: 'recorder/statistics_during_period', start_time: R.start.toISOString(), statistic_ids: ids, period: R.period, types: ['change'] });
-        const arr = (id) => { const out = Array(R.n).fill(0); (res[id] || []).forEach((p) => { const t = typeof p.start === 'number' ? p.start : Date.parse(p.start); for (let i = 0; i < R.n; i++) { if (t >= +R.step(i) && t < +R.step(i + 1)) { out[i] += Math.max(0, p.change || 0); break; } } }); return out; };
-        const sol = Array(R.n).fill(0); c.stat_solar.forEach((id) => arr(id).forEach((v, i) => { sol[i] += v; }));
-        const st = this._hass.states[c.stat_water], fac = st && st.attributes.unit_of_measurement === 'm³' ? 1000 : 1;
-        this._stat[rng] = { R, tiles: [
-          { k: 'grid', n: 'Netz', icon: 'mdi:transmission-tower-import', c: C.red, unit: 'kWh', dec: 1, v: arr(c.stat_grid), more: c.stat_grid },
-          { k: 'solar', n: 'Solar', icon: 'mdi:solar-power-variant', c: C.solar, unit: 'kWh', dec: 1, v: sol, more: c.solar_day },
-          { k: 'bat', n: 'Akku', icon: 'mdi:battery-arrow-down', c: C.lila, unit: 'kWh', dec: 1, v: arr(c.stat_discharge), more: c.stat_discharge },
-          { k: 'water', n: 'Wasser', icon: 'mdi:water', c: C.blue, unit: 'L', dec: 0, v: arr(c.stat_water).map((v) => v * fac), more: c.water_day }] };
+        // eine Periode frueher starten, damit der Zaehlerstand vor dem ersten Balken bekannt ist
+        const pre = new Date(+R.start - (R.period === 'hour' ? 3600e3 : 864e5));
+        const res = await this._hass.callWS({ type: 'recorder/statistics_during_period', start_time: pre.toISOString(), statistic_ids: ids, period: R.period, types: ['change', 'state'] });
+        const base = {}, last = {};
+        ids.forEach((id) => {
+          const out = Array(R.n).fill(0);
+          (res[id] || []).forEach((p) => {
+            const t = typeof p.start === 'number' ? p.start : Date.parse(p.start);
+            if (p.state != null) last[id] = p.state;
+            for (let i = 0; i < R.n; i++) { if (t >= +R.step(i) && t < +R.step(i + 1)) { out[i] += Math.max(0, p.change || 0); break; } }
+          });
+          base[id] = out;
+        });
+        this._stat[rng] = { R, base, last };
       } catch (e) { this._stat[rng] = { err: String(e && e.message || e) }; }
       this._chart();
+    }
+    // Werte je Kachel: abgeschlossene Perioden aus der Statistik + laufende Periode aus dem Live-Zaehler
+    _series(D) {
+      const c = this._c, R = D.R, now = Date.now();
+      let cur = -1; for (let i = 0; i < R.n; i++) if (now >= +R.step(i) && now < +R.step(i + 1)) cur = i;
+      const v = (id) => { const out = (D.base[id] || Array(R.n).fill(0)).slice(); const st = this._st(id);
+        if (cur >= 0 && D.last[id] != null && st != null && !isNaN(parseFloat(st))) out[cur] += Math.max(0, parseFloat(st) - D.last[id]); return out; };
+      const sol = Array(R.n).fill(0); c.stat_solar.forEach((id) => v(id).forEach((x, i) => { sol[i] += x; }));
+      const st = this._hass.states[c.stat_water], fac = st && st.attributes.unit_of_measurement === 'm³' ? 1000 : 1;
+      return [
+        { k: 'grid', n: 'Netz', icon: 'mdi:transmission-tower-import', c: C.red, unit: 'kWh', dec: 1, v: v(c.stat_grid) },
+        { k: 'solar', n: 'Solar', icon: 'mdi:solar-power-variant', c: C.solar, unit: 'kWh', dec: 1, v: sol },
+        { k: 'bat', n: 'Akku', icon: 'mdi:battery-arrow-down', c: C.lila, unit: 'kWh', dec: 1, v: v(c.stat_discharge) },
+        { k: 'water', n: 'Wasser', icon: 'mdi:water', c: C.blue, unit: 'L', dec: 0, v: v(c.stat_water).map((x) => x * fac) }];
     }
     _chart() {
       if (!this._root || !this._c.charts) return;
       const rng = this._rng, D = this._stat[rng], sel = this._sel;
       this._set('vseg', 'html', [['tag', 'Tag'], ['woche', 'Woche'], ['monat', 'Monat']].map(([v, l]) => `<span data-rng="${v}" class="${rng === v ? 'on' : ''}">${l}</span>`).join(''));
       if (!D || D.err) { this._set('g4', 'html', `<div class="ld" style="grid-column:1/-1">${D ? 'Statistik nicht verfügbar' : 'Lade Verlauf …'}</div>`); return; }
-      const { R, tiles } = D, n = R.n, gap = n > 24 ? 1 : n > 7 ? 2 : 4;
+      const R = D.R, tiles = this._series(D), n = R.n, gap = n > 24 ? 1 : n > 7 ? 2 : 4;
       const lab = (i) => { const d = R.step(i); return R.period === 'hour' ? `${i}–${i + 1} Uhr` : `${WD[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`; };
       this._set('vt', 'html', sel != null ? lab(sel) : rng === 'tag' ? 'Heute' : rng === 'woche' ? 'Letzte 7 Tage' : MON[R.start.getMonth()]);
       // Zeitachse: Uhrzeit (Tag), Wochentag (Woche), Datum (Monat)
