@@ -1,4 +1,4 @@
-// energie-karte-card v2.8 (28.11.2026: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v2.9 (28.11.2026: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -213,7 +213,7 @@
         if (ev.target.closest('#lnk')) { history.pushState(null, '', c.link); window.dispatchEvent(new CustomEvent('location-changed', { detail: { replace: false } })); return; }
         const sg = ev.target.closest('[data-rng]'); if (sg) { this._rng = sg.dataset.rng; this._sel = null; this._loadStats(); this._chart(); return; }
         if (ev.target.closest('[data-clr]')) { this._sel = null; this._chart(); return; }
-        const bc = ev.target.closest('.bc'); if (bc) { const i = +bc.dataset.i; this._sel = this._sel === i ? null : i; this._chart(); return; }
+        const bc = ev.target.closest('.bc'); if (bc) { const i = +bc.dataset.i; if (this._cur != null && i > this._cur) return; this._sel = this._sel === i ? null : i; this._chart(); return; }
         const t = ev.target.closest('.tk'); if (t) { const id = { solar: c.solar_power, grid: c.grid_power, home: c.home_day, bat: c.battery_power, water: c.water_flow, car: c.car_power }[t.dataset.k]; if (id) this.dispatchEvent(new CustomEvent('hass-more-info', { detail: { entityId: id }, bubbles: true, composed: true })); }
       });
       // feste 400er-Flaeche auf Kartenbreite skalieren (Schrift waechst mit)
@@ -379,12 +379,13 @@
       if (sl) {
         let cur = n - 1; const now = Date.now(); for (let i = 0; i < n; i++) if (now >= +R.step(i) && now < +R.step(i + 1)) cur = i;
         const v = sel != null ? sel : cur;
-        if (sl.max !== String(n - 1)) sl.max = String(n - 1);
+        this._cur = cur;
+        if (sl.max !== String(cur)) sl.max = String(cur);
         if (!this._drag && sl.value !== String(v)) sl.value = String(v);
-        sl.style.setProperty('--p', (n > 1 ? +sl.value / (n - 1) * 100 : 0) + '%');
+        sl.style.setProperty('--p', (cur > 0 ? +sl.value / cur * 100 : 0) + '%');
         this._set('slw', 'cls', 'slw' + (sel == null ? ' idle' : ''));
         this._set('sl0', 'html', R.period === 'hour' ? '0 Uhr' : `${R.step(0).getDate()}.${R.step(0).getMonth() + 1}.`);
-        this._set('sl1', 'html', R.period === 'hour' ? '24 Uhr' : `${R.step(n - 1).getDate()}.${R.step(n - 1).getMonth() + 1}.`);
+        this._set('sl1', 'html', 'jetzt');
         this._set('slm', 'html', sel == null ? 'Zum Wählen schieben' : lab(sel));
       }
     }
