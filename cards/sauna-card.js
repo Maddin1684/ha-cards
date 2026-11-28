@@ -1,4 +1,5 @@
-// sauna-card v1.12 (28.11.2026): Licht-Zeilen hoeher, Plus/Minus mit Abstand zum unteren Rand.
+// sauna-card v1.13 (28.11.2026): 'heizt' auch, wenn die Temperatur steigt (Aufheizrate >= 0,3 °C/min, z. B. nach Holz nachlegen), nicht nur ueber binary_sensor.sauna_heizt.
+// v1.12 (28.11.2026): Licht-Zeilen hoeher, Plus/Minus mit Abstand zum unteren Rand.
 // v1.11 (28.11.2026): Licht-Symbole in der tatsaechlichen Lichtfarbe; Zeilen aufklappbar: Lampe mit Farbe und Helligkeit, LED-Band mit Helligkeit; Tipp aufs Symbol schaltet ein/aus.
 // v1.10 (28.11.2026): Temperatur- und Aufheiz-Symbol beim Heizen in Apple-Rot; Heiz-Pfeil naeher am Titel.
 // v1.9 (26.11.2026): Duftrichtung Fichtenessenz ergaenzt; Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
@@ -19,7 +20,7 @@
   if (customElements.get(TAG)) return;
   const C = { green: '#30d158', yellow: '#ffd60a', orange: '#f56300', red: '#ff453a', blue: '#0a84ff', gang: '#f56300' }; // Orange = Martins Orange #f56300
   const DEF = {
-    temp: 'sensor.saunatemp_sauna', heizt: 'binary_sensor.sauna_heizt', aufheiz: 'sensor.sauna_aufheizzeit', test: 'input_boolean.sauna_prognose_test',
+    temp: 'sensor.saunatemp_sauna', heizt: 'binary_sensor.sauna_heizt', rate: 'sensor.sauna_aufheizrate', aufheiz: 'sensor.sauna_aufheizzeit', test: 'input_boolean.sauna_prognose_test',
     gang_aktiv: 'input_boolean.sauna_gang_aktiv', gang_start: 'input_text.sauna_aktueller_gang_start', gang_dauer: 'sensor.sauna_gang_dauer',
     session: 'input_boolean.saunazeit', ablauf: 'input_text.sauna_ablauf_heute', gaenge: 'counter.sauna_gange_heute', zeit: 'sensor.saunazeit_heute',
     aufguss: 'input_select.sauna_aufguss_hintergrund', bank: 'light.cob_strip_sauna', lampe: 'light.sauna', ambiente: 'input_select.ambiente',
@@ -188,7 +189,7 @@
       } catch (e) { /* kein Verlauf */ }
       this._hBusy = false;
     }
-    _active() { return this._on('heizt') || this._on('test') || this._on('session') || this._on('gang_aktiv') || num(this._v('temp')) >= 50; }
+    _active() { return this._on('heizt') || num(this._v('rate')) >= 0.3 || this._on('test') || this._on('session') || this._on('gang_aktiv') || num(this._v('temp')) >= 50; }
     _chartOpen() { return this._chartMan != null ? this._chartMan : this._active(); }
 
     // Gaenge heute aus 'HH:MM-HH:MM;...' plus laufender Gang -> [[start, ende, live], ...] als Zeitstempel
@@ -244,7 +245,7 @@
 
     _html() {
       const E = this._e, out = [];
-      const t = num(this._v('temp')), heizt = this._on('heizt') || this._on('test'), active = this._active();
+      const t = num(this._v('temp')), heizt = this._on('heizt') || this._on('test') || (t >= 30 && num(this._v('rate')) >= 0.3), active = this._active();
       if (this._c.title !== false) out.push(`<div class="hd">${esc(this._c.title || 'Sauna')}${heizt ? `<img class="hz" src="${esc(this._c.heiz_icon || '/local/icons2/pressure-high.svg')}" alt="heizt">` : ''}</div>`);
 
       /* ---------- Jetzt ---------- */
