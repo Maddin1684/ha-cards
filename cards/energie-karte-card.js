@@ -1,4 +1,4 @@
-// energie-karte-card v1.5 (28.11.2026: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.6 (28.11.2026: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -88,7 +88,7 @@
     .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.14), rgba(118,118,128,.12) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
     .tk.gl { animation:tglow 1.6s ease-in-out infinite; }
     @keyframes tglow { 0%,100% { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gc) 50%, transparent), 0 0 0 transparent; } 50% { box-shadow:inset 0 0 0 1px var(--gc), 0 0 22px color-mix(in srgb, var(--gc) 55%, transparent); } }
-    .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:11px; color:rgba(235,235,245,.6); }
+    .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:11px; white-space:nowrap; color:rgba(235,235,245,.6); }
     .tk .th ha-icon { --mdc-icon-size:18px; width:18px; height:18px; display:inline-flex; transition:color .4s; }
     .tk .tv { position:relative; z-index:1; font-size:18px; font-weight:600; letter-spacing:-.01em; line-height:22px; margin-top:auto; font-variant-numeric:tabular-nums; white-space:nowrap; transition:color .4s; }
     .tk .td { position:relative; z-index:1; font-size:10.5px; line-height:13px; color:rgba(235,235,245,.6); white-space:nowrap; font-variant-numeric:tabular-nums; margin-top:1px; overflow:hidden; text-overflow:ellipsis; }
@@ -181,7 +181,7 @@
       const c = this._c;
       const tile = (k, nm, cls, inner) => {
         const w = T[k][2] || TW, l = T[k][0] - w / 2, t = T[k][1] - TH / 2;
-        return `<div class="tk ${cls}" id="t-${k}" data-k="${k}" style="left:${l}px;top:${t}px;width:${w}px;height:${TH}px">${inner}<div class="th"><ha-icon id="i-${k}"></ha-icon><span>${nm}</span></div><div class="tv" id="v-${k}"></div><div class="td" id="d-${k}"></div></div>`;
+        return `<div class="tk ${cls}" id="t-${k}" data-k="${k}" style="left:${l}px;top:${t}px;width:${w}px;height:${TH}px">${inner}<div class="th"><ha-icon id="i-${k}"></ha-icon><span id="n-${k}">${nm}</span></div><div class="tv" id="v-${k}"></div><div class="td" id="d-${k}"></div></div>`;
       };
       const flowSvg = `<svg class="tln" viewBox="0 0 ${VW} ${VH}"><defs><filter id="gl" filterUnits="userSpaceOnUse" x="0" y="0" width="${VW}" height="${VH}"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${FLOWS.map((_, i) => `<g id="f${i}"></g>`).join('')}</svg>`;
       const tiles = tile('solar', 'Solar', 'sol', `<span class="rays off" id="rays"></span><span class="sp"><span class="spr"><span><i class="dot" style="background:${C.solar}"></i>Dachgaube</span><b id="sd"></b></span><span class="spr"><span><i class="dot" style="background:${C.solar2}"></i>Gartenhaus</span><b id="sg"></b></span><span class="spb"><i id="sdb" style="background:${C.solar};flex-grow:0"></i><i id="sgb" style="background:${C.solar2};flex-grow:0"></i></span></span>`)
@@ -253,7 +253,7 @@
       // Kacheln
       const tk = (k, col, active, cls) => { this._set('t-' + k, 'cls', `tk ${cls}${active ? ' on' : ''}${G[k] ? ' gl' : ''}`); this._set('t-' + k, '--c', col); this._set('t-' + k, '--gc', G[k] || 'transparent'); };
       const val = (k, txt, col) => { this._set('v-' + k, 'html', txt); this._set('v-' + k, 'color', col); };
-      const MDI = { solar: 'mdi:solar-power-variant', grid: 'mdi:transmission-tower', home: 'mdi:home', water: 'mdi:water', car: 'mdi:car-electric', ev: 'mdi:ev-station',
+      const MDI = { solar: 'mdi:solar-power-variant', grid: s.grid > 0 ? 'mdi:transmission-tower-import' : s.grid < 0 ? 'mdi:transmission-tower-export' : 'mdi:transmission-tower', home: 'mdi:home', water: 'mdi:water', car: 'mdi:car-electric', ev: 'mdi:ev-station',
         bat: s.soc >= 80 ? 'mdi:battery-high' : s.soc >= 45 ? 'mdi:battery-medium' : s.soc >= 15 ? 'mdi:battery-low' : 'mdi:battery-outline' };
       const icon = (k, name, col) => { this._set('i-' + k, 'icon', MDI[name]); this._set('i-' + k, 'color', col); };
       // Solar
@@ -264,7 +264,8 @@
       this._set('sdb', 'flexGrow', String(s.sd)); this._set('sgb', 'flexGrow', String(s.sg));
       // Netz
       const gCol = s.grid > 0 ? C.red : s.grid < 0 ? C.green : C.t2; tk('grid', gCol, s.grid !== 0, ''); icon('grid', 'grid', s.grid ? gCol : C.t2);
-      val('grid', (s.grid < 0 ? '↤ ' : '') + fmtW(s.grid), gCol); this._set('d-grid', 'html', s.grid < 0 ? `${dc(s.gday)} kWh · Export` : `${dc(s.gday)} kWh heute`);
+      val('grid', fmtW(s.grid), gCol); this._set('d-grid', 'html', `${dc(s.gday)} kWh heute`);
+      this._set('n-grid', 'html', s.grid > 0 ? 'Bezug' : s.grid < 0 ? 'Einspeisung' : 'Netz');
       // Haus: Herkunft jetzt
       tk('home', '#fff', false, 'hs'); icon('home', 'home', '#fff'); val('home', fmtW(f.home), '#fff');
       const parts = [[f.sToHome, C.solar], [f.gToHome, C.red], [f.bToHome, C.lila]];
