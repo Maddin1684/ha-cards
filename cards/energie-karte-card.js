@@ -1,4 +1,4 @@
-// energie-karte-card v1.9 (28.11.2026: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v2.0 (28.11.2026: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -57,13 +57,24 @@
   const glowOf = (s) => ({ solar: s.solar >= 1800 ? C.solar : '', grid: s.grid >= 2000 ? C.red : s.grid <= -300 ? C.green : '', bat: s.bat >= 1500 ? C.green : s.bat <= -800 ? C.lila : '',
     water: s.water >= 10 ? C.blue : '', car: s.wall >= 10000 && (s.wallNetz || 0) >= s.wall * 0.95 ? C.cyan : '', home: '' });
 
-  // Geometrie der Flaeche (400 x 350, wird auf Kartenbreite gezoomt)
-  const VW = 400, VH = 350, TW = 104, TH = 94;
-  const T = { solar: [200, 46, 200], grid: [62, 180], home: [200, 180], bat: [338, 180], water: [62, 302], car: [338, 302] };
-  const FLOWS = [
-    ['M200,93 L200,133', 'sToHome', C.solar], ['M100,46 C72,46 62,80 62,133', 'sToGrid', C.green], ['M300,46 C328,46 338,80 338,133', 'sToBat', C.solar],
-    ['M114,180 L148,180', 'gToHome', C.red], ['M62,227 C62,250 140,246 200,246 C260,246 338,250 338,227', 'gToBat', C.red], ['M286,180 L252,180', 'bToHome', C.lila],
-    ['M114,302 C166,302 182,276 182,227', 'water', C.blue], ['M218,227 C218,276 234,302 286,302', 'wall', C.cyan]];
+  // Geometrie: Breite Wd passt sich der Karte an (330–440 px), erst darueber/darunter wird skaliert
+  const VH = 350, TH = 94, FKEYS = [['sToHome', C.solar], ['sToGrid', C.green], ['sToBat', C.solar], ['gToHome', C.red], ['gToBat', C.red], ['bToHome', C.lila], ['water', C.blue], ['wall', C.cyan]];
+  function geo(Wd) {
+    const m = 4, tw = Math.max(90, Math.min(110, (Wd - 2 * m - 2 * 30) / 3)), xl = m + tw / 2, xr = Wd - m - tw / 2, xc = Wd / 2;
+    const sw = Math.min(220, Wd - 2 * m - tw - 24), sL = xc - sw / 2, sR = xc + sw / 2, h = tw / 2;
+    const T = { solar: [xc, 46, sw], grid: [xl, 180, tw], home: [xc, 180, tw], bat: [xr, 180, tw], water: [xl, 302, tw], car: [xr, 302, tw] };
+    const f = (v) => v.toFixed(1);
+    const P = [
+      `M${f(xc)},93 L${f(xc)},133`,
+      `M${f(sL)},46 C${f(sL - (sL - xl) * 0.74)},46 ${f(xl)},80 ${f(xl)},133`,
+      `M${f(sR)},46 C${f(sR + (xr - sR) * 0.74)},46 ${f(xr)},80 ${f(xr)},133`,
+      `M${f(xl + h)},180 L${f(xc - h)},180`,
+      `M${f(xl)},227 C${f(xl)},250 ${f(xc - 60)},246 ${f(xc)},246 C${f(xc + 60)},246 ${f(xr)},250 ${f(xr)},227`,
+      `M${f(xr - h)},180 L${f(xc + h)},180`,
+      `M${f(xl + h)},302 C${f(xl + h + 52)},302 ${f(xc - 18)},276 ${f(xc - 18)},227`,
+      `M${f(xc + 18)},227 C${f(xc + 18)},276 ${f(xr - h - 52)},302 ${f(xr - h)},302`];
+    return { Wd, T, flows: FKEYS.map(([k, col], i) => [P[i], k, col]) };
+  }
   // Dauer je Leistung (0,75 – 6 s wie bisher, log), in Stufen damit die Animation nicht bei jeder kleinen Aenderung neu startet
   const durOf = (w) => { const k = Math.min(1, Math.log10(1 + w) / Math.log10(20001)); return Math.round((3.2 - 2.4 * k) * 5) / 5; };
 
@@ -78,7 +89,7 @@
     .sim span { font-size:12px; padding:4px 10px; border-radius:14px; background:rgba(118,118,128,.24); cursor:pointer; user-select:none; }
     .sim span.on { background:${C.orange}; color:#fff; }
     .fw { position:relative; width:100%; }
-    .tflow { position:relative; width:${VW}px; height:${VH}px; margin:2px 0 4px; transform-origin:0 0; }
+    .tflow { position:relative; height:${VH}px; margin:2px 0 4px; transform-origin:0 0; }
     .tln { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
     @keyframes comet { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
     @keyframes breath { 0%,100% { stroke-opacity:.4; } 50% { stroke-opacity:.65; } }
@@ -93,6 +104,8 @@
     .tk .tv { position:relative; z-index:1; font-size:18px; font-weight:600; letter-spacing:-.01em; line-height:22px; margin-top:auto; font-variant-numeric:tabular-nums; white-space:nowrap; transition:color .4s; }
     .tk .td { position:relative; z-index:1; font-size:10.5px; line-height:13px; color:rgba(235,235,245,.6); white-space:nowrap; font-variant-numeric:tabular-nums; margin-top:1px; overflow:hidden; text-overflow:ellipsis; }
     .tk.bt .td, .tk.cr .td { margin-bottom:5px; }
+    .nar .tk { padding:8px 8px 7px; } .nar .tk .td { font-size:10px; } .nar .tk .tv { font-size:17px; } .nar .tk .gs { left:32px; }
+    .nar .tk .soc2 { left:8px; right:8px; }
     .tk .gs { position:absolute; left:34px; top:28px; z-index:1; font-size:10px; line-height:12px; font-weight:500; transition:color .4s; }
     .tk .jr { position:relative; z-index:1; display:flex; align-items:center; gap:6px; margin:3px 0 2px; font-size:10px; line-height:12px; color:rgba(235,235,245,.6); }
     .tk .mx { flex:1; display:flex; height:4px; gap:2px; border-radius:2px; overflow:hidden; background:rgba(118,118,128,.3); }
@@ -162,13 +175,12 @@
 
     _build() {
       const r = this.shadowRoot || this.attachShadow({ mode: 'open' });
-      this._root = r; this._last = {}; this._fl = [];
+      this._root = r; this._last = {}; this._fl = []; this._Wd = null; this._k = null;
       const c = this._c;
       const tile = (k, nm, cls, inner) => {
-        const w = T[k][2] || TW, l = T[k][0] - w / 2, t = T[k][1] - TH / 2;
-        return `<div class="tk ${cls}" id="t-${k}" data-k="${k}" style="left:${l}px;top:${t}px;width:${w}px;height:${TH}px">${inner}<div class="th"><ha-icon id="i-${k}"></ha-icon><span id="n-${k}">${nm}</span></div><div class="tv" id="v-${k}"></div><div class="td" id="d-${k}"></div></div>`;
+        return `<div class="tk ${cls}" id="t-${k}" data-k="${k}" style="height:${TH}px">${inner}<div class="th"><ha-icon id="i-${k}"></ha-icon><span id="n-${k}">${nm}</span></div><div class="tv" id="v-${k}"></div><div class="td" id="d-${k}"></div></div>`;
       };
-      const flowSvg = `<svg class="tln" viewBox="0 0 ${VW} ${VH}"><defs><filter id="gl" filterUnits="userSpaceOnUse" x="0" y="0" width="${VW}" height="${VH}"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${FLOWS.map((_, i) => `<g id="f${i}"></g>`).join('')}</svg>`;
+      const flowSvg = `<svg class="tln" id="tln"><defs><filter id="gl" filterUnits="userSpaceOnUse" x="0" y="0" width="600" height="${VH}"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${FKEYS.map((_, i) => `<g id="f${i}"></g>`).join('')}</svg>`;
       const tiles = tile('solar', 'Solar', 'sol', `<span class="rays off" id="rays"></span><span class="sp"><span class="spr"><span><i class="dot" style="background:${C.solar}"></i>Dachgaube</span><b id="sd"></b></span><span class="spr"><span><i class="dot" style="background:${C.solar2}"></i>Gartenhaus</span><b id="sg"></b></span><span class="spb"><i id="sdb" style="background:${C.solar};flex-grow:0"></i><i id="sgb" style="background:${C.solar2};flex-grow:0"></i></span></span>`)
         + tile('grid', 'Netz', '', '<span class="gs" id="gs"></span>')
         + tile('home', 'Haus', 'hs', '')
@@ -198,8 +210,15 @@
     }
     _fit() {
       const fw = this._root && this._root.getElementById('fw'), tf = this._root && this._root.getElementById('tf'); if (!fw || !tf) return;
-      const k = Math.min(1.3, (fw.clientWidth || VW) / VW); if (this._k === k) return; this._k = k;
-      tf.style.transform = `scale(${k})`; fw.style.height = (VH * k + 6) + 'px';
+      const cw = fw.clientWidth || 400, Wd = Math.round(Math.max(330, Math.min(500, cw))), k = Math.min(1.2, cw / Wd);
+      if (this._Wd !== Wd) {
+        this._Wd = Wd; this._g = geo(Wd); this._fl = [];
+        tf.style.width = Wd + 'px'; tf.classList.toggle('nar', Wd < 380); this._root.getElementById('tln').setAttribute('viewBox', `0 0 ${Wd} ${VH}`);
+        Object.entries(this._g.T).forEach(([key, [x, y, w]]) => { const e = this._root.getElementById('t-' + key); if (e) { e.style.left = (x - w / 2) + 'px'; e.style.top = (y - TH / 2) + 'px'; e.style.width = w + 'px'; } });
+        if (this._hass) this._render();
+      }
+      if (this._k === k) return; this._k = k;
+      tf.style.transform = `scale(${k})`; tf.style.marginLeft = Math.max(0, (cw - Wd * k) / 2) + 'px'; fw.style.height = (VH * k + 6) + 'px';
     }
     _set(id, prop, val) { const key = id + '|' + prop; if (this._last[key] === val) return; this._last[key] = val; const e = this._root.getElementById(id); if (!e) return; if (prop === 'html') e.innerHTML = val; else if (prop === 'cls') e.className = val; else if (prop === 'icon') e.setAttribute('icon', val); else if (prop.startsWith('--')) e.style.setProperty(prop, val); else e.style[prop] = val; }
     _st(id) { const s = id && this._hass && this._hass.states[id]; return s ? s.state : undefined; }
@@ -221,7 +240,8 @@
       if (c.simulation) this._set('sim', 'html', [['', 'Live'], ...Object.entries(SIM).map(([k, v]) => [k, v.n])].map(([k, n]) => `<span data-sim="${k}" class="${this._sim === k ? 'on' : ''}">${n}</span>`).join(''));
       // Linien: nur neu zeichnen, wenn aktiv/inaktiv oder Tempostufe wechselt (kein Springen)
       const W = Object.assign({}, f, { water: s.water * 120, wall: s.wall });
-      FLOWS.forEach(([d, key, col], i) => {
+      if (!this._g) return;
+      this._g.flows.forEach(([d, key, col], i) => {
         const w = W[key], on = w > 0.5, t = on ? durOf(w) : 0, sig = on ? 'a' + t : 'z';
         if (this._fl[i] === sig) return; this._fl[i] = sig;
         let h;
@@ -305,7 +325,7 @@
       this._set('vt', 'html', sel != null ? lab(sel) : rng === 'tag' ? 'Heute' : rng === 'woche' ? 'Letzte 7 Tage' : MON[R.start.getMonth()]);
       // Zeitachse: Uhrzeit (Tag), Wochentag (Woche), Datum (Monat)
       const ctr = (i) => ((i + 0.5) / n * 100).toFixed(2);
-      const ax = R.period === 'hour' ? [[0, '0 Uhr', 'l'], [6, '6'], [12, '12'], [18, '18']].map(([i, l, k]) => `<span class="${k || ''}" style="left:${(i / 24 * 100).toFixed(2)}%">${l}</span>`).join('')
+      const ax = R.period === 'hour' ? [[0, '0', 'l'], [6, '6'], [12, '12'], [18, '18']].map(([i, l, k]) => `<span class="${k || ''}" style="left:${(i / 24 * 100).toFixed(2)}%">${l}</span>`).join('')
         : n === 7 ? Array.from({ length: 7 }, (_, i) => `<span style="left:${ctr(i)}%">${WD[R.step(i).getDay()]}</span>`).join('')
         : [0, 7, 14, 21, 28].filter((i) => i < n).map((i) => `<span style="left:${ctr(i)}%">${i + 1}.</span>`).join('');
       const html = tiles.map((t) => {
