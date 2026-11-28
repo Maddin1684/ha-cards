@@ -1,4 +1,4 @@
-// wind-kompass-card v1.12 (27.11.2026: Windrichtung im Kreis kleiner; grafischer Editor fuer Sensoren, Sonne/Mond und Darstellung; v1.11: Himmelsrichtungen wieder wie vorher; Text im Kreis kleiner und leicht transparent; Windnadel faehrt weich auf kuerzestem Weg um den Kreis; v1.10: Himmelsrichtungen kleiner (16) und leicht transparent; v1.9: Variante layout: umschalter – 'Aktuell' (nur Kompass) / 'Rueckblick' (Windrose, Wind-/Boeen-Anteile, Zeitraum); v1.8: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
+// wind-kompass-card v1.13 (28.11.2026: Windrose umschaltbar Wind/Boeen per Tipp auf den Prozent-Balken (Standard Wind), gewaehlter Balken hervorgehoben; v1.12 (27.11.2026: Windrichtung im Kreis kleiner; grafischer Editor fuer Sensoren, Sonne/Mond und Darstellung; v1.11: Himmelsrichtungen wieder wie vorher; Text im Kreis kleiner und leicht transparent; Windnadel faehrt weich auf kuerzestem Weg um den Kreis; v1.10: Himmelsrichtungen kleiner (16) und leicht transparent; v1.9: Variante layout: umschalter – 'Aktuell' (nur Kompass) / 'Rueckblick' (Windrose, Wind-/Boeen-Anteile, Zeitraum); v1.8: Sonne/Mond bleiben immer innerhalb der Karte (Position begrenzt, Kompass etwas kleiner), Sonnengrafik ohne dunklen Kasten (screen); v1.7: wieder Original-Sonnengrafik sun.png, so gross dass der Kern der Mondgroesse entspricht; v1.6: Sonne als gezeichnete Scheibe in Mondgroesse mit leichtem Leuchten (statt sun.png mit grossem Schein); v1.5: Himmelsrichtung wird ausgeblendet, wenn Sonne/Mond davor steht; v1.4: Sonne groesser (18 %); v1.3: Kompass kleiner, Anteile senkrecht rechts daneben (Wind/Boeen, gleiche Klassen), Legende mit km/h, Windstille Apple-Grau; Sonne/Mond weiter aussen; Test-Umschalter Sonne/Mond; Kennzahlenzeile entfernt; v1.2: Balken zeigen Anteile der Geschwindigkeitsklassen (Wind und Boeen) im gewaehlten Zeitraum statt aktueller Werte; v1.1: Mond nur nach Sonnenuntergang (nie beide); Sonne/Mond weiter aussen; Zeitraum als eckiger Umschalter; Wind und Boeen als Balken mit Zonen und Maximum; v1.0: erste Version – Kompass mit Luftaufnahme, Windrichtung (Pfeil in Windfarben) und -geschwindigkeit,
 // Sonne bzw. Mond (mit Mondphase) am Rand je nachdem was am Himmel steht; integrierte Windrose der letzten Stunden (1 h / 3 h / 24 h / 3 Tage) mit Geschwindigkeitsklassen in Windfarben)
 (() => {
   const TAG = 'wind-kompass-card';
@@ -38,7 +38,8 @@
       .lg { flex-direction:row !important; flex-wrap:wrap; justify-content:center; gap:4px 10px !important; }
       .vt { height:150px !important; width:22px !important; }
     }
-    .vc { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; color:var(--secondary-text-color); }
+    .vc { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; color:var(--secondary-text-color); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity .25s; }
+    .vb .vc:not(.on) { opacity:.45; } .vc.on { color:var(--primary-text-color); font-weight:500; }
     .vt { width:26px; height:190px; border-radius:7px; overflow:hidden; display:flex; flex-direction:column-reverse; background:rgba(118,118,128,.22); }
     .vt i { display:flex; align-items:center; justify-content:center; font-style:normal; font-size:9px; font-weight:500; color:rgba(0,0,0,.75); overflow:hidden; white-space:nowrap; }
     .vt i + i { border-bottom:1px solid rgba(28,28,30,.6); }
@@ -105,6 +106,7 @@
         <div class="main"><div class="wrap" id="wrap"><svg class="k" id="k" viewBox="0 0 300 300"></svg><svg class="k" viewBox="0 0 300 300"><defs><linearGradient id="wka" x1="0" y1="0" x2="0" y2="1"><stop id="wka1" offset="0"/><stop id="wka2" offset="1" stop-opacity=".25"/></linearGradient></defs><g class="arr" id="arrg"><path id="arrp" d="M150,66 L139,38 L150,46 L161,38 Z" fill="url(#wka)" stroke-width="1" stroke-linejoin="round"/></g></svg><div id="sky"></div><div class="ctr" id="ctr"></div></div>
         <div class="vb" id="bars"></div><div class="lg" id="lg"></div></div><div class="pills" id="pills"></div></ha-card>`;
       r.querySelector('ha-card').addEventListener('click', (ev) => {
+        const sr = ev.target.closest('[data-src]'); if (sr) { this._src = sr.dataset.src; this._last = {}; this._render(true); return; }
         const mm = ev.target.closest('[data-m]'); if (mm) { this._mode = mm.dataset.m; this._last = {}; this._render(true); return; }
         const tt = ev.target.closest('[data-sk]'); if (tt) { this._sk = tt.dataset.sk; this._render(true); return; }
         const p = ev.target.closest('[data-p]'); if (p) { this._per = p.dataset.p; this._histAt = 0; this._hist = null; this._last = {}; this._load(); this._render(true); return; }
@@ -127,12 +129,12 @@
         const D = ser(this._c.direction_entity), S = ser(this._c.speed_entity), G = this._c.gust_entity ? ser(this._c.gust_entity) : [];
         // gleichmaessig abtasten (je nach Zeitraum 1–5 min) und Richtung/Geschwindigkeit paaren
         const step = hrs <= 3 ? 60000 : hrs <= 24 ? 120000 : 300000;
-        const cnt = Array.from({ length: 16 }, () => BINS.map(() => 0)), gb = BINS.map(() => 0); let calm = 0, n = 0, i = 0, j = 0, q = 0, d = null, s = null, g = null, gn = 0, gcalm = 0, smax = 0, sum = 0;
+        const cnt = Array.from({ length: 16 }, () => BINS.map(() => 0)), gcnt = Array.from({ length: 16 }, () => BINS.map(() => 0)), gb = BINS.map(() => 0); let calm = 0, n = 0, i = 0, j = 0, q = 0, d = null, s = null, g = null, gn = 0, gcalm = 0, smax = 0, sum = 0;
         for (let t = from; t <= now; t += step) {
           while (i < D.length && D[i].t <= t) d = D[i++].v;
           while (j < S.length && S[j].t <= t) s = S[j++].v;
           while (q < G.length && G[q].t <= t) g = G[q++].v;
-          if (g != null) { gn++; if (g < 1) gcalm++; else gb[BINS.findIndex((x) => g < x.to)]++; }
+          if (g != null) { gn++; if (g < 1) gcalm++; else { const gi = BINS.findIndex((x) => g < x.to); gb[gi]++; if (d != null) gcnt[Math.round((((d % 360) + 360) % 360) / 22.5) % 16][gi]++; } }
           if (d == null || s == null) continue;
           n++; sum += s; smax = Math.max(smax, s);
           if (s < 1) { calm++; continue; }
@@ -140,7 +142,7 @@
           cnt[sec][b]++;
         }
         const gmax = G.filter((x) => x.t >= from).reduce((m, x) => Math.max(m, x.v), 0);
-        if (per === this._per) { this._hist = { cnt, calm, n, smax, avg: n ? sum / n : 0, gmax, gb, gn, gcalm }; this._last.k = null; this._render(true); }
+        if (per === this._per) { this._hist = { cnt, gcnt, calm, n, smax, avg: n ? sum / n : 0, gmax, gb, gn, gcalm }; this._last.k = null; this._render(true); }
       } catch (e) { console.warn(TAG, e); }
       this._busy = false;
     }
@@ -155,7 +157,7 @@
       const sunUp = sk === 'sun' || (sk === 'live' && sun && sun.state === 'above_horizon'), moonUp = sk === 'moon' || (sk === 'live' && !sunUp && mo && (mo.state === 'up' || num(mo.attributes.moon_altitude, -1) > 0));
       const sunAz = sun ? num(sun.attributes.azimuth, 180) : 180, moonAz = mo ? num(mo.attributes.moon_azimuth, 120) : 120;
       this._set('tst', c.test ? [['live', 'Live'], ['sun', 'Sonne'], ['moon', 'Mond']].map(([k, l]) => `<span data-sk="${k}" class="${k === sk ? 'on' : ''}">${l}</span>`).join('') : '');
-      const sig = [this._mode, sk, dir, sp, sunUp, sun && Math.round(num(sun.attributes.azimuth, 0)), moonUp, mo && Math.round(num(mo.attributes.moon_azimuth, 0)), this._per, !!this._hist].join('|');
+      const sig = [this._mode, sk, dir, sp, sunUp, sun && Math.round(num(sun.attributes.azimuth, 0)), moonUp, mo && Math.round(num(mo.attributes.moon_azimuth, 0)), this._per, this._src, !!this._hist].join('|');
       if (!force && sig === this._sig) return; this._sig = sig;
       this._root.querySelector('.hd').textContent = c.title || ''; this._root.querySelector('.hd').style.display = c.title ? '' : 'none';
       const R = 86, cx = 150, cy = 150, col = wcol(sp);
@@ -165,12 +167,13 @@
       this._set('seg', sw ? `<span class="sh">${past ? 'Rückblick ' + (PER.find((p) => p[0] === this._per) || PER[1])[1] : 'Aktuell'}</span><span class="ic"><span data-m="now" class="${past ? '' : 'on'}">Aktuell</span><span data-m="past" class="${past ? 'on' : ''}">Rückblick</span></span>` : '');
       this._root.querySelector('.main').classList.toggle('now', !past);
       const h = past ? this._hist : null;
+      const useG = this._src === 'gust' && h && h.gn, RC = h ? (useG ? h.gcnt : h.cnt) : null;
       if (c.rose && h && h.n) {
-        const tot = h.n, mx = Math.max(...h.cnt.map((a) => a.reduce((x, y) => x + y, 0))) / tot || 1, k = (R - 6) / Math.max(mx, 0.08);
+        const tot = useG ? h.gn : h.n, mx = Math.max(...RC.map((a) => a.reduce((x, y) => x + y, 0))) / tot || 1, k = (R - 6) / Math.max(mx, 0.08);
         let rings = '';
         [0.25, 0.5, 0.75, 1].forEach((f) => { const rr = 18 + (R - 24) * f; rings += `<circle cx="150" cy="150" r="${rr.toFixed(1)}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width=".8"/>`; });
         rose += rings;
-        h.cnt.forEach((a, sec) => {
+        RC.forEach((a, sec) => {
           let r0 = 18;
           a.forEach((v, b) => {
             if (!v) return; const r1 = r0 + v / tot * k;
@@ -219,8 +222,8 @@
       const CALM = '#8e8e93';
       const dist = (arr, calm, tot) => { if (!tot) return ''; const seg = [[CALM, calm, 1]].concat(BINS.map((b, k) => [b.c, arr[k], 0]));
         return seg.filter((x) => x[1] > 0).map(([cc, v, cm]) => { const pc = v / tot * 100; return `<i class="${cm ? 'cm' : ''}" style="height:${pc.toFixed(2)}%;background:${cc}">${pc >= 8 ? Math.round(pc) + '%' : ''}</i>`; }).join(''); };
-      const bars = h && h.n ? `<div class="vc"><div class="vt">${dist(h.cnt.reduce((m, a) => m.map((x, k) => x + a[k]), BINS.map(() => 0)), h.calm, h.n)}</div>Wind</div>`
-        + (h.gn ? `<div class="vc"><div class="vt">${dist(h.gb, h.gcalm, h.gn)}</div>Böen</div>` : '') : '';
+      const bars = h && h.n ? `<div class="vc${useG ? '' : ' on'}" data-src="wind"><div class="vt">${dist(h.cnt.reduce((m, a) => m.map((x, k) => x + a[k]), BINS.map(() => 0)), h.calm, h.n)}</div>Wind</div>`
+        + (h.gn ? `<div class="vc${useG ? ' on' : ''}" data-src="gust"><div class="vt">${dist(h.gb, h.gcalm, h.gn)}</div>Böen</div>` : '') : '';
       this._set('bars', past ? bars : '');
       // Zeitraum und Legende
       this._set('pills', c.rose && past ? PER.map(([k, l]) => `<span data-p="${k}" class="${k === this._per ? 'on' : ''}">${l}</span>`).join('') : '');
