@@ -1,4 +1,4 @@
-// energie-karte-card v3.0 (28.11.2026: kleines x auch rechts neben dem Schieberegler (setzt Auswahl zurueck); v2.9: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v3.1 (28.11.2026: Zeitmarken unter dem Schieberegler, Anzahl je nach Breite, gewaehlte Marke hervorgehoben; v3.0: kleines x auch rechts neben dem Schieberegler (setzt Auswahl zurueck); v2.9: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -137,7 +137,6 @@
     .slr { display:flex; align-items:center; gap:10px; }
     .slw .slx { display:inline-flex; align-items:center; justify-content:center; flex:none; width:20px; height:20px; border-radius:50%; background:rgba(118,118,128,.32); font-size:11px; line-height:1; cursor:pointer; transition:opacity .25s; }
     .slw.idle .slx { opacity:0; pointer-events:none; }
-    .slw .sll { padding-right:30px; }
     .slw input { -webkit-appearance:none; appearance:none; width:100%; height:20px; margin:0; background:transparent; cursor:pointer; touch-action:none; }
     .slw input::-webkit-slider-runnable-track { height:3px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,.4) var(--p, 0%), rgba(118,118,128,.24) var(--p, 0%)); }
     .slw input::-moz-range-track { height:3px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,.4) var(--p, 0%), rgba(118,118,128,.24) var(--p, 0%)); }
@@ -145,9 +144,10 @@
     .slw input::-moz-range-thumb { width:14px; height:14px; border:0; border-radius:50%; background:rgba(255,255,255,.85); box-shadow:0 1px 3px rgba(0,0,0,.3); }
     .slw input:active::-webkit-slider-thumb { transform:scale(1.25); }
     .slw.idle input::-webkit-slider-thumb { opacity:.4; } .slw.idle input::-webkit-slider-runnable-track { background:rgba(118,118,128,.24); }
-    .slw .sll { display:flex; justify-content:space-between; font-size:10px; color:var(--secondary-text-color); margin-top:2px; font-variant-numeric:tabular-nums; }
-    .slw .sll #slm { color:var(--primary-text-color); font-weight:500; }
-    .slw.idle .sll #slm { color:var(--secondary-text-color); font-weight:400; }
+    .slw .sll { position:relative; height:14px; margin:2px 30px 0 0; font-size:10px; line-height:14px; color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
+    .slw .sll span { position:absolute; top:0; transform:translateX(-50%); white-space:nowrap; transition:color .2s; }
+    .slw .sll span.l { transform:translateX(-7px); } .slw .sll span.r { transform:translateX(calc(-100% + 7px)); }
+    .slw .sll span.on { color:var(--primary-text-color); font-weight:600; }
     .vh .ft ha-icon { --mdc-icon-size:20px; color:#fff; display:flex; }
     .vh .t { flex:1 1 auto; min-width:0; line-height:17px; font-weight:500; font-size:14px; text-transform:uppercase; letter-spacing:.04em; color:var(--primary-text-color); }
     .seg { display:flex; background:rgba(118,118,128,.2); border-radius:8px; padding:2px; flex:none; margin-left:auto; }
@@ -209,7 +209,7 @@
         <div class="hd"><div class="ttl">${c.title || ''}</div>${c.link ? `<span class="pl" id="lnk">${ic('chart', 'currentColor')}${c.link_label || ''}</span>` : ''}</div>
         ${c.simulation ? `<div class="sim" id="sim"></div>` : ''}
         <div class="fw" id="fw"><div class="tflow" id="tf">${flowSvg}${tiles}</div></div>
-        ${c.charts ? `<div class="vh"><span class="ft"><ha-icon icon="mdi:chart-bar"></ha-icon></span><span class="t" id="vt">Heute</span><span class="seg" id="vseg"></span></div><div class="g4" id="g4"><div class="ld" style="grid-column:1/-1">Lade Verlauf …</div></div><div class="slw idle" id="slw"><div class="slr"><input type="range" id="sl" min="0" max="23" step="1" value="0" aria-label="Zeit wählen"><span class="vx slx" data-clr="1" aria-label="Auswahl aufheben">✕</span></div><div class="sll"><span id="sl0"></span><span id="slm">Zum Wählen schieben</span><span id="sl1"></span></div></div>` : ''}
+        ${c.charts ? `<div class="vh"><span class="ft"><ha-icon icon="mdi:chart-bar"></ha-icon></span><span class="t" id="vt">Heute</span><span class="seg" id="vseg"></span></div><div class="g4" id="g4"><div class="ld" style="grid-column:1/-1">Lade Verlauf …</div></div><div class="slw idle" id="slw"><div class="slr"><input type="range" id="sl" min="0" max="23" step="1" value="0" aria-label="Zeit wählen"><span class="vx slx" data-clr="1" aria-label="Auswahl aufheben">✕</span></div><div class="sll" id="sll"></div></div>` : ''}
       </ha-card>`;
       const card = r.querySelector('ha-card');
       card.addEventListener('click', (ev) => {
@@ -241,6 +241,7 @@
         Object.entries(this._g.T).forEach(([key, [x, y, w]]) => { const e = this._root.getElementById('t-' + key); if (e) { e.style.left = (x - w / 2) + 'px'; e.style.top = (y - TH / 2) + 'px'; e.style.width = w + 'px'; } });
         if (this._hass) this._render();
       }
+      if (this._c.charts) requestAnimationFrame(() => this._chart());
       if (this._k === k) return; this._k = k;
       tf.style.transform = `scale(${k})`; tf.style.marginLeft = Math.max(0, (cw - Wd * k) / 2) + 'px'; fw.style.height = (VH * k + 6) + 'px';
     }
@@ -388,9 +389,18 @@
         if (!this._drag && sl.value !== String(v)) sl.value = String(v);
         sl.style.setProperty('--p', (cur > 0 ? +sl.value / cur * 100 : 0) + '%');
         this._set('slw', 'cls', 'slw' + (sel == null ? ' idle' : ''));
-        this._set('sl0', 'html', R.period === 'hour' ? '0 Uhr' : `${R.step(0).getDate()}.${R.step(0).getMonth() + 1}.`);
-        this._set('sl1', 'html', 'jetzt');
-        this._set('slm', 'html', sel == null ? 'Zum Wählen schieben' : lab(sel));
+        // Zeitmarken: so viele wie Platz (ca. 34 px je Marke), immer auf runden Schritten
+        const w = Math.max(80, (sl.clientWidth || 280) - 14), steps = R.period === 'hour' ? [1, 2, 3, 4, 6, 12] : [1, 2, 3, 5, 7, 10, 14];
+        const fit = Math.max(1, Math.floor(w / (R.period === 'hour' ? 30 : 38)));
+        const st = cur > 0 ? (steps.find((x) => cur / x <= fit) || steps[steps.length - 1]) : 1;
+        const txt = (i) => R.period === 'hour' ? String(i) : n === 7 ? WD[R.step(i).getDay()] : `${R.step(i).getDate()}.`;
+        const marks = []; for (let i = 0; i < cur; i += st) marks.push(i);
+        while (marks.length > 1 && (cur - marks[marks.length - 1]) / Math.max(1, cur) * w < 30) marks.pop();
+        const pos = (i) => 7 + (cur > 0 ? i / cur : 0) * w;
+        let h = marks.map((i) => `<span class="${i === 0 ? 'l' : ''}${sel === i ? ' on' : ''}" style="left:${pos(i).toFixed(1)}px">${txt(i)}</span>`).join('');
+        h += `<span class="r${sel === cur ? ' on' : ''}" style="left:${pos(cur).toFixed(1)}px">jetzt</span>`;
+        if (sel != null && !marks.includes(sel) && sel !== cur) h += `<span class="on" style="left:${pos(sel).toFixed(1)}px;background:var(--ha-card-background, rgba(28,28,30,.95));padding:0 3px;border-radius:4px">${txt(sel)}</span>`;
+        this._set('sll', 'html', h);
       }
     }
   }
