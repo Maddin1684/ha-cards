@@ -1,4 +1,4 @@
-// energie-karte-card v1.1 (28.11.2026: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.2 (28.11.2026: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -81,10 +81,10 @@
     .tln { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
     @keyframes comet { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
     @keyframes breath { 0%,100% { stroke-opacity:.4; } 50% { stroke-opacity:.65; } }
-    .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(44,44,46,.62); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+    .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(44,44,46,.42); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
       display:flex; flex-direction:column; transition:background .4s, box-shadow .4s; cursor:pointer; box-sizing:border-box; color:#fff; }
-    .tk.on { background:linear-gradient(155deg, color-mix(in srgb, var(--c) 24%, rgba(44,44,46,.66)) 0%, rgba(44,44,46,.66) 65%); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
-    .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.12), rgba(44,44,46,.66) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
+    .tk.on { background:linear-gradient(155deg, color-mix(in srgb, var(--c) 24%, rgba(44,44,46,.46)) 0%, rgba(44,44,46,.46) 65%); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
+    .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.12), rgba(44,44,46,.46) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
     .tk.gl { animation:tglow 1.6s ease-in-out infinite; }
     @keyframes tglow { 0%,100% { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gc) 50%, transparent), 0 0 0 transparent; } 50% { box-shadow:inset 0 0 0 1px var(--gc), 0 0 22px color-mix(in srgb, var(--gc) 55%, transparent); } }
     .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:11px; color:rgba(235,235,245,.6); }
@@ -306,7 +306,7 @@
             this._stat[key] = { R, series: [{ n: 'Netz', v: grid, c: C.red }, { n: 'Solar', v: sol.map((v, i) => Math.max(0, v - chg[i])), c: C.solar }, { n: 'Akku', v: dis, c: C.lila }], neg: chg };
           } else {
             const st = this._hass.states[c.stat_water], u = st && st.attributes.unit_of_measurement, fac = u === 'm³' ? 1000 : u === 'L' ? 1 : 1;
-            this._stat[key] = { R, series: [{ n: 'Wasser', v: arr(c.stat_water).map((v) => v * fac), c: 'linear-gradient(180deg,#64d2ff,#0a84ff)' }] };
+            this._stat[key] = { R, series: [{ n: 'Wasser', v: arr(c.stat_water).map((v) => v * fac), c: C.blue }] };
           }
         } catch (e) { this._stat[key] = { err: String(e && e.message || e) }; }
         this._chart(k);
