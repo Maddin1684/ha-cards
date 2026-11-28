@@ -1,4 +1,4 @@
-// energie-karte-card v1.3 (28.11.2026: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v1.4 (28.11.2026: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -82,10 +82,10 @@
     .tln { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
     @keyframes comet { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
     @keyframes breath { 0%,100% { stroke-opacity:.4; } 50% { stroke-opacity:.65; } }
-    .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(44,44,46,.42); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+    .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(44,44,46,.28); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
       display:flex; flex-direction:column; transition:background .4s, box-shadow .4s; cursor:pointer; box-sizing:border-box; color:#fff; }
-    .tk.on { background:linear-gradient(155deg, color-mix(in srgb, var(--c) 24%, rgba(44,44,46,.46)) 0%, rgba(44,44,46,.46) 65%); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
-    .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.12), rgba(44,44,46,.46) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
+    .tk.on { background:linear-gradient(155deg, color-mix(in srgb, var(--c) 24%, rgba(44,44,46,.3)) 0%, rgba(44,44,46,.3) 65%); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
+    .tk.hs { background:linear-gradient(155deg, rgba(255,255,255,.12), rgba(44,44,46,.3) 65%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
     .tk.gl { animation:tglow 1.6s ease-in-out infinite; }
     @keyframes tglow { 0%,100% { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gc) 50%, transparent), 0 0 0 transparent; } 50% { box-shadow:inset 0 0 0 1px var(--gc), 0 0 22px color-mix(in srgb, var(--gc) 55%, transparent); } }
     .tk .th { position:relative; z-index:1; display:flex; align-items:center; gap:6px; font-size:11px; color:rgba(235,235,245,.6); }
@@ -271,7 +271,7 @@
       const bCol = s.bat > 0 ? C.green : s.bat < 0 ? C.lila : 'rgba(118,118,128,.6)'; tk('bat', bCol, s.bat !== 0, 'bt'); icon('bat', 'bat', s.bat ? bCol : C.t2);
       val('bat', fmtW(s.bat), s.bat ? bCol : C.t2); this._set('d-bat', 'html', `${s.soc} %${s.bat > 0 ? ' · lädt' : s.bat < 0 ? ' · entlädt' : ''}`);
       this._set('bfill', 'height', s.soc + '%'); this._set('bfill', '--fc', bCol);
-      this._set('bsoc', 'width', Math.max(0.5, s.soc) + '%'); this._set('bsoc', '--sc', socCol(s.soc));
+      this._set('bsoc', 'width', Math.max(0.5, s.soc) + '%'); this._set('bsoc', '--sc', s.bat ? bCol : '#8e8e93');
       // Wasser
       const wOn = s.water > 0; tk('water', C.blue, wOn, ''); icon('water', 'water', wOn ? C.blue : C.t2);
       val('water', dc(s.water, 0) + ' L/min', wOn ? C.blue : C.t2); this._set('d-water', 'html', `${s.wday} L heute`); this._set('rip', 'cls', 'rip' + (wOn ? '' : ' off'));
