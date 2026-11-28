@@ -1,4 +1,4 @@
-// energie-karte-card v3.1 (28.11.2026: Zeitmarken unter dem Schieberegler, Anzahl je nach Breite, gewaehlte Marke hervorgehoben; v3.0: kleines x auch rechts neben dem Schieberegler (setzt Auswahl zurueck); v2.9: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v3.2 (28.11.2026: Schieberegler ohne Auswahl ohne Knopf (ganze Linie = ganzer Zeitraum, Hinweis), Knopf erst beim Tippen/Ziehen; Zeitmarken mit 'Uhr'; v3.1: Zeitmarken unter dem Schieberegler, Anzahl je nach Breite, gewaehlte Marke hervorgehoben; v3.0: kleines x auch rechts neben dem Schieberegler (setzt Auswahl zurueck); v2.9: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -143,7 +143,9 @@
     .slw input::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; margin-top:-5.5px; border-radius:50%; background:rgba(255,255,255,.85); box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .15s, opacity .3s; }
     .slw input::-moz-range-thumb { width:14px; height:14px; border:0; border-radius:50%; background:rgba(255,255,255,.85); box-shadow:0 1px 3px rgba(0,0,0,.3); }
     .slw input:active::-webkit-slider-thumb { transform:scale(1.25); }
-    .slw.idle input::-webkit-slider-thumb { opacity:.4; } .slw.idle input::-webkit-slider-runnable-track { background:rgba(118,118,128,.24); }
+    .slw.idle input::-webkit-slider-thumb { opacity:0; } .slw.idle input::-moz-range-thumb { opacity:0; }
+    .slw.idle input::-webkit-slider-runnable-track { background:rgba(255,255,255,.22); } .slw.idle input::-moz-range-track { background:rgba(255,255,255,.22); }
+    .slw .slh { text-align:center; font-size:10px; line-height:14px; margin:2px 30px 0 0; color:var(--secondary-text-color); }
     .slw .sll { position:relative; height:14px; margin:2px 30px 0 0; font-size:10px; line-height:14px; color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
     .slw .sll span { position:absolute; top:0; transform:translateX(-50%); white-space:nowrap; transition:color .2s; }
     .slw .sll span.l { transform:translateX(-7px); } .slw .sll span.r { transform:translateX(calc(-100% + 7px)); }
@@ -227,7 +229,7 @@
       const sl = r.getElementById('sl');
       if (sl) {
         sl.addEventListener('input', () => { this._sel = +sl.value; this._chart(); });
-        sl.addEventListener('pointerdown', () => { this._drag = true; }); sl.addEventListener('pointerup', () => { this._drag = false; });
+        sl.addEventListener('pointerdown', () => { this._drag = true; }); sl.addEventListener('pointerup', () => { this._drag = false; if (this._sel == null) { this._sel = +sl.value; this._chart(); } });
       }
       if (this._hass) this._render();
       if (c.charts) this._chart();
@@ -391,16 +393,19 @@
         this._set('slw', 'cls', 'slw' + (sel == null ? ' idle' : ''));
         // Zeitmarken: so viele wie Platz (ca. 34 px je Marke), immer auf runden Schritten
         const w = Math.max(80, (sl.clientWidth || 280) - 14), steps = R.period === 'hour' ? [1, 2, 3, 4, 6, 12] : [1, 2, 3, 5, 7, 10, 14];
-        const fit = Math.max(1, Math.floor(w / (R.period === 'hour' ? 30 : 38)));
+        const fit = Math.max(1, Math.floor(w / (R.period === 'hour' ? 46 : 38)));
         const st = cur > 0 ? (steps.find((x) => cur / x <= fit) || steps[steps.length - 1]) : 1;
-        const txt = (i) => R.period === 'hour' ? String(i) : n === 7 ? WD[R.step(i).getDay()] : `${R.step(i).getDate()}.`;
+        const txt = (i) => R.period === 'hour' ? `${i} Uhr` : n === 7 ? WD[R.step(i).getDay()] : `${R.step(i).getDate()}.`;
         const marks = []; for (let i = 0; i < cur; i += st) marks.push(i);
-        while (marks.length > 1 && (cur - marks[marks.length - 1]) / Math.max(1, cur) * w < 30) marks.pop();
+        while (marks.length > 1 && (cur - marks[marks.length - 1]) / Math.max(1, cur) * w < (R.period === 'hour' ? 44 : 30)) marks.pop();
         const pos = (i) => 7 + (cur > 0 ? i / cur : 0) * w;
+        if (sel != null && !marks.includes(sel)) for (let j = marks.length - 1; j >= 0; j--) if (Math.abs(marks[j] - sel) / Math.max(1, cur) * w < (R.period === 'hour' ? 44 : 30)) marks.splice(j, 1);
         let h = marks.map((i) => `<span class="${i === 0 ? 'l' : ''}${sel === i ? ' on' : ''}" style="left:${pos(i).toFixed(1)}px">${txt(i)}</span>`).join('');
         h += `<span class="r${sel === cur ? ' on' : ''}" style="left:${pos(cur).toFixed(1)}px">jetzt</span>`;
         if (sel != null && !marks.includes(sel) && sel !== cur) h += `<span class="on" style="left:${pos(sel).toFixed(1)}px;background:var(--ha-card-background, rgba(28,28,30,.95));padding:0 3px;border-radius:4px">${txt(sel)}</span>`;
-        this._set('sll', 'html', h);
+        const span = rng === 'tag' ? 'Ganzer Tag' : rng === 'woche' ? 'Ganze Woche' : 'Ganzer Monat';
+        this._set('sll', 'html', sel == null ? `<div class="slh">${span} – zum Wählen tippen oder ziehen</div>` : h);
+        this._set('sll', 'cls', sel == null ? '' : 'sll');
       }
     }
   }
