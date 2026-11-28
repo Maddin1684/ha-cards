@@ -1,4 +1,4 @@
-// energie-karte-card v3.4 (28.11.2026: Schieberegler noch dezenter (2px Linie, 11px Knopf); v3.3: Schieberegler mit eigener Endstufe 'Gesamt' (Standard), links davon Stunden/Tage; kein x mehr am Regler; v3.2: Schieberegler ohne Auswahl ohne Knopf (ganze Linie = ganzer Zeitraum, Hinweis), Knopf erst beim Tippen/Ziehen; Zeitmarken mit 'Uhr'; v3.1: Zeitmarken unter dem Schieberegler, Anzahl je nach Breite, gewaehlte Marke hervorgehoben; v3.0: kleines x auch rechts neben dem Schieberegler (setzt Auswahl zurueck); v2.9: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
+// energie-karte-card v3.5 (28.11.2026: optional Hausbild als Mittelpunkt (haus_bild_tag / haus_bild_nacht, wechselt mit sun.sun): Kacheln rundherum, Fluesse enden am Haus, Solar laeuft hinter das Dach (Gaube hinten), Enyaq-Fluss startet am Auto (links), Wasser zur Garage (rechts), Haus-Werte als Chip unter dem Haus; v3.4: Schieberegler noch dezenter (2px Linie, 11px Knopf); v3.3: Schieberegler mit eigener Endstufe 'Gesamt' (Standard), links davon Stunden/Tage; kein x mehr am Regler; v3.2: Schieberegler ohne Auswahl ohne Knopf (ganze Linie = ganzer Zeitraum, Hinweis), Knopf erst beim Tippen/Ziehen; Zeitmarken mit 'Uhr'; v3.1: Zeitmarken unter dem Schieberegler, Anzahl je nach Breite, gewaehlte Marke hervorgehoben; v3.0: kleines x auch rechts neben dem Schieberegler (setzt Auswahl zurueck); v2.9: Schieberegler endet bei der laufenden Stunde / dem heutigen Tag (keine Zukunft), Zukunftsbalken nicht waehlbar; v2.8: Schieberegler dezenter (kleiner, duenner, gedaempft); v2.7: Schieberegler unter den Mini-Kacheln zum Waehlen von Stunde/Tag; v2.6: kleines x neben gewaehlter Stunde/Tag setzt auf Gesamt zurueck; v2.5: Verlauf enthaelt die laufende Stunde bzw. den laufenden Tag (Live-Zaehlerstand minus letzter Statistikstand), aktualisiert jede Minute; v2.4: Umschalter bleibt rechts, Ueberschrift bricht bei Platzmangel um; v2.3: Verlauf-Kopf bricht um statt abzuschneiden; v2.2: Verlauf-Ueberschrift wie andere Karten (Icon-Kachel, 14px, Trennlinie); v2.1: Balken der Mini-Kacheln mit Verlauf schwach (unten) zu kraeftig (oben); v2.0: Kachel-Flaeche passt sich der Kartenbreite an (iPad/schmale Spalten: Schrift bleibt lesbar statt alles zu verkleinern), Zeitachse Mini-Kacheln kuerzer; v1.9: Mini-Kacheln mit Zeitachse (Uhrzeit, Wochentag, Datum); v1.8: Verlauf unten als Mini-Kacheln (Netz, Solar, Akku, Wasser) mit Tagessumme und Balken, ein Umschalter Tag/Woche/Monat; Kachel-Namen weiss und groesser; v1.7: Netz-Titel bleibt 'Netz', darunter Bezug/Einspeisung; v1.6: Netz zeigt Bezug/Einspeisung mit Strommast-Import/Export-Icon und Titel; v1.5: Icons wie Energiefluss-Karte (mdi), Kachel-Hintergrund wie andere Karten (Apple-Grau .12); v1.4: Batterie-Balken in Kachelfarbe (gruen laedt, lila entlaedt, grau Ruhe), Kacheln noch transparenter; v1.3: Ladestandsbalken einfarbig nach Stand (rot < 20, gelb < 40, gruen) mit Verlauf schwach zu kraeftig; v1.2: Wasser-Balken im Blau der Kachel, Kacheln noch transparenter; v1.1: drehende Sonne weiter links oben, Tagesdaten-Pille standardmaessig aus, Ladestandsbalken als Verlauf rot-gelb-gruen, Kacheln transparenter; v1.0: erste Version – Live-Energiefluss als Kacheln mit atmenden Linien und weichem Lichtschweif (Farben und Glow-Regeln wie Energiefluss-Karte),
 // Solar aufgeteilt in Dachgaube/Gartenhaus, Haus-Herkunft jetzt, Batterie- und Enyaq-Ladestand als Balken, Wasser fliesst zum Haus; einklappbare Diagramme Strom und Wasser
 // (Tag/Woche/Monat aus der Langzeitstatistik); Simulations-Schalter zum Testen; grafischer Editor fuer alle Entitaeten)
 (() => {
@@ -59,7 +59,8 @@
 
   // Geometrie: Breite Wd passt sich der Karte an (330–440 px), erst darueber/darunter wird skaliert
   const VH = 350, TH = 94, FKEYS = [['sToHome', C.solar], ['sToGrid', C.green], ['sToBat', C.solar], ['gToHome', C.red], ['gToBat', C.red], ['bToHome', C.lila], ['water', C.blue], ['wall', C.cyan]];
-  function geo(Wd) {
+  function geo(Wd, house) {
+    if (house) return geoHouse(Wd);
     const m = 4, tw = Math.max(90, Math.min(110, (Wd - 2 * m - 2 * 30) / 3)), xl = m + tw / 2, xr = Wd - m - tw / 2, xc = Wd / 2;
     const sw = Math.min(220, Wd - 2 * m - tw - 24), sL = xc - sw / 2, sR = xc + sw / 2, h = tw / 2;
     const T = { solar: [xc, 46, sw], grid: [xl, 180, tw], home: [xc, 180, tw], bat: [xr, 180, tw], water: [xl, 302, tw], car: [xr, 302, tw] };
@@ -73,7 +74,32 @@
       `M${f(xr - h)},180 L${f(xc + h)},180`,
       `M${f(xl + h)},302 C${f(xl + h + 52)},302 ${f(xc - 18)},276 ${f(xc - 18)},227`,
       `M${f(xc + 18)},227 C${f(xc + 18)},276 ${f(xr - h - 52)},302 ${f(xr - h)},302`];
-    return { Wd, T, flows: FKEYS.map(([k, col], i) => [P[i], k, col]) };
+    return { Wd, VH, T, flows: FKEYS.map(([k, col], i) => [P[i], k, col]) };
+  }
+  // Haus-Modus: Hausbild 'Hof' (1131 x 1391, freigestellt) in der Mitte, Kacheln rundherum.
+  // Bildmasse als Anteil: Waende links/rechts, Dachfirst (Solar kommt von hinten), Auto (links unten), Garage (rechts unten)
+  const HOF = { ar: 1131 / 1391, wl: 0.045, wr: 0.985, wy: 0.45, roof: [0.6, 0.05], car: [0.2, 0.86], water: [0.78, 0.9] };
+  function geoHouse(Wd) {
+    const P0 = HOF, m = 4, tw = Math.max(90, Math.min(110, (Wd - 2 * m - 2 * 30) / 3)), xl = m + tw / 2, xr = Wd - m - tw / 2, xc = Wd / 2, h = tw / 2;
+    const sw = Math.min(220, Wd - 2 * m - tw - 24), sL = xc - sw / 2, sR = xc + sw / 2;
+    // Hausbreite so, dass die Hauswaende zwischen die Seitenkacheln passen
+    const HW = Math.min(240, (Wd - 2 * (m + tw) - 12) / (P0.wr - P0.wl)), HH = HW / P0.ar, x0 = xc - HW * (P0.wl + P0.wr) / 2, y0 = 112;
+    const X = (fx) => x0 + fx * HW, Y = (fy) => y0 + fy * HH, f = (v) => v.toFixed(1);
+    const gy = Math.round(Y(P0.wy)), by = Math.round(Math.max(y0 + HH - 22, gy + TH + 10)), iy = y0 + HH - 4, ih = 56;
+    const VHh = Math.round(Math.max(by + TH / 2, iy + ih) + 6);
+    // Enyaq links unten (Auto steht links), Wasser rechts unten (Garage)
+    const T = { solar: [xc, 46, sw], grid: [xl, gy, tw], bat: [xr, gy, tw], car: [xl, by, tw], water: [xr, by, tw], home: [xc, iy + ih / 2, Math.min(150, Wd - 2 * (m + tw) - 14), ih] };
+    const P = [
+      `M${f(xc)},93 L${f(xc)},${f(Y(0.12))}`,
+      `M${f(sL)},46 C${f(sL - (sL - xl) * 0.74)},46 ${f(xl)},${f(gy - 80)} ${f(xl)},${f(gy - TH / 2)}`,
+      `M${f(sR)},46 C${f(sR + (xr - sR) * 0.74)},46 ${f(xr)},${f(gy - 80)} ${f(xr)},${f(gy - TH / 2)}`,
+      `M${f(xl + h)},${gy} L${f(X(P0.wl + 0.03))},${gy}`,
+      `M${f(xl + h)},${gy + 26} L${f(xr - h)},${gy + 26}`,
+      `M${f(xr - h)},${gy} L${f(X(P0.wr - 0.03))},${gy}`,
+      `M${f(xr - h)},${by} C${f(xr - h - 24)},${by} ${f(X(P0.water[0]))},${f(Y(P0.water[1]) + 14)} ${f(X(P0.water[0]))},${f(Y(P0.water[1]))}`,
+      `M${f(X(P0.car[0]))},${f(Y(P0.car[1]))} C${f(X(P0.car[0]) - 10)},${f(Y(P0.car[1]) + 18)} ${f(xl + h + 18)},${by} ${f(xl + h)},${by}`];
+    // Solar (0) und Netz->Akku (4) laufen hinter dem Haus
+    return { Wd, VH: VHh, T, house: { x: x0, y: y0, w: HW, h: HH }, back: [0, 4], flows: FKEYS.map(([k, col], i) => [P[i], k, col]) };
   }
   // Dauer je Leistung (0,75 – 6 s wie bisher, log), in Stufen damit die Animation nicht bei jeder kleinen Aenderung neu startet
   const durOf = (w) => { const k = Math.min(1, Math.log10(1 + w) / Math.log10(20001)); return Math.round((3.2 - 2.4 * k) * 5) / 5; };
@@ -91,6 +117,11 @@
     .fw { position:relative; width:100%; }
     .tflow { position:relative; height:${VH}px; margin:2px 0 4px; transform-origin:0 0; }
     .tln { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+    .hbild { position:absolute; object-fit:contain; pointer-events:none; filter:drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
+    /* Haus-Modus: Haus-Werte als kompakter Chip unter dem Haus */
+    .hm .tk.hs { flex-direction:column; align-items:center; justify-content:center; padding:5px 10px; border-radius:14px; background:rgba(28,28,30,.55); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); box-shadow:inset 0 0 0 1px rgba(255,255,255,.1); }
+    .hm .tk.hs .th { display:none; } .hm .tk.hs .tv { margin:0; font-size:16px; line-height:20px; } .hm .tk.hs .td { width:100%; text-align:center; margin:0; font-size:10px; line-height:12px; }
+    .hm .tk.hs .jr { margin:2px 0 1px; }
     @keyframes comet { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
     @keyframes breath { 0%,100% { stroke-opacity:.4; } 50% { stroke-opacity:.65; } }
     .tk { position:absolute; border-radius:16px; padding:9px 10px 8px; overflow:hidden; background:rgba(118,118,128,.12); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
@@ -195,7 +226,9 @@
       const tile = (k, nm, cls, inner) => {
         return `<div class="tk ${cls}" id="t-${k}" data-k="${k}" style="height:${TH}px">${inner}<div class="th"><ha-icon id="i-${k}"></ha-icon><span id="n-${k}">${nm}</span></div><div class="tv" id="v-${k}"></div><div class="td" id="d-${k}"></div></div>`;
       };
-      const flowSvg = `<svg class="tln" id="tln"><defs><filter id="gl" filterUnits="userSpaceOnUse" x="0" y="0" width="600" height="${VH}"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${FKEYS.map((_, i) => `<g id="f${i}"></g>`).join('')}</svg>`;
+      // untere Linien-Ebene (Netz -> Akku laeuft hinter dem Haus), Hausbild, obere Linien-Ebene, Kacheln
+      const hm = !!(c.haus_bild || c.haus_bild_tag || c.haus_bild_nacht), back = hm ? [0, 4] : [4];
+      const flowSvg = `<svg class="tln" id="tln0">${back.map((i) => `<g id="f${i}"></g>`).join('')}</svg>${hm ? `<img class="hbild" id="hbild" alt="">` : ''}<svg class="tln" id="tln"><defs><filter id="gl" filterUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${FKEYS.map((_, i) => back.includes(i) ? '' : `<g id="f${i}"></g>`).join('')}</svg>`;
       const tiles = tile('solar', 'Solar', 'sol', `<span class="rays off" id="rays"></span><span class="sp"><span class="spr"><span><i class="dot" style="background:${C.solar}"></i>Dachgaube</span><b id="sd"></b></span><span class="spr"><span><i class="dot" style="background:${C.solar2}"></i>Gartenhaus</span><b id="sg"></b></span><span class="spb"><i id="sdb" style="background:${C.solar};flex-grow:0"></i><i id="sgb" style="background:${C.solar2};flex-grow:0"></i></span></span>`)
         + tile('grid', 'Netz', '', '<span class="gs" id="gs"></span>')
         + tile('home', 'Haus', 'hs', '')
@@ -233,16 +266,18 @@
       const fw = this._root && this._root.getElementById('fw'), tf = this._root && this._root.getElementById('tf'); if (!fw || !tf) return;
       const cw = fw.clientWidth || 400, Wd = Math.round(Math.max(330, Math.min(500, cw))), k = Math.min(1.2, cw / Wd);
       if (this._Wd !== Wd) {
-        this._Wd = Wd; this._g = geo(Wd); this._fl = [];
-        tf.style.width = Wd + 'px'; tf.classList.toggle('nar', Wd < 380); this._root.getElementById('tln').setAttribute('viewBox', `0 0 ${Wd} ${VH}`);
-        Object.entries(this._g.T).forEach(([key, [x, y, w]]) => { const e = this._root.getElementById('t-' + key); if (e) { e.style.left = (x - w / 2) + 'px'; e.style.top = (y - TH / 2) + 'px'; e.style.width = w + 'px'; } });
+        this._Wd = Wd; this._g = geo(Wd, !!(this._c.haus_bild || this._c.haus_bild_tag || this._c.haus_bild_nacht)); this._fl = []; this._k = null;
+        const G = this._g; tf.style.width = Wd + 'px'; tf.style.height = G.VH + 'px'; tf.classList.toggle('nar', Wd < 380); tf.classList.toggle('hm', !!G.house);
+        ['tln', 'tln0'].forEach((id) => this._root.getElementById(id).setAttribute('viewBox', `0 0 ${Wd} ${G.VH}`));
+        const hb = this._root.getElementById('hbild'); if (hb && G.house) Object.assign(hb.style, { left: G.house.x + 'px', top: G.house.y + 'px', width: G.house.w + 'px', height: G.house.h + 'px' });
+        Object.entries(G.T).forEach(([key, [x, y, w, hh]]) => { const e = this._root.getElementById('t-' + key); if (e) { const th = hh || TH; e.style.left = (x - w / 2) + 'px'; e.style.top = (y - th / 2) + 'px'; e.style.width = w + 'px'; e.style.height = th + 'px'; } });
         if (this._hass) this._render();
       }
       if (this._c.charts) requestAnimationFrame(() => this._chart());
       if (this._k === k) return; this._k = k;
-      tf.style.transform = `scale(${k})`; tf.style.marginLeft = Math.max(0, (cw - Wd * k) / 2) + 'px'; fw.style.height = (VH * k + 6) + 'px';
+      tf.style.transform = `scale(${k})`; tf.style.marginLeft = Math.max(0, (cw - Wd * k) / 2) + 'px'; fw.style.height = (this._g.VH * k + 6) + 'px';
     }
-    _set(id, prop, val) { const key = id + '|' + prop; if (this._last[key] === val) return; this._last[key] = val; const e = this._root.getElementById(id); if (!e) return; if (prop === 'html') e.innerHTML = val; else if (prop === 'cls') e.className = val; else if (prop === 'icon') e.setAttribute('icon', val); else if (prop.startsWith('--')) e.style.setProperty(prop, val); else e.style[prop] = val; }
+    _set(id, prop, val) { const key = id + '|' + prop; if (this._last[key] === val) return; this._last[key] = val; const e = this._root.getElementById(id); if (!e) return; if (prop === 'html') e.innerHTML = val; else if (prop === 'cls') e.className = val; else if (prop === 'icon') e.setAttribute('icon', val); else if (prop === 'src') e.setAttribute('src', val); else if (prop.startsWith('--')) e.style.setProperty(prop, val); else e.style[prop] = val; }
     _st(id) { const s = id && this._hass && this._hass.states[id]; return s ? s.state : undefined; }
 
     _values() {
@@ -275,6 +310,11 @@
         } else h = `<path d="${d}" fill="none" stroke="rgba(189,189,189,.35)" stroke-width="1" stroke-dasharray="2 4"/>`;
         this._set('f' + i, 'html', h);
       });
+      // Hausbild Tag/Nacht nach sun.sun
+      if (c.haus_bild || c.haus_bild_tag || c.haus_bild_nacht) {
+        const nacht = this._sim ? false : this._st('sun.sun') === 'below_horizon';
+        this._set('hbild', 'src', (nacht ? c.haus_bild_nacht : c.haus_bild_tag) || c.haus_bild || c.haus_bild_tag || c.haus_bild_nacht);
+      }
       // Kacheln
       const tk = (k, col, active, cls) => { this._set('t-' + k, 'cls', `tk ${cls}${active ? ' on' : ''}${G[k] ? ' gl' : ''}`); this._set('t-' + k, '--c', col); this._set('t-' + k, '--gc', G[k] || 'transparent'); };
       const val = (k, txt, col) => { this._set('v-' + k, 'html', txt); this._set('v-' + k, 'color', col); };
@@ -425,6 +465,7 @@
       { name: 'stat_grid', selector: E('sensor') }, { name: 'stat_solar', selector: { entity: { domain: 'sensor', multiple: true } } },
       { name: 'stat_discharge', selector: E('sensor') }, { name: 'stat_water', selector: E('sensor') },
     ] },
+    { type: 'expandable', name: '', title: 'Hausbild (optional, als Mittelpunkt)', schema: [{ name: 'haus_bild_tag', selector: { text: {} } }, { name: 'haus_bild_nacht', selector: { text: {} } }] },
     { type: 'expandable', name: '', title: 'Test', schema: [{ name: 'simulation', selector: { boolean: {} } }] },
   ];
   const LBL = {
@@ -436,7 +477,7 @@
     car_power: 'Wallbox Ladeleistung (W)', car_grid_power: 'Enyaq Netzladeleistung (W)', car_day: 'Wallbox heute (kWh)', car_soc: 'Enyaq Ladestand (%)',
     charts: 'Verlauf (Mini-Kacheln) anzeigen', stat_grid: 'Netzbezug (kWh-Zähler)', stat_solar: 'Solarertrag (kWh-Zähler)', stat_charge: 'Akku geladen (kWh-Zähler)',
     stat_discharge: 'Akku entladen (kWh-Zähler)', stat_water: 'Wasserzähler (m³ oder L)',
-    simulation: 'Simulations-Schalter anzeigen',
+    simulation: 'Simulations-Schalter anzeigen', haus_bild_tag: 'Hausbild Tag (z. B. /local/elmo/hof-tag.png)', haus_bild_nacht: 'Hausbild Nacht (z. B. /local/elmo/hof-nacht.png)',
   };
   class EnergieKarteEditor extends HTMLElement {
     setConfig(c) { this._c = Object.assign({}, c || {}); this._draw(); }
