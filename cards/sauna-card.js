@@ -1,4 +1,5 @@
-// sauna-card v1.11 (28.11.2026): Licht-Symbole in der tatsaechlichen Lichtfarbe; Zeilen aufklappbar: Lampe mit Farbe und Helligkeit, LED-Band mit Helligkeit; Tipp aufs Symbol schaltet ein/aus.
+// sauna-card v1.12 (28.11.2026): Licht-Zeilen hoeher, Plus/Minus mit Abstand zum unteren Rand.
+// v1.11 (28.11.2026): Licht-Symbole in der tatsaechlichen Lichtfarbe; Zeilen aufklappbar: Lampe mit Farbe und Helligkeit, LED-Band mit Helligkeit; Tipp aufs Symbol schaltet ein/aus.
 // v1.10 (28.11.2026): Temperatur- und Aufheiz-Symbol beim Heizen in Apple-Rot; Heiz-Pfeil naeher am Titel.
 // v1.9 (26.11.2026): Duftrichtung Fichtenessenz ergaenzt; Zeilen wie Wetterstation (oben buendig, 40 px, Werte auf Hoehe der ersten Namenszeile).
 // v1.8 (26.11.2026): Sauna-Kuebel als Symbol bei 'Heute', Aufguss wieder mit Wassertropfen.
@@ -100,6 +101,7 @@
     .a-pulse { animation:sacpulse 2s ease-in-out infinite; }
     .pg { flex:0 0 100%; height:6px; border-radius:3px; background:rgba(118,118,128,.3); overflow:hidden; margin:-4px 0 10px; }
     .pg i { display:block; height:100%; border-radius:3px; transition:width .6s; }
+    .r[data-lx] { min-height:52px; } .r[data-lx] .bd { height:52px; } .r[data-lx] .nm { padding:15px 0; } .r[data-lx] > .st { padding-top:15px; padding-bottom:10px; }
     .lsl { display:flex; align-items:center; gap:10px; padding:2px 0 10px; font-size:12px; color:var(--secondary-text-color); }
     .lsl ha-icon { --mdc-icon-size:18px; display:flex; }
     .lsl span { min-width:36px; text-align:right; font-variant-numeric:tabular-nums; }
